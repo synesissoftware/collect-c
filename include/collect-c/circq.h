@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 5th February 2025
+ * Updated: 6th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -143,7 +143,13 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 
 #define COLLECT_C_CIRCQ_pop_back(cq_name)                   collect_c_cq_pop_from_back_n(&(cq_name), 1, NULL)
 #define COLLECT_C_CIRCQ_pop_front(cq_name)                  collect_c_cq_pop_from_front_n(&(cq_name), 1, NULL)
-#define COLLECT_C_CIRCQ_clear(cq_name, ...)                 collect_c_cq_clear(&(cq_name), NULL, NULL, __VA_ARGS__)
+
+#define COLLECT_C_CIRCQ_clear_1_(cq_name)                   collect_c_cq_clear(&(cq_name), NULL, NULL, NULL)
+#define COLLECT_C_CIRCQ_clear_2_(cq_name, p)                collect_c_cq_clear(&(cq_name), NULL, NULL, (p))
+
+#define COLLECT_C_CIRCQ_clear_GET_MACRO_(_1, _2, macro, ...)    macro
+
+#define COLLECT_C_CIRCQ_clear(...)                          COLLECT_C_CIRCQ_clear_GET_MACRO_(__VA_ARGS__, COLLECT_C_CIRCQ_clear_2_, COLLECT_C_CIRCQ_clear_1_, NULL)(__VA_ARGS__)
 
 
 /* /////////////////////////////////////////////////////////////////////////

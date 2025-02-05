@@ -1,3 +1,17 @@
+/* /////////////////////////////////////////////////////////////////////////
+ * File:    test/unit/test.unit.cq/entry.c
+ *
+ * Purpose: Unit-test for circular queue.
+ *
+ * Created: 5th February 2025
+ * Updated: 6th February 2025
+ *
+ * ////////////////////////////////////////////////////////////////////// */
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * includes
+ */
 
 #include <collect-c/terse/circq.h>
 
@@ -7,6 +21,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+
+/* /////////////////////////////////////////////////////////////////////////
+ * forward declarations
+ */
 
 static void TEST_define_empty(void);
 static void TEST_define_AND_allocate(void);
@@ -20,6 +38,10 @@ static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void);
 
 static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void);
 
+
+/* /////////////////////////////////////////////////////////////////////////
+ * main()
+ */
 
 int main(int argc, char* argv[])
 {
@@ -50,6 +72,10 @@ int main(int argc, char* argv[])
     return retCode;
 }
 
+
+/* /////////////////////////////////////////////////////////////////////////
+ * test function definitions
+ */
 
 struct custom_t
 {
@@ -690,6 +716,15 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
             TEST_INT_EQ(503, *(int const*)CLC_CQ_at(q, 2));
             TEST_INT_EQ(604, *(int const*)CLC_CQ_at(q, 3));
         }
+
+        /* clear all elements */
+        {
+            CLC_CQ_clear(q);
+
+            TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(0, CLC_CQ_len(q));
+            TEST_INT_EQ(4, CLC_CQ_spare(q));
+        }
     }
 }
 
@@ -763,7 +798,7 @@ static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
         TEST_INT_EQ(6, sum);
 
 
-        /* clear all element */
+        /* clear all elements */
 
         CLC_CQ_clear(q, &num_removed);
 
