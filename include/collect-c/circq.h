@@ -42,6 +42,7 @@
 
 #include <collect-c/common.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -67,6 +68,13 @@ struct collect_c_cq_t
     int32_t flags;              /*! Control flags. */
     int32_t reserved0;          /*! Reserved field. */
     void*   storage;            /*! Pointer to the storage. */
+    void*   param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free */
+    void  (*pfn_element_free)(
+        size_t  el_size
+    ,   size_t  el_index
+    ,   void*   el_ptr
+    ,   void*   param_element_free
+    );                          /*! Custom function to be invoked when */
 };
 #ifndef __cplusplus
 typedef struct collect_c_cq_t   collect_c_cq_t;
@@ -88,7 +96,7 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
  */
 #define COLLECT_C_CIRCQ_DEFINE_EMPTY(cq_el_type, cq_name, cq_cap)           \
                                                                             \
-    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, 0, NULL)
+    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, 0, NULL, NULL, 0)
 
 
 /** @def COLLECT_C_CIRCQ_DEFINE_ON_STACK(cq_name, cq_array)
@@ -102,7 +110,25 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
  */
 #define COLLECT_C_CIRCQ_DEFINE_ON_STACK(cq_name, cq_array)                  \
                                                                             \
-    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((cq_array)[0], sizeof((cq_array)) / sizeof((cq_array)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, cq_array)
+    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((cq_array)[0], sizeof((cq_array)) / sizeof((cq_array)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, cq_array, NULL, 0)
+
+
+/** @def COLLECT_C_CIRCQ_DEFINE_ON_STACK_WITH_CALLBACK(cq_name, cq_array, elf_fn, elf_param)
+ *
+ * Declares and defines a queue instance that uses for its memory the given
+ * array instance, and specifies a callback function to be invoked each time
+ * an API function causes an element to be erased/removed/overwritte.
+ *
+ * @param cq_name The name of the instance;
+ * @param cq_array The name of the array instance that will serve as the
+ *  memory of the queue instance;
+ * @param elf_fn Callback function to be invoked when element is
+ *  erased/removed/overwritte;
+ * @param elf_param Parameter to be given to the callback function;
+ */
+#define COLLECT_C_CIRCQ_DEFINE_ON_STACK_WITH_CALLBACK(cq_name, cq_array, elf_fn, elf_param) \
+                                                                                            \
+    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((cq_array)[0], sizeof((cq_array)) / sizeof((cq_array)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, cq_array, elf_fn, elf_param)
 
 
 #define COLLECT_C_CIRCQ_is_empty(cq_name)                   ((cq_name).e == (cq_name).b)
@@ -112,12 +138,12 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 #define COLLECT_C_CIRCQ_at(cq_name, el_ix)                  (((char*)(cq_name).storage) + ((((cq_name).b + (el_ix)) % (cq_name).capacity) * (cq_name).el_size))
 #define COLLECT_C_CIRCQ_element_index(cq_name, el_ix)       (((cq_name).b + (el_ix)) % (cq_name).capacity)
 
-#define COLLECT_C_CIRCQ_add_by_pre(cq_name, ptr_new_el)     collect_c_cq_add_by_ref(&(cq_name), (ptr_new_el))
-#define COLLECT_C_CIRCQ_add_by_value(cq_name, new_el)       collect_c_cq_add_by_ref(&(cq_name), &(new_el))
+#define COLLECT_C_CIRCQ_add_by_ref(cq_name, ptr_new_el)     collect_c_cq_add_by_ref(&(cq_name), ptr_new_el)
+#define COLLECT_C_CIRCQ_add_by_value(cq_name, t_el, new_el) (assert(sizeof(t_el) == (cq_name).el_size), collect_c_cq_add_by_ref(&(cq_name), &((t_el){(new_el)})))
 
 #define COLLECT_C_CIRCQ_pop_back(cq_name)                   collect_c_cq_pop_from_back_n(&(cq_name), 1, NULL)
 #define COLLECT_C_CIRCQ_pop_front(cq_name)                  collect_c_cq_pop_from_front_n(&(cq_name), 1, NULL)
-#define COLLECT_C_CIRCQ_clear(cq_name)                      collect_c_cq_clear(&(cq_name), NULL, NULL)
+#define COLLECT_C_CIRCQ_clear(cq_name, ...)                 collect_c_cq_clear(&(cq_name), NULL, NULL, __VA_ARGS__)
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -246,7 +272,7 @@ collect_c_cq_pop_from_front_n(
  * helper macros
  */
 
-#define COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, cq_flags, cq_storage) \
+#define COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, cq_flags, cq_storage, elf_fn, elf_param) \
                                                                             \
     {                                                                       \
         .el_size = sizeof(cq_el_type),                                      \
@@ -256,6 +282,8 @@ collect_c_cq_pop_from_front_n(
         .flags = (cq_flags),                                                \
         .reserved0 = 0,                                                     \
         .storage = (cq_storage),                                            \
+        .param_element_free = (elf_param),                                  \
+        .pfn_element_free = (elf_fn),                                       \
     }
 
 

@@ -24,12 +24,14 @@
 
 #define CLC_CQ_DEFINE_EMPTY                                 COLLECT_C_CIRCQ_DEFINE_EMPTY
 #define CLC_CQ_DEFINE_ON_STACK                              COLLECT_C_CIRCQ_DEFINE_ON_STACK
+#define CLC_CQ_DEFINE_ON_STACK_WITH_CB                      COLLECT_C_CIRCQ_DEFINE_ON_STACK_WITH_CALLBACK
+
 #define CLC_CQ_is_empty                                     COLLECT_C_CIRCQ_is_empty
 #define CLC_CQ_len                                          COLLECT_C_CIRCQ_len
 #define CLC_CQ_spare                                        COLLECT_C_CIRCQ_spare
 #define CLC_CQ_at                                           COLLECT_C_CIRCQ_at
 #define CLC_CQ_element_index                                COLLECT_C_CIRCQ_element_index
-#define CLC_CQ_add_by_pre                                   COLLECT_C_CIRCQ_add_by_pre
+#define CLC_CQ_add_by_ref                                   COLLECT_C_CIRCQ_add_by_ref
 #define CLC_CQ_add_by_value                                 COLLECT_C_CIRCQ_add_by_value
 #define CLC_CQ_pop_back                                     COLLECT_C_CIRCQ_pop_back
 #define CLC_CQ_pop_front                                    COLLECT_C_CIRCQ_pop_front

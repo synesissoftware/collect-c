@@ -66,6 +66,17 @@ collect_c_cq_free_storage(
 
     if (0 == (COLLECT_C_CIRCQ_F_USE_STACK_ARRAY & q->flags))
     {
+        if (NULL != q->pfn_element_free)
+        {
+            for (size_t i = q->b; q->e != i; ++i)
+            {
+                size_t const    ix  =   i % q->capacity;
+                void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+
+                (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+            }
+        }
+
         free(q->storage);
 
         q->storage = NULL;
@@ -127,6 +138,14 @@ collect_c_cq_clear(
 
     for (; q->e != q->b; ++*num_dropped)
     {
+        if (NULL != q->pfn_element_free)
+        {
+            size_t const    ix  =   q->b % q->capacity;
+            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+
+            (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+        }
+
         ++q->b;
     }
 
@@ -154,6 +173,14 @@ collect_c_cq_pop_from_back_n(
 
     for (; q->e != q->b && 0 != num_to_drop; --num_to_drop)
     {
+        if (NULL != q->pfn_element_free)
+        {
+            size_t const    ix  =   (q->e - 1) % q->capacity;
+            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+
+            (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+        }
+
         --q->e;
     }
 
@@ -181,6 +208,14 @@ collect_c_cq_pop_from_front_n(
 
     for (size_t i = q->b; q->e != i && 0 != num_to_drop; --num_to_drop)
     {
+        if (NULL != q->pfn_element_free)
+        {
+            size_t const    ix  =   i % q->capacity;
+            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+
+            (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+        }
+
         ++q->b;
     }
 
