@@ -14,7 +14,9 @@
  */
 
 #ifdef __cplusplus
-# error This file not currently compatible with C++ compilation
+# ifndef COLLECT_C_CIRCQ_SUPPRESS_CXX_WARNING
+#  error This file not currently compatible with C++ compilation
+# endif
 #endif
 
 
@@ -85,7 +87,7 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
  * API functions & macros
  */
 
-/** @def COLLECT_C_CIRCQ_DEFINE_EMPTY(cq_el_type, cq_name, cq_cap)
+/** @def COLLECT_C_CIRCQ_define_empty(cq_el_type, cq_name, cq_cap)
  *
  * Declares and defines an empty queue instance. The instance will need to
  * be further set-up via collect_c_cq_allocate_storage().
@@ -94,12 +96,12 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
  * @param cq_name The name of the instance;
  * @param cq_cap The capacity that the instance should have;
  */
-#define COLLECT_C_CIRCQ_DEFINE_EMPTY(cq_el_type, cq_name, cq_cap)           \
+#define COLLECT_C_CIRCQ_define_empty(cq_el_type, cq_name, cq_cap)           \
                                                                             \
     collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, 0, NULL, NULL, 0)
 
 
-/** @def COLLECT_C_CIRCQ_DEFINE_ON_STACK(cq_name, cq_array)
+/** @def COLLECT_C_CIRCQ_define_on_stack(cq_name, cq_array)
  *
  * Declares and defines a queue instance that uses for its memory the given
  * array instance.
@@ -108,12 +110,12 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
  * @param cq_array The name of the array instance that will serve as the
  *  memory of the queue instance;
  */
-#define COLLECT_C_CIRCQ_DEFINE_ON_STACK(cq_name, cq_array)                  \
+#define COLLECT_C_CIRCQ_define_on_stack(cq_name, cq_array)                  \
                                                                             \
     collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((cq_array)[0], sizeof((cq_array)) / sizeof((cq_array)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, cq_array, NULL, 0)
 
 
-/** @def COLLECT_C_CIRCQ_DEFINE_ON_STACK_WITH_CALLBACK(cq_name, cq_array, elf_fn, elf_param)
+/** @def COLLECT_C_CIRCQ_define_on_stack_with_callback(cq_name, cq_array, elf_fn, elf_param)
  *
  * Declares and defines a queue instance that uses for its memory the given
  * array instance, and specifies a callback function to be invoked each time
@@ -126,7 +128,7 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
  *  erased/removed/overwritte;
  * @param elf_param Parameter to be given to the callback function;
  */
-#define COLLECT_C_CIRCQ_DEFINE_ON_STACK_WITH_CALLBACK(cq_name, cq_array, elf_fn, elf_param) \
+#define COLLECT_C_CIRCQ_define_on_stack_with_callback(cq_name, cq_array, elf_fn, elf_param) \
                                                                                             \
     collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((cq_array)[0], sizeof((cq_array)) / sizeof((cq_array)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, cq_array, elf_fn, elf_param)
 

@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container terse api.
  *
  * Created: 5th February 2025
- * Updated: 5th February 2025
+ * Updated: 6th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -22,9 +22,9 @@
 
 #define CLC_CQ_F_USE_STACK_ARRAY                            COLLECT_C_CIRCQ_F_USE_STACK_ARRAY
 
-#define CLC_CQ_DEFINE_EMPTY                                 COLLECT_C_CIRCQ_DEFINE_EMPTY
-#define CLC_CQ_DEFINE_ON_STACK                              COLLECT_C_CIRCQ_DEFINE_ON_STACK
-#define CLC_CQ_DEFINE_ON_STACK_WITH_CB                      COLLECT_C_CIRCQ_DEFINE_ON_STACK_WITH_CALLBACK
+#define CLC_CQ_define_empty                                 COLLECT_C_CIRCQ_define_empty
+#define CLC_CQ_define_on_stack                              COLLECT_C_CIRCQ_define_on_stack
+#define CLC_CQ_define_on_stack_with_cb                      COLLECT_C_CIRCQ_define_on_stack_with_callback
 
 #define CLC_CQ_is_empty                                     COLLECT_C_CIRCQ_is_empty
 #define CLC_CQ_len                                          COLLECT_C_CIRCQ_len

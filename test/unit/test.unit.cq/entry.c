@@ -29,7 +29,7 @@
 static void TEST_define_empty(void);
 static void TEST_define_AND_allocate(void);
 
-static void TEST_CQ_DEFINE_ON_STACK(void);
+static void TEST_CQ_define_on_stack(void);
 static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void);
 static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void);
 static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void);
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_define_empty);
         XTESTS_RUN_CASE(TEST_define_AND_allocate);
 
-        XTESTS_RUN_CASE(TEST_CQ_DEFINE_ON_STACK);
+        XTESTS_RUN_CASE(TEST_CQ_define_on_stack);
         XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD);
         XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD);
         XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD);
@@ -89,7 +89,7 @@ typedef struct custom_t custom_t;
 static void TEST_define_empty(void)
 {
     {
-        CLC_CQ_DEFINE_EMPTY(int, q, 32);
+        CLC_CQ_define_empty(int, q, 32);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
@@ -97,7 +97,7 @@ static void TEST_define_empty(void)
     }
 
     {
-        CLC_CQ_DEFINE_EMPTY(bool, q, 64);
+        CLC_CQ_define_empty(bool, q, 64);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
@@ -105,7 +105,7 @@ static void TEST_define_empty(void)
     }
 
     {
-        CLC_CQ_DEFINE_EMPTY(custom_t, q, 16);
+        CLC_CQ_define_empty(custom_t, q, 16);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
@@ -116,7 +116,7 @@ static void TEST_define_empty(void)
 static void TEST_define_AND_allocate(void)
 {
     {
-        CLC_CQ_DEFINE_EMPTY(int, q, 32);
+        CLC_CQ_define_empty(int, q, 32);
 
         int const r = collect_c_cq_allocate_storage(&q);
 
@@ -129,12 +129,12 @@ static void TEST_define_AND_allocate(void)
     }
 }
 
-static void TEST_CQ_DEFINE_ON_STACK(void)
+static void TEST_CQ_define_on_stack(void)
 {
     {
         int array[32];
 
-        CLC_CQ_DEFINE_ON_STACK(q, array);
+        CLC_CQ_define_on_stack(q, array);
 
         TEST_INT_EQ(32, CLC_CQ_spare(q));
     }
@@ -145,7 +145,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
     {
         int array[8];
 
-        CLC_CQ_DEFINE_ON_STACK(q, array);
+        CLC_CQ_define_on_stack(q, array);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
@@ -266,7 +266,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
     {
         int array[4];
 
-        CLC_CQ_DEFINE_ON_STACK(q, array);
+        CLC_CQ_define_on_stack(q, array);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
@@ -414,7 +414,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
     {
         int array[4];
 
-        CLC_CQ_DEFINE_ON_STACK(q, array);
+        CLC_CQ_define_on_stack(q, array);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
@@ -569,7 +569,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
     {
         int array[4];
 
-        CLC_CQ_DEFINE_ON_STACK(q, array);
+        CLC_CQ_define_on_stack(q, array);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
@@ -752,7 +752,7 @@ static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
         size_t  num_removed;
 
         int     array[8];
-        CLC_CQ_DEFINE_ON_STACK_WITH_CB(q, array, fn_accumulate_on_free, &sum);
+        CLC_CQ_define_on_stack_WITH_CB(q, array, fn_accumulate_on_free, &sum);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
@@ -815,7 +815,7 @@ static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
 static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void)
 {
     {
-        CLC_CQ_DEFINE_EMPTY(int, q, 32);
+        CLC_CQ_define_empty(int, q, 32);
 
         int const r = collect_c_cq_allocate_storage(&q);
 
