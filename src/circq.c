@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 5th February 2025
+ * Updated: 6th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -64,23 +64,27 @@ collect_c_cq_free_storage(
     assert(NULL != q);
     assert(NULL != q->storage);
 
+    if (NULL != q->pfn_element_free)
+    {
+        for (; q->e != q->b; )
+        {
+            size_t const    ix  =   q->b % q->capacity;
+            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+
+            (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+
+            ++q->b;
+        }
+    }
+
     if (0 == (COLLECT_C_CIRCQ_F_USE_STACK_ARRAY & q->flags))
     {
-        if (NULL != q->pfn_element_free)
-        {
-            for (size_t i = q->b; q->e != i; ++i)
-            {
-                size_t const    ix  =   i % q->capacity;
-                void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
-
-                (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
-            }
-        }
-
         free(q->storage);
 
         q->storage = NULL;
     }
+
+    q->b = q->e = 0;
 }
 
 
@@ -136,18 +140,27 @@ collect_c_cq_clear(
 
     *num_dropped = 0;
 
-    for (; q->e != q->b; ++*num_dropped)
+    if (NULL != q->pfn_element_free)
     {
-        if (NULL != q->pfn_element_free)
+        for (; q->e != q->b; ++*num_dropped)
         {
             size_t const    ix  =   q->b % q->capacity;
             void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
-        }
 
-        ++q->b;
+            ++q->b;
+        }
     }
+    else
+    {
+        for (; q->e != q->b; ++*num_dropped)
+        {
+            ++q->b;
+        }
+    }
+
+    q->b = q->e = 0;
 
     return 0;
 }
