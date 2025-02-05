@@ -1,13 +1,22 @@
 
-#include <collect-c/circq.h>
+#include <collect-c/terse/circq.h>
 
 #include <xtests/terse-api.h>
 
-#include <assert.h>
+#include <errno.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 
-static void TEST_COUNTERS(void);
+static void TEST_define_empty(void);
+static void TEST_define_AND_allocate(void);
+static void TEST_CQ_DEFINE_ON_STACK(void);
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void);
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void);
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void);
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void);
+static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void);
+
 
 int main(int argc, char* argv[])
 {
@@ -18,7 +27,18 @@ int main(int argc, char* argv[])
 
     if (XTESTS_START_RUNNER("test.unit.cq", verbosity))
     {
-        XTESTS_RUN_CASE(TEST_COUNTERS);
+        XTESTS_RUN_CASE(TEST_define_empty);
+
+        XTESTS_RUN_CASE(TEST_define_AND_allocate);
+
+        XTESTS_RUN_CASE(TEST_CQ_DEFINE_ON_STACK);
+
+        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD);
+        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD);
+        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD);
+        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR);
+
+        XTESTS_RUN_CASE(TEST_HEAP_ADD_WITHOUT_WRAP_1);
 
         XTESTS_PRINT_RESULTS();
 
@@ -29,94 +49,680 @@ int main(int argc, char* argv[])
 }
 
 
-struct clc_cq_nix_test_t
+struct custom_t
 {
-    size_t  ix;
-    size_t  n;
+    uint32_t    x;
+    uint32_t    y;
+    uint64_t    z;
 };
-#ifndef __cplusplus
-typedef struct clc_cq_nix_test_t clc_cq_nix_test_t;
-#endif
+typedef struct custom_t custom_t;
 
-static
-clc_cq_nix_test_t
-calc_nix(
-    size_t b
-,   size_t e
-,   size_t capacity
-)
+
+static void TEST_define_empty(void)
 {
-    assert(b <= e);
+    {
+        CLC_CQ_DEFINE_EMPTY(int, q, 32);
 
-    clc_cq_nix_test_t r;
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(32, CLC_CQ_spare(q));
+    }
 
-    r.ix    =   b % capacity;
-    r.n     =   e - b;
+    {
+        CLC_CQ_DEFINE_EMPTY(bool, q, 64);
 
-    return r;
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(64, CLC_CQ_spare(q));
+    }
+
+    {
+        CLC_CQ_DEFINE_EMPTY(custom_t, q, 16);
+
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(16, CLC_CQ_spare(q));
+    }
 }
 
-
-static void TEST_COUNTERS(void)
+static void TEST_define_AND_allocate(void)
 {
     {
-        size_t const            b   =   0;
-        size_t const            e   =   0;
+        CLC_CQ_DEFINE_EMPTY(int, q, 32);
 
-        clc_cq_nix_test_t const nix =   calc_nix(b, e, 8);
+        int const r = collect_c_cq_allocate_storage(&q);
 
-        TEST_INT_EQ(0, nix.ix);
-        TEST_INT_EQ(0, nix.n);
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            collect_c_cq_free_storage(&q);
+        }
     }
+}
 
+static void TEST_CQ_DEFINE_ON_STACK(void)
+{
     {
-        size_t const            b   =   0;
-        size_t const            e   =   1;
+        int array[32];
 
-        clc_cq_nix_test_t const nix =   calc_nix(b, e, 8);
+        CLC_CQ_DEFINE_ON_STACK(q, array);
 
-        TEST_INT_EQ(0, nix.ix);
-        TEST_INT_EQ(1, nix.n);
+        TEST_INT_EQ(32, CLC_CQ_spare(q));
     }
+}
 
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
+{
     {
-        size_t const            b   =   0;
-        size_t const            e   =   5;
+        int array[8];
 
-        clc_cq_nix_test_t const nix =   calc_nix(b, e, 8);
+        CLC_CQ_DEFINE_ON_STACK(q, array);
 
-        TEST_INT_EQ(0, nix.ix);
-        TEST_INT_EQ(5, nix.n);
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(8, CLC_CQ_spare(q));
+
+        /* add el[0] */
+        {
+            int const   el  =   101;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(1, CLC_CQ_len(q));
+            TEST_INT_EQ(7, CLC_CQ_spare(q));
+        }
+
+        /* add el[1] */
+        {
+            int const   el  =   202;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(2, CLC_CQ_len(q));
+            TEST_INT_EQ(6, CLC_CQ_spare(q));
+        }
+
+        /* add el[2] */
+        {
+            int const   el  =   303;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(5, CLC_CQ_spare(q));
+        }
+
+        /* add el[3] */
+        {
+            int const   el  =   404;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(4, CLC_CQ_spare(q));
+        }
+
+        /* add el[4] */
+        {
+            int const   el  =   505;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(5, CLC_CQ_len(q));
+            TEST_INT_EQ(3, CLC_CQ_spare(q));
+        }
+
+        /* add el[5] */
+        {
+            int const   el  =   606;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(6, CLC_CQ_len(q));
+            TEST_INT_EQ(2, CLC_CQ_spare(q));
+        }
+
+        /* add el[6] */
+        {
+            int const   el  =   707;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(7, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* add el[7] */
+        {
+            int const   el  =   808;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* fail to add another add when no space */
+        {
+            int const   el  =   911;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(ENOSPC, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
     }
+}
 
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
+{
     {
-        size_t const            b   =   6;
-        size_t const            e   =   13;
+        int array[4];
 
-        clc_cq_nix_test_t const nix =   calc_nix(b, e, 8);
+        CLC_CQ_DEFINE_ON_STACK(q, array);
 
-        TEST_INT_EQ(6, nix.ix);
-        TEST_INT_EQ(7, nix.n);
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(4, CLC_CQ_spare(q));
+
+        /* add el[0] */
+        {
+            int const   el  =   101;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(1, CLC_CQ_len(q));
+            TEST_INT_EQ(3, CLC_CQ_spare(q));
+        }
+
+        /* add el[1] */
+        {
+            int const   el  =   202;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(2, CLC_CQ_len(q));
+            TEST_INT_EQ(2, CLC_CQ_spare(q));
+        }
+
+        /* add el[2] */
+        {
+            int const   el  =   303;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* add el[3] */
+        {
+            int const   el  =   404;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* fail to add another add when no space */
+        {
+            int const   el  =   911;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(ENOSPC, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 2));
+            TEST_INT_EQ(404, *(int const*)CLC_CQ_at(q, 3));
+        }
+
+        /* pop front */
+        {
+            int r = CLC_CQ_pop_front(q);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(404, *(int const*)CLC_CQ_at(q, 2));
+        }
+
+        /* pop front */
+        {
+            int r = CLC_CQ_pop_front(q);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(2, CLC_CQ_len(q));
+            TEST_INT_EQ(2, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(404, *(int const*)CLC_CQ_at(q, 1));
+        }
+
+        /* add el[2]' */
+        {
+            int const   el  =   502;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(404, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(502, *(int const*)CLC_CQ_at(q, 2));
+        }
+
+        /* add el[3]' */
+        {
+            int const   el  =   603;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(404, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(502, *(int const*)CLC_CQ_at(q, 2));
+            TEST_INT_EQ(603, *(int const*)CLC_CQ_at(q, 3));
+        }
     }
+}
 
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
+{
     {
-        size_t const            b   =   106;
-        size_t const            e   =   113;
+        int array[4];
 
-        clc_cq_nix_test_t const nix =   calc_nix(b, e, 8);
+        CLC_CQ_DEFINE_ON_STACK(q, array);
 
-        TEST_INT_EQ(2, nix.ix);
-        TEST_INT_EQ(7, nix.n);
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(4, CLC_CQ_spare(q));
+
+        /* add el[0] */
+        {
+            int const   el  =   101;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(1, CLC_CQ_len(q));
+            TEST_INT_EQ(3, CLC_CQ_spare(q));
+        }
+
+        /* add el[1] */
+        {
+            int const   el  =   202;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(2, CLC_CQ_len(q));
+            TEST_INT_EQ(2, CLC_CQ_spare(q));
+        }
+
+        /* add el[2] */
+        {
+            int const   el  =   303;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* add el[3] */
+        {
+            int const   el  =   404;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* fail to add another add when no space */
+        {
+            int const   el  =   911;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(ENOSPC, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 2));
+            TEST_INT_EQ(404, *(int const*)CLC_CQ_at(q, 3));
+        }
+
+        /* pop back */
+        {
+            int r = CLC_CQ_pop_back(q);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 2));
+        }
+
+        /* pop back */
+        {
+            int r = CLC_CQ_pop_back(q);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(2, CLC_CQ_len(q));
+            TEST_INT_EQ(2, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+        }
+
+        /* add el[2]' */
+        {
+            int const   el  =   503;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(503, *(int const*)CLC_CQ_at(q, 2));
+        }
+
+        /* add el[3]' */
+        {
+            int const   el  =   604;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(503, *(int const*)CLC_CQ_at(q, 2));
+            TEST_INT_EQ(604, *(int const*)CLC_CQ_at(q, 3));
+        }
     }
+}
 
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
+{
     {
-        size_t const            b   =   111;
-        size_t const            e   =   113;
+        int array[4];
 
-        clc_cq_nix_test_t const nix =   calc_nix(b, e, 8);
+        CLC_CQ_DEFINE_ON_STACK(q, array);
 
-        TEST_INT_EQ(7, nix.ix);
-        TEST_INT_EQ(2, nix.n);
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(4, CLC_CQ_spare(q));
+
+        /* add el[0] */
+        {
+            int const   el  =   101;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(1, CLC_CQ_len(q));
+            TEST_INT_EQ(3, CLC_CQ_spare(q));
+        }
+
+        /* add el[1] */
+        {
+            int const   el  =   202;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(2, CLC_CQ_len(q));
+            TEST_INT_EQ(2, CLC_CQ_spare(q));
+        }
+
+        /* add el[2] */
+        {
+            int const   el  =   303;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* add el[3] */
+        {
+            int const   el  =   404;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* fail to add another add when no space */
+        {
+            int const   el  =   911;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(ENOSPC, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 2));
+            TEST_INT_EQ(404, *(int const*)CLC_CQ_at(q, 3));
+        }
+
+        /* pop back */
+        {
+            int r = CLC_CQ_pop_back(q);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 2));
+        }
+
+        /* pop back */
+        {
+            int r = CLC_CQ_pop_back(q);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(2, CLC_CQ_len(q));
+            TEST_INT_EQ(2, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+        }
+
+        /* add el[2]' */
+        {
+            int const   el  =   503;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(503, *(int const*)CLC_CQ_at(q, 2));
+        }
+
+        /* add el[3]' */
+        {
+            int const   el  =   604;
+            int const   r   =   CLC_CQ_add_by_value(q, el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(503, *(int const*)CLC_CQ_at(q, 2));
+            TEST_INT_EQ(604, *(int const*)CLC_CQ_at(q, 3));
+        }
+    }
+}
+
+static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void)
+{
+    {
+        CLC_CQ_DEFINE_EMPTY(int, q, 32);
+
+        int const r = collect_c_cq_allocate_storage(&q);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            for (int i = 0; 10 != i; ++i)
+            {
+                int const   r2  =   CLC_CQ_add_by_value(q, i);
+                size_t      ix  =   CLC_CQ_element_index(q, i);
+
+                TEST_INT_EQ(0, r2);
+
+                TEST_INT_EQ(i, (int)ix);
+            }
+
+            TEST_INT_EQ(10, CLC_CQ_len(q));
+
+            collect_c_cq_free_storage(&q);
+        }
     }
 }
 
