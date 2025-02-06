@@ -754,10 +754,7 @@ namespace {
             for (std::size_t i = 0; num_iterations != i; ++i)
             {
                 {
-                    COLLECT_C_CIRCQ_define_empty(int, q, 256);
-
-                    q.pfn_element_free      =   int_callback;
-                    q.param_element_free    =   &anchor_value;
+                    CLC_CQ_define_empty_with_cb(int, q, 256, int_callback, &anchor_value);
 
                     int const r = clc_cq_allocate_storage(&q);
 

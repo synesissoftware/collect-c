@@ -104,6 +104,20 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
     collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, 0, NULL, NULL, 0)
 
 
+/** @def COLLECT_C_CIRCQ_define_empty_with_callback(cq_el_type, cq_name, cq_cap, elf_fn, elf_param)
+ *
+ * Declares and defines an empty queue instance. The instance will need to
+ * be further set-up via collect_c_cq_allocate_storage().
+ *
+ * @param cq_el_type The type of the elements to be stored;
+ * @param cq_name The name of the instance;
+ * @param cq_cap The capacity that the instance should have;
+ */
+#define COLLECT_C_CIRCQ_define_empty_with_callback(cq_el_type, cq_name, cq_cap, elf_fn, elf_param)  \
+                                                                                                    \
+    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, 0, NULL, elf_fn, elf_param)
+
+
 /** @def COLLECT_C_CIRCQ_define_on_stack(cq_name, cq_array)
  *
  * Declares and defines a queue instance that uses for its memory the given
