@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 6th February 2025
+ * Updated: 7th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -25,7 +25,7 @@
  */
 
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
-#define COLLECT_C_CIRCQ_VER_MINOR       0
+#define COLLECT_C_CIRCQ_VER_MINOR       1
 #define COLLECT_C_CIRCQ_VER_PATCH       0
 #define COLLECT_C_CIRCQ_VER_ALPHABETA   1
 
@@ -55,6 +55,9 @@
 
 /** Causes allocation to be on the heap. */
 #define COLLECT_C_CIRCQ_F_USE_STACK_ARRAY                   (0x00000001)
+
+/** Causes adding to a full instance to overwrite the front element. Requires also that a callback function is provided. */
+#define COLLECT_C_CIRCQ_F_OVERWRITE_FRONT_WHEN_FULL         (0x00000002)
 
 
 /* /////////////////////////////////////////////////////////////////////////

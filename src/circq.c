@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 6th February 2025
+ * Updated: 7th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -17,6 +17,7 @@
 
 #include <errno.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -100,9 +101,24 @@ collect_c_cq_add_by_ref(
 
     if (q->capacity == q->e - q->b)
     {
-        return ENOSPC;
+        bool const overwrite_front_when_full = 0 != (COLLECT_C_CIRCQ_F_OVERWRITE_FRONT_WHEN_FULL & q->flags);
+
+        if (!overwrite_front_when_full ||
+            NULL == q->pfn_element_free)
+        {
+            return ENOSPC;
+        }
+        else
+        {
+            size_t const    ix  =   q->b % q->capacity;
+            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+
+            (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+
+            ++q->b;
+        }
     }
-    else
+
     {
         size_t const    ix  =   q->e % q->capacity;
         void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
