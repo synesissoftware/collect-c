@@ -136,25 +136,25 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
     collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((cq_array)[0], sizeof((cq_array)) / sizeof((cq_array)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, cq_array, elf_fn, elf_param)
 
 
-#define COLLECT_C_CIRCQ_is_empty(cq_name)                   ((cq_name).e == (cq_name).b)
-#define COLLECT_C_CIRCQ_len(cq_name)                        ((cq_name).e - (cq_name).b)
-#define COLLECT_C_CIRCQ_spare(cq_name)                      ((cq_name).capacity - COLLECT_C_CIRCQ_len(cq_name))
+#define COLLECT_C_CIRCQ_is_empty(cq_name)                       ((cq_name).e == (cq_name).b)
+#define COLLECT_C_CIRCQ_len(cq_name)                            ((cq_name).e - (cq_name).b)
+#define COLLECT_C_CIRCQ_spare(cq_name)                          ((cq_name).capacity - COLLECT_C_CIRCQ_len(cq_name))
 
-#define COLLECT_C_CIRCQ_at(cq_name, el_ix)                  (((char*)(cq_name).storage) + ((((cq_name).b + (el_ix)) % (cq_name).capacity) * (cq_name).el_size))
-#define COLLECT_C_CIRCQ_element_index(cq_name, el_ix)       (((cq_name).b + (el_ix)) % (cq_name).capacity)
+#define COLLECT_C_CIRCQ_at(cq_name, el_ix)                      (((char*)(cq_name).storage) + ((((cq_name).b + (el_ix)) % (cq_name).capacity) * (cq_name).el_size))
+#define COLLECT_C_CIRCQ_element_index(cq_name, el_ix)           (((cq_name).b + (el_ix)) % (cq_name).capacity)
 
-#define COLLECT_C_CIRCQ_add_by_ref(cq_name, ptr_new_el)     collect_c_cq_add_by_ref(&(cq_name), ptr_new_el)
-#define COLLECT_C_CIRCQ_add_by_value(cq_name, t_el, new_el) (assert(sizeof(t_el) == (cq_name).el_size), collect_c_cq_add_by_ref(&(cq_name), &((t_el){(new_el)})))
+#define COLLECT_C_CIRCQ_push_by_ref(cq_name, ptr_new_el)        collect_c_cq_push_by_ref(&(cq_name), ptr_new_el)
+#define COLLECT_C_CIRCQ_push_by_value(cq_name, t_el, new_el)    (assert(sizeof(t_el) == (cq_name).el_size), collect_c_cq_push_by_ref(&(cq_name), &((t_el){(new_el)})))
 
-#define COLLECT_C_CIRCQ_pop_back(cq_name)                   collect_c_cq_pop_from_back_n(&(cq_name), 1, NULL)
-#define COLLECT_C_CIRCQ_pop_front(cq_name)                  collect_c_cq_pop_from_front_n(&(cq_name), 1, NULL)
+#define COLLECT_C_CIRCQ_pop_back(cq_name)                       collect_c_cq_pop_from_back_n(&(cq_name), 1, NULL)
+#define COLLECT_C_CIRCQ_pop_front(cq_name)                      collect_c_cq_pop_from_front_n(&(cq_name), 1, NULL)
 
-#define COLLECT_C_CIRCQ_clear_1_(cq_name)                   collect_c_cq_clear(&(cq_name), NULL, NULL, NULL)
-#define COLLECT_C_CIRCQ_clear_2_(cq_name, p)                collect_c_cq_clear(&(cq_name), NULL, NULL, (p))
+#define COLLECT_C_CIRCQ_clear_1_(cq_name)                       collect_c_cq_clear(&(cq_name), NULL, NULL, NULL)
+#define COLLECT_C_CIRCQ_clear_2_(cq_name, p)                    collect_c_cq_clear(&(cq_name), NULL, NULL, (p))
 
 #define COLLECT_C_CIRCQ_clear_GET_MACRO_(_1, _2, macro, ...)    macro
 
-#define COLLECT_C_CIRCQ_clear(...)                          COLLECT_C_CIRCQ_clear_GET_MACRO_(__VA_ARGS__, COLLECT_C_CIRCQ_clear_2_, COLLECT_C_CIRCQ_clear_1_, NULL)(__VA_ARGS__)
+#define COLLECT_C_CIRCQ_clear(...)                              COLLECT_C_CIRCQ_clear_GET_MACRO_(__VA_ARGS__, COLLECT_C_CIRCQ_clear_2_, COLLECT_C_CIRCQ_clear_1_, NULL)(__VA_ARGS__)
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -212,7 +212,7 @@ collect_c_cq_free_storage(
  * @pre (NULL != q->storage);
  */
 int
-collect_c_cq_add_by_ref(
+collect_c_cq_push_by_ref(
     collect_c_cq_t* q
 ,   void const*     ptr_new_el
 );
