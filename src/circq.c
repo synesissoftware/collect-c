@@ -1,5 +1,5 @@
 /* /////////////////////////////////////////////////////////////////////////
- * File:    src/containers/circular_queue.c
+ * File:    src/containers/circq.c
  *
  * Purpose: Circular-queue container.
  *
