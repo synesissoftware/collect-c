@@ -22,6 +22,13 @@
 
 
 /* /////////////////////////////////////////////////////////////////////////
+ * helper functions and macros
+ */
+
+#define COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix)     ((void*)(((char*)(q)->storage) + ((ix) * (q)->el_size)))
+
+
+/* /////////////////////////////////////////////////////////////////////////
  * API functions
  */
 
@@ -69,7 +76,7 @@ collect_c_cq_free_storage(
         for (; q->e != q->b; )
         {
             size_t const    ix  =   q->b % q->capacity;
-            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
 
@@ -104,7 +111,7 @@ collect_c_cq_push_by_ref(
     else
     {
         size_t const    ix  =   q->e % q->capacity;
-        void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+        void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
         memcpy(p, ptr_new_el, q->el_size);
 
@@ -144,7 +151,7 @@ collect_c_cq_clear(
         for (; q->e != q->b; ++*num_dropped)
         {
             size_t const    ix  =   q->b % q->capacity;
-            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
 
@@ -188,7 +195,7 @@ collect_c_cq_pop_from_back_n(
         if (NULL != q->pfn_element_free)
         {
             size_t const    ix  =   (q->e - 1) % q->capacity;
-            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
         }
@@ -223,7 +230,7 @@ collect_c_cq_pop_from_front_n(
         if (NULL != q->pfn_element_free)
         {
             size_t const    ix  =   i % q->capacity;
-            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
         }
