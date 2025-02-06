@@ -214,7 +214,7 @@ collect_c_cq_add_by_ref(
 ,   void const*     ptr_new_el
 );
 
-/** Clears all elements from the front of the queue.
+/** Clears all elements from the queue.
  *
  * @param q Pointer to the circular queue. Must not be NULL;
  * @param reserved0 Reserved. Must be 0;
@@ -235,7 +235,7 @@ collect_c_cq_clear(
 ,   size_t*         num_dropped
 );
 
-/** Attempts to drop a number of elements from the front of the queue.
+/** Attempts to drop a number of elements from the back of the queue.
  *
  * @param q Pointer to the circular queue. Must not be NULL;
  * @param num_to_drop Maximum number of elements to drop working from the
