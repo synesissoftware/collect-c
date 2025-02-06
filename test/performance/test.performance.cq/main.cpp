@@ -109,6 +109,12 @@ namespace {
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     );
+
+    std::uint64_t
+    create_on_stack_256_and_push_by_ref_4092_elements_cb_overwrite(
+        std::size_t num_iterations
+    ,   std::size_t num_warm_loops
+    );
 } // anonymous namespace
 
 
@@ -138,7 +144,7 @@ display_results_title(
 {
     std::cout
         << '\t'
-        << std::setw(50) << std::left << "function name"
+        << std::setw(64) << std::left << "function name"
         << '\t'
         << std::setw(16) << std::right << "#iterations"
         << '\t'
@@ -167,7 +173,7 @@ display_results(
 
     std::cout
         << '\t'
-        << std::setw(50) << std::left << function_name
+        << std::setw(64) << std::left << function_name
         << '\t'
         << std::setw(16) << std::right << num_iterations
         << '\t'
@@ -211,6 +217,8 @@ int main(int argc, char* /*argv*/[])
     anchor_value += create_on_stack_256_and_push_by_ref_64_elements_cb(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
     anchor_value += create_on_heap_256_and_push_by_ref_64_elements_cb(NUM_ITERATIONS, NUM_WARM_LOOPS);
+
+    anchor_value += create_on_stack_256_and_push_by_ref_4092_elements_cb_overwrite(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
     return (0 == argc && 0 == anchor_value) ? EXIT_FAILURE : EXIT_SUCCESS;
 }
@@ -705,6 +713,77 @@ namespace {
             if (1 == w)
             {
                 display_results(__FUNCTION__, num_iterations, std::size(values), tm_ns, anchor_value);
+            }
+        }
+
+        return anchor_value;
+    }
+
+#if 0
+
+    static void fn_stub(
+        size_t   /* el_size */
+    ,   size_t   /* el_index */
+    ,   void*    /* el_ptr */
+    ,   void*    /* param_element_free */
+    )
+    {}
+#endif
+
+    std::uint64_t
+    create_on_stack_256_and_push_by_ref_4092_elements_cb_overwrite(
+        std::size_t num_iterations
+    ,   std::size_t num_warm_loops
+    )
+    {
+        const std::size_t NUM_VALUES = 4092;
+
+        num_iterations /= 10;
+
+        std::uint64_t anchor_value = 0;
+
+        stopwatch_t sw;
+
+        for (std::size_t w = num_warm_loops; 0 != w; --w)
+        {
+            interval_t tm_ns = 0;
+
+            anchor_value = 0;
+
+            sw.start();
+            for (std::size_t i = 0; num_iterations != i; ++i)
+            {
+                {
+                    COLLECT_C_CIRCQ_define_empty(int, q, 256);
+
+                    q.pfn_element_free      =   int_callback;
+                    q.param_element_free    =   &anchor_value;
+
+                    int const r = clc_cq_allocate_storage(&q);
+
+                    if (0 == r)
+                    {
+                        q.flags |= CLC_CQ_F_OVERWRITE_FRONT_WHEN_FULL;
+
+                        for (std::size_t j = 0; NUM_VALUES != j; ++j)
+                        {
+                            int const value = static_cast<int>(j);
+
+                            CLC_CQ_push_by_ref(q, &value);
+                        }
+                        anchor_value += CLC_CQ_spare(q);
+
+                        clc_cq_free_storage(&q);
+                    }
+                }
+            }
+            sw.stop();
+
+            tm_ns = sw.get_nanoseconds();
+
+            if (1 == w)
+            {
+                display_results(__FUNCTION__, num_iterations, NUM_VALUES, tm_ns, anchor_value);
             }
         }
 
