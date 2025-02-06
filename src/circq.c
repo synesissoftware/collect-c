@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 6th February 2025
+ * Updated: 7th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -89,7 +89,7 @@ collect_c_cq_free_storage(
 
 
 int
-collect_c_cq_add_by_ref(
+collect_c_cq_push_by_ref(
     collect_c_cq_t* q
 ,   void const*     ptr_new_el
 )

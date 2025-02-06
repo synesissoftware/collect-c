@@ -4,7 +4,7 @@
  * Purpose: Unit-test for circular queue.
  *
  * Created: 5th February 2025
- * Updated: 6th February 2025
+ * Updated: 7th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -154,7 +154,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
         /* add el[0] */
         {
             int const   el  =   101;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -166,7 +166,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
         /* add el[1] */
         {
             int const   el  =   202;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -178,7 +178,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
         /* add el[2] */
         {
             int const   el  =   303;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -190,7 +190,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
         /* add el[3] */
         {
             int const   el  =   404;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -202,7 +202,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
         /* add el[4] */
         {
             int const   el  =   505;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -214,7 +214,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
         /* add el[5] */
         {
             int const   el  =   606;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -226,7 +226,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
         /* add el[6] */
         {
             int const   el  =   707;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -238,7 +238,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
         /* add el[7] */
         {
             int const   el  =   808;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -250,7 +250,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
         /* fail to add another add when no space */
         {
             int const   el  =   911;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(ENOSPC, r);
 
@@ -274,7 +274,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
 
         /* add el[0] */
         {
-            int const   r   =   CLC_CQ_add_by_value(q, int, 101);
+            int const   r   =   CLC_CQ_push_by_value(q, int, 101);
 
             TEST_INT_EQ(0, r);
 
@@ -285,7 +285,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
 
         /* add el[1] */
         {
-            int const   r   =   CLC_CQ_add_by_value(q, int, 202);
+            int const   r   =   CLC_CQ_push_by_value(q, int, 202);
 
             TEST_INT_EQ(0, r);
 
@@ -296,7 +296,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
 
         /* add el[2] */
         {
-            int const   r   =   CLC_CQ_add_by_value(q, int, 303);
+            int const   r   =   CLC_CQ_push_by_value(q, int, 303);
 
             TEST_INT_EQ(0, r);
 
@@ -307,7 +307,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
 
         /* add el[3] */
         {
-            int const   r   =   CLC_CQ_add_by_value(q, int, 404);
+            int const   r   =   CLC_CQ_push_by_value(q, int, 404);
 
             TEST_INT_EQ(0, r);
 
@@ -318,7 +318,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
 
         /* fail to add another add when no space */
         {
-            int const   r   =   CLC_CQ_add_by_value(q, int, 911);
+            int const   r   =   CLC_CQ_push_by_value(q, int, 911);
 
             TEST_INT_EQ(ENOSPC, r);
 
@@ -372,7 +372,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
 
         /* add el[2]' */
         {
-            int const   r   =   CLC_CQ_add_by_value(q, int, 502);
+            int const   r   =   CLC_CQ_push_by_value(q, int, 502);
 
             TEST_INT_EQ(0, r);
 
@@ -390,7 +390,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
 
         /* add el[3]' */
         {
-            int const   r   =   CLC_CQ_add_by_value(q, int, 603);
+            int const   r   =   CLC_CQ_push_by_value(q, int, 603);
 
             TEST_INT_EQ(0, r);
 
@@ -423,7 +423,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
         /* add el[0] */
         {
             int const   el  =   101;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -435,7 +435,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
         /* add el[1] */
         {
             int const   el  =   202;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -447,7 +447,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
         /* add el[2] */
         {
             int const   el  =   303;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -459,7 +459,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
         /* add el[3] */
         {
             int const   el  =   404;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -471,7 +471,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
         /* fail to add another add when no space */
         {
             int const   el  =   911;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(ENOSPC, r);
 
@@ -526,7 +526,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
         /* add el[2]' */
         {
             int const   el  =   503;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -545,7 +545,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
         /* add el[3]' */
         {
             int const   el  =   604;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -578,7 +578,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
         /* add el[0] */
         {
             int const   el  =   101;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -590,7 +590,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
         /* add el[1] */
         {
             int const   el  =   202;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -602,7 +602,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
         /* add el[2] */
         {
             int const   el  =   303;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -614,7 +614,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
         /* add el[3] */
         {
             int const   el  =   404;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -626,7 +626,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
         /* fail to add another add when no space */
         {
             int const   el  =   911;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(ENOSPC, r);
 
@@ -681,7 +681,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
         /* add el[2]' */
         {
             int const   el  =   503;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -700,7 +700,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
         /* add el[3]' */
         {
             int const   el  =   604;
-            int const   r   =   CLC_CQ_add_by_ref(q, &el);
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
 
             TEST_INT_EQ(0, r);
 
@@ -763,11 +763,11 @@ static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
 
         /* add five elements */
 
-        CLC_CQ_add_by_value(q, int, 1);
-        CLC_CQ_add_by_value(q, int, 2);
-        CLC_CQ_add_by_value(q, int, 3);
-        CLC_CQ_add_by_value(q, int, 4);
-        CLC_CQ_add_by_value(q, int, 5);
+        CLC_CQ_push_by_value(q, int, 1);
+        CLC_CQ_push_by_value(q, int, 2);
+        CLC_CQ_push_by_value(q, int, 3);
+        CLC_CQ_push_by_value(q, int, 4);
+        CLC_CQ_push_by_value(q, int, 5);
 
         TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(5, CLC_CQ_len(q));
@@ -825,7 +825,7 @@ static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void)
         {
             for (int i = 0; 10 != i; ++i)
             {
-                int const   r2  =   CLC_CQ_add_by_ref(q, &i);
+                int const   r2  =   CLC_CQ_push_by_ref(q, &i);
                 size_t      ix  =   CLC_CQ_element_index(q, i);
 
                 TEST_INT_EQ(0, r2);

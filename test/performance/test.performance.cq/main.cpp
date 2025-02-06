@@ -69,43 +69,43 @@ namespace {
     );
 
     std::uint64_t
-    create_on_stack_16_and_add_by_ref_4_elements(
+    create_on_stack_16_and_push_by_ref_4_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     );
 
     std::uint64_t
-    create_on_stack_16_and_add_by_ref_16_elements(
+    create_on_stack_16_and_push_by_ref_16_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     );
 
     std::uint64_t
-    create_on_heap_16_and_add_by_ref_16_elements(
+    create_on_heap_16_and_push_by_ref_16_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     );
 
     std::uint64_t
-    create_on_stack_256_and_add_by_ref_64_elements(
+    create_on_stack_256_and_push_by_ref_64_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     );
 
     std::uint64_t
-    create_on_heap_256_and_add_by_ref_64_elements(
+    create_on_heap_256_and_push_by_ref_64_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     );
 
     std::uint64_t
-    create_on_stack_256_and_add_by_ref_64_elements_cb(
+    create_on_stack_256_and_push_by_ref_64_elements_cb(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     );
 
     std::uint64_t
-    create_on_heap_256_and_add_by_ref_64_elements_cb(
+    create_on_heap_256_and_push_by_ref_64_elements_cb(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     );
@@ -198,19 +198,19 @@ int main(int argc, char* /*argv*/[])
 
     anchor_value += create_on_stack_then_clear(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
-    anchor_value += create_on_stack_16_and_add_by_ref_4_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
+    anchor_value += create_on_stack_16_and_push_by_ref_4_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
-    anchor_value += create_on_stack_16_and_add_by_ref_16_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
+    anchor_value += create_on_stack_16_and_push_by_ref_16_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
-    anchor_value += create_on_heap_16_and_add_by_ref_16_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
+    anchor_value += create_on_heap_16_and_push_by_ref_16_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
-    anchor_value += create_on_stack_256_and_add_by_ref_64_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
+    anchor_value += create_on_stack_256_and_push_by_ref_64_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
-    anchor_value += create_on_heap_256_and_add_by_ref_64_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
+    anchor_value += create_on_heap_256_and_push_by_ref_64_elements(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
-    anchor_value += create_on_stack_256_and_add_by_ref_64_elements_cb(NUM_ITERATIONS, NUM_WARM_LOOPS);
+    anchor_value += create_on_stack_256_and_push_by_ref_64_elements_cb(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
-    anchor_value += create_on_heap_256_and_add_by_ref_64_elements_cb(NUM_ITERATIONS, NUM_WARM_LOOPS);
+    anchor_value += create_on_heap_256_and_push_by_ref_64_elements_cb(NUM_ITERATIONS, NUM_WARM_LOOPS);
 
     return (0 == argc && 0 == anchor_value) ? EXIT_FAILURE : EXIT_SUCCESS;
 }
@@ -321,7 +321,7 @@ namespace {
     }
 
     std::uint64_t
-    create_on_stack_16_and_add_by_ref_4_elements(
+    create_on_stack_16_and_push_by_ref_4_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     )
@@ -352,10 +352,10 @@ namespace {
 
                     CLC_CQ_define_on_stack(q, ar);
 
-                    CLC_CQ_add_by_ref(q, &values[0]);
-                    CLC_CQ_add_by_ref(q, &values[1]);
-                    CLC_CQ_add_by_ref(q, &values[2]);
-                    CLC_CQ_add_by_ref(q, &values[3]);
+                    CLC_CQ_push_by_ref(q, &values[0]);
+                    CLC_CQ_push_by_ref(q, &values[1]);
+                    CLC_CQ_push_by_ref(q, &values[2]);
+                    CLC_CQ_push_by_ref(q, &values[3]);
 
                     anchor_value += CLC_CQ_spare(q);
                 }
@@ -374,7 +374,7 @@ namespace {
     }
 
     std::uint64_t
-    create_on_stack_16_and_add_by_ref_16_elements(
+    create_on_stack_16_and_push_by_ref_16_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     )
@@ -404,7 +404,7 @@ namespace {
 
                     for (std::size_t j = 0; std::size(values) != j; ++j)
                     {
-                        CLC_CQ_add_by_ref(q, &values[j]);
+                        CLC_CQ_push_by_ref(q, &values[j]);
                     }
                     anchor_value += CLC_CQ_spare(q);
                 }
@@ -423,7 +423,7 @@ namespace {
     }
 
     std::uint64_t
-    create_on_heap_16_and_add_by_ref_16_elements(
+    create_on_heap_16_and_push_by_ref_16_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     )
@@ -455,7 +455,7 @@ namespace {
                     {
                         for (std::size_t j = 0; std::size(values) != j; ++j)
                         {
-                            CLC_CQ_add_by_ref(q, &values[j]);
+                            CLC_CQ_push_by_ref(q, &values[j]);
                         }
                         anchor_value += CLC_CQ_spare(q);
 
@@ -477,7 +477,7 @@ namespace {
     }
 
     std::uint64_t
-    create_on_stack_256_and_add_by_ref_64_elements(
+    create_on_stack_256_and_push_by_ref_64_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     )
@@ -513,7 +513,7 @@ namespace {
 
                     for (std::size_t j = 0; std::size(values) != j; ++j)
                     {
-                        CLC_CQ_add_by_ref(q, &values[j]);
+                        CLC_CQ_push_by_ref(q, &values[j]);
                     }
                     anchor_value += CLC_CQ_spare(q);
                 }
@@ -532,7 +532,7 @@ namespace {
     }
 
     std::uint64_t
-    create_on_heap_256_and_add_by_ref_64_elements(
+    create_on_heap_256_and_push_by_ref_64_elements(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     )
@@ -570,7 +570,7 @@ namespace {
                     {
                         for (std::size_t j = 0; std::size(values) != j; ++j)
                         {
-                            CLC_CQ_add_by_ref(q, &values[j]);
+                            CLC_CQ_push_by_ref(q, &values[j]);
                         }
                         anchor_value += CLC_CQ_spare(q);
 
@@ -592,7 +592,7 @@ namespace {
     }
 
     std::uint64_t
-    create_on_stack_256_and_add_by_ref_64_elements_cb(
+    create_on_stack_256_and_push_by_ref_64_elements_cb(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     )
@@ -628,7 +628,7 @@ namespace {
 
                     for (std::size_t j = 0; std::size(values) != j; ++j)
                     {
-                        CLC_CQ_add_by_ref(q, &values[j]);
+                        CLC_CQ_push_by_ref(q, &values[j]);
                     }
                     anchor_value += CLC_CQ_spare(q);
 
@@ -649,7 +649,7 @@ namespace {
     }
 
     std::uint64_t
-    create_on_heap_256_and_add_by_ref_64_elements_cb(
+    create_on_heap_256_and_push_by_ref_64_elements_cb(
         std::size_t num_iterations
     ,   std::size_t num_warm_loops
     )
@@ -690,7 +690,7 @@ namespace {
                     {
                         for (std::size_t j = 0; std::size(values) != j; ++j)
                         {
-                            CLC_CQ_add_by_ref(q, &values[j]);
+                            CLC_CQ_push_by_ref(q, &values[j]);
                         }
                         anchor_value += CLC_CQ_spare(q);
 
