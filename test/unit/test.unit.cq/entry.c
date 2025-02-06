@@ -118,13 +118,13 @@ static void TEST_define_AND_allocate(void)
     {
         CLC_CQ_define_empty(int, q, 32);
 
-        int const r = collect_c_cq_allocate_storage(&q);
+        int const r = clc_cq_allocate_storage(&q);
 
         TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
 
         if (0 == r)
         {
-            collect_c_cq_free_storage(&q);
+            clc_cq_free_storage(&q);
         }
     }
 }
@@ -817,7 +817,7 @@ static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void)
     {
         CLC_CQ_define_empty(int, q, 32);
 
-        int const r = collect_c_cq_allocate_storage(&q);
+        int const r = clc_cq_allocate_storage(&q);
 
         TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
 
@@ -835,7 +835,7 @@ static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void)
 
             TEST_INT_EQ(10, CLC_CQ_len(q));
 
-            collect_c_cq_free_storage(&q);
+            clc_cq_free_storage(&q);
         }
     }
 }

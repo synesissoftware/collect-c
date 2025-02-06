@@ -77,7 +77,7 @@ collect_c_cq_free_storage(
         }
     }
 
-    if (0 == (COLLECT_C_CIRCQ_F_USE_STACK_ARRAY & q->flags))
+    if (0 == (CLC_CQ_F_USE_STACK_ARRAY & q->flags))
     {
         free(q->storage);
 

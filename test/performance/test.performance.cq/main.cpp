@@ -449,7 +449,7 @@ namespace {
                 {
                     COLLECT_C_CIRCQ_define_empty(int, q, 16);
 
-                    int const r = collect_c_cq_allocate_storage(&q);
+                    int const r = clc_cq_allocate_storage(&q);
 
                     if (0 == r)
                     {
@@ -459,7 +459,7 @@ namespace {
                         }
                         anchor_value += CLC_CQ_spare(q);
 
-                        collect_c_cq_free_storage(&q);
+                        clc_cq_free_storage(&q);
                     }
                 }
             }
@@ -564,7 +564,7 @@ namespace {
                 {
                     COLLECT_C_CIRCQ_define_empty(int, q, 256);
 
-                    int const r = collect_c_cq_allocate_storage(&q);
+                    int const r = clc_cq_allocate_storage(&q);
 
                     if (0 == r)
                     {
@@ -574,7 +574,7 @@ namespace {
                         }
                         anchor_value += CLC_CQ_spare(q);
 
-                        collect_c_cq_free_storage(&q);
+                        clc_cq_free_storage(&q);
                     }
                 }
             }
@@ -684,7 +684,7 @@ namespace {
                     q.pfn_element_free      =   int_callback;
                     q.param_element_free    =   &anchor_value;
 
-                    int const r = collect_c_cq_allocate_storage(&q);
+                    int const r = clc_cq_allocate_storage(&q);
 
                     if (0 == r)
                     {
@@ -694,7 +694,7 @@ namespace {
                         }
                         anchor_value += CLC_CQ_spare(q);
 
-                        collect_c_cq_free_storage(&q);
+                        clc_cq_free_storage(&q);
                     }
                 }
             }
