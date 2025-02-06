@@ -96,7 +96,6 @@ collect_c_cq_push_by_ref(
 {
     assert(NULL != q);
     assert(NULL != q->storage);
-    assert(COLLECT_C_CIRCQ_spare(*q) != 0);
 
     if (q->capacity == q->e - q->b)
     {
@@ -130,8 +129,8 @@ collect_c_cq_clear(
 
     assert(NULL != q);
     assert(NULL != q->storage);
-    assert(NULL != reserved0);
-    assert(NULL != reserved1);
+    assert(NULL == reserved0);
+    assert(NULL == reserved1);
 
     if (NULL == num_dropped)
     {
