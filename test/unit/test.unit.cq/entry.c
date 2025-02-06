@@ -752,7 +752,7 @@ static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
         size_t  num_removed;
 
         int     array[8];
-        CLC_CQ_define_on_stack_WITH_CB(q, array, fn_accumulate_on_free, &sum);
+        CLC_CQ_define_on_stack_with_cb(q, array, fn_accumulate_on_free, &sum);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
