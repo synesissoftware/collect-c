@@ -1,5 +1,5 @@
 /* /////////////////////////////////////////////////////////////////////////
- * File:    src/containers/circular_queue.c
+ * File:    src/circq.c
  *
  * Purpose: Circular-queue container.
  *
@@ -20,6 +20,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * helper functions and macros
+ */
+
+#define COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix)     ((void*)(((char*)(q)->storage) + ((ix) * (q)->el_size)))
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -70,7 +77,7 @@ collect_c_cq_free_storage(
         for (; q->e != q->b; )
         {
             size_t const    ix  =   q->b % q->capacity;
-            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
 
@@ -97,7 +104,6 @@ collect_c_cq_push_by_ref(
 {
     assert(NULL != q);
     assert(NULL != q->storage);
-    assert(COLLECT_C_CIRCQ_spare(*q) != 0);
 
     if (q->capacity == q->e - q->b)
     {
@@ -111,7 +117,7 @@ collect_c_cq_push_by_ref(
         else
         {
             size_t const    ix  =   q->b % q->capacity;
-            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
 
@@ -121,7 +127,7 @@ collect_c_cq_push_by_ref(
 
     {
         size_t const    ix  =   q->e % q->capacity;
-        void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+        void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
         memcpy(p, ptr_new_el, q->el_size);
 
@@ -146,8 +152,8 @@ collect_c_cq_clear(
 
     assert(NULL != q);
     assert(NULL != q->storage);
-    assert(NULL != reserved0);
-    assert(NULL != reserved1);
+    assert(NULL == reserved0);
+    assert(NULL == reserved1);
 
     if (NULL == num_dropped)
     {
@@ -161,7 +167,7 @@ collect_c_cq_clear(
         for (; q->e != q->b; ++*num_dropped)
         {
             size_t const    ix  =   q->b % q->capacity;
-            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
 
@@ -205,7 +211,7 @@ collect_c_cq_pop_from_back_n(
         if (NULL != q->pfn_element_free)
         {
             size_t const    ix  =   (q->e - 1) % q->capacity;
-            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
         }
@@ -240,7 +246,7 @@ collect_c_cq_pop_from_front_n(
         if (NULL != q->pfn_element_free)
         {
             size_t const    ix  =   i % q->capacity;
-            void* const     p   =   ((char*)q->storage) + (ix * q->el_size);
+            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
             (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
         }
