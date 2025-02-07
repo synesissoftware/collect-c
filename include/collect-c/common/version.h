@@ -9,6 +9,10 @@
  * ////////////////////////////////////////////////////////////////////// */
 
 
+/* /////////////////////////////////////////////////////////////////////////
+ * compatibility
+ */
+
 #ifdef __cplusplus
 # error All collect-c components are C only
 #endif
@@ -21,6 +25,10 @@
 # error collect-c requires C99 or later. If you are using Visual C++ you are encouraged to experiment with _MSC_VER for compatiblity and then submit patches to this project
 #endif
 
+
+/* /////////////////////////////////////////////////////////////////////////
+ * version
+ */
 
 #define COLLECT_C_VER_MAJOR         0
 #define COLLECT_C_VER_MINOR         0
@@ -36,9 +44,16 @@
     )
 
 
+/* /////////////////////////////////////////////////////////////////////////
+ * includes
+ */
 
 #include <stdint.h>
 
+
+/* /////////////////////////////////////////////////////////////////////////
+ * API functions
+ */
 
 /** Obtains the value of COLLECT_C_VER at the time of compilation of the
  * library.
@@ -48,4 +63,12 @@ collect_c_api_version(void);
 
 
 
+/* /////////////////////////////////////////////////////////////////////////
+ * inclusion control
+ */
+
 #pragma once
+
+
+/* ///////////////////////////// end of file //////////////////////////// */
+

@@ -14,6 +14,7 @@
  */
 
 #include <collect-c/common/version.h>
+#include <collect-c/circq.h>
 
 #include <xtests/terse-api.h>
 
@@ -25,6 +26,7 @@
  */
 
 static void TEST_LIBRARY_version(void);
+static void TEST_CIRCQ_version(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -41,6 +43,7 @@ int main(int argc, char* argv[])
     if (XTESTS_START_RUNNER("test.unit.cq", verbosity))
     {
         XTESTS_RUN_CASE(TEST_LIBRARY_version);
+        XTESTS_RUN_CASE(TEST_CIRCQ_version);
 
         XTESTS_PRINT_RESULTS();
 
@@ -60,6 +63,13 @@ static void TEST_LIBRARY_version(void)
 {
     {
         TEST_INT_EQ(COLLECT_C_VER, collect_c_api_version());
+    }
+}
+
+static void TEST_CIRCQ_version(void)
+{
+    {
+        TEST_INT_EQ(COLLECT_C_CIRCQ_VER, collect_c_cq_version());
     }
 }
 
