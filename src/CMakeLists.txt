@@ -5,7 +5,7 @@
 # Purpose:  CMake lists file for collect-c library
 #
 # Created:  4th February 2025
-# Updated:  5th February 2025
+# Updated:  7th February 2025
 #
 # ######################################################################## #
 
@@ -41,6 +41,7 @@ endif()
 
 set(CORE_SRCS
 	circq.c
+	dlist.c
 	version.c
 )
 
