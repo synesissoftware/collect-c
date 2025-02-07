@@ -76,9 +76,9 @@ collect_c_cq_free_storage(
         for (; q->e != q->b; )
         {
             size_t const    ix  =   q->b % q->capacity;
-            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+            void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-            (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
 
             ++q->b;
         }
@@ -111,9 +111,9 @@ collect_c_cq_push_by_ref(
     else
     {
         size_t const    ix  =   q->e % q->capacity;
-        void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+        void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-        memcpy(p, ptr_new_el, q->el_size);
+        memcpy(pe, ptr_new_el, q->el_size);
 
         ++q->e;
 
@@ -151,9 +151,9 @@ collect_c_cq_clear(
         for (; q->e != q->b; ++*num_dropped)
         {
             size_t const    ix  =   q->b % q->capacity;
-            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+            void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-            (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
 
             ++q->b;
         }
@@ -195,9 +195,9 @@ collect_c_cq_pop_from_back_n(
         if (NULL != q->pfn_element_free)
         {
             size_t const    ix  =   (q->e - 1) % q->capacity;
-            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+            void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-            (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
         }
 
         --q->e;
@@ -230,9 +230,9 @@ collect_c_cq_pop_from_front_n(
         if (NULL != q->pfn_element_free)
         {
             size_t const    ix  =   i % q->capacity;
-            void* const     p   =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+            void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-            (*q->pfn_element_free)(q->el_size, ix, p, q->param_element_free);
+            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
         }
 
         ++q->b;
