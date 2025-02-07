@@ -136,6 +136,7 @@ typedef struct collect_c_dlist_t        collect_c_dlist_t;
 #define COLLECT_C_DLIST_spare(l_name)                       ((l_name).num_spares)
 
 #define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)    (assert(sizeof(t_el) == (l_name).el_size), collect_c_dlist_push_back_by_ref(&(l_name), &((t_el){(new_el)})))
+#define COLLECT_DLIST_push_front_by_val(l_name, t_el, new_el)   (assert(sizeof(t_el) == (l_name).el_size), collect_c_dlist_push_front_by_ref(&(l_name), &((t_el){(new_el)})))
 
 
 
@@ -168,6 +169,12 @@ clc_dlist_free_storage(
 
 int
 collect_c_dlist_push_back_by_ref(
+    collect_c_dlist_t*  l
+,   void const*         ptr_new_el
+);
+
+int
+collect_c_dlist_push_front_by_ref(
     collect_c_dlist_t*  l
 ,   void const*         ptr_new_el
 );

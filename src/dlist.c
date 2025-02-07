@@ -137,6 +137,54 @@ collect_c_dlist_push_back_by_ref(
     }
 }
 
+int
+collect_c_dlist_push_front_by_ref(
+    collect_c_dlist_t*  l
+,   void const*         ptr_new_el
+)
+{
+    assert(NULL != l);
+    assert(NULL != ptr_new_el);
+
+    assert((NULL == l->head) == (NULL == l->tail));
+
+    {
+        if (NULL == l->head)
+        {
+            collect_c_dlist_node_t* const nd = clc_c_dl_make_node_(NULL, NULL, l->el_size, ptr_new_el);
+
+            if (NULL == nd)
+            {
+                return ENOMEM;
+            }
+
+            l->head = l->tail = nd;
+
+            assert(0 == l->size);
+
+            l->size = 1;
+        }
+        else
+        {
+            collect_c_dlist_node_t* const   prev    =   NULL;
+            collect_c_dlist_node_t* const   next    =   l->head;
+            collect_c_dlist_node_t* const   nd      =   clc_c_dl_make_node_(prev, next, l->el_size, ptr_new_el);
+
+            if (NULL == nd)
+            {
+                return ENOMEM;
+            }
+
+            l->head->prev = nd;
+            l->head = nd;
+
+            ++l->size;
+        }
+
+        return 0;
+    }
+}
+
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

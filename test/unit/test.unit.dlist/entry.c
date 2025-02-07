@@ -27,8 +27,10 @@
  */
 
 static void TEST_define_empty(void);
-static void TEST_ADD_1_ELEMENT(void);
-static void TEST_ADD_9_ELEMENTS(void);
+static void TEST_push_back_1_ELEMENT(void);
+static void TEST_push_back_9_ELEMENTS(void);
+static void TEST_push_front_1_ELEMENT(void);
+static void TEST_push_front_9_ELEMENTS(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -45,8 +47,10 @@ int main(int argc, char* argv[])
     if (XTESTS_START_RUNNER("test.unit.dlist", verbosity))
     {
         XTESTS_RUN_CASE(TEST_define_empty);
-        XTESTS_RUN_CASE(TEST_ADD_1_ELEMENT);
-        XTESTS_RUN_CASE(TEST_ADD_9_ELEMENTS);
+        XTESTS_RUN_CASE(TEST_push_back_1_ELEMENT);
+        XTESTS_RUN_CASE(TEST_push_back_9_ELEMENTS);
+        XTESTS_RUN_CASE(TEST_push_front_1_ELEMENT);
+        XTESTS_RUN_CASE(TEST_push_front_9_ELEMENTS);
 
         XTESTS_PRINT_RESULTS();
 
@@ -137,7 +141,7 @@ static void TEST_define_empty(void)
     }
 }
 
-static void TEST_ADD_1_ELEMENT(void)
+static void TEST_push_back_1_ELEMENT(void)
 {
     {
         CLC_DL_define_empty(int, l);
@@ -160,7 +164,7 @@ static void TEST_ADD_1_ELEMENT(void)
     }
 }
 
-static void TEST_ADD_9_ELEMENTS(void)
+static void TEST_push_back_9_ELEMENTS(void)
 {
     {
         int const values[] =
@@ -175,6 +179,67 @@ static void TEST_ADD_9_ELEMENTS(void)
         for (size_t i = 0; STLSOFT_NUM_ELEMENTS(values) != i; ++i)
         {
             int const r = CLC_DL_push_back_by_val(l, int, values[i]);
+
+            TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+            if (0 == r)
+            {
+                ++num_succeeded;
+
+                TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+                TEST_INT_EQ(num_succeeded, CLC_DL_len(l));
+                TEST_INT_EQ(0, CLC_DL_spare(l));
+            }
+        }
+
+        if (STLSOFT_NUM_ELEMENTS(values) == num_succeeded)
+        {
+            TEST_INT_EQ(45, accumulate_l2_forward(&l, 0));
+            TEST_INT_EQ(45, accumulate_l2_backward(&l, 0));
+        }
+
+        clc_dlist_free_storage(&l);
+    }
+}
+
+static void TEST_push_front_1_ELEMENT(void)
+{
+    {
+        CLC_DL_define_empty(int, l);
+
+        int const r = CLC_DL_push_front_by_val(l, int, 101);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+            TEST_INT_EQ(1, CLC_DL_len(l));
+            TEST_INT_EQ(0, CLC_DL_spare(l));
+
+            TEST_INT_EQ(101, accumulate_l2_forward(&l, 0));
+            TEST_INT_EQ(101, accumulate_l2_backward(&l, 0));
+
+            clc_dlist_free_storage(&l);
+        }
+    }
+}
+
+static void TEST_push_front_9_ELEMENTS(void)
+{
+    {
+        int const values[] =
+        {
+            1, 2, 3, 4, 5, 6, 7, 8, 9,
+        };
+
+        CLC_DL_define_empty(int, l);
+
+        size_t num_succeeded = 0;
+
+        for (size_t i = 0; STLSOFT_NUM_ELEMENTS(values) != i; ++i)
+        {
+            int const r = CLC_DL_push_front_by_val(l, int, values[i]);
 
             TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
 

@@ -27,6 +27,8 @@
 #define CLC_DL_spare                                        COLLECT_C_DLIST_spare
 
 #define CLC_DL_push_back_by_val                             COLLECT_DLIST_push_back_by_val
+#define CLC_DL_push_front_by_val                            COLLECT_DLIST_push_front_by_val
+
 
 /* /////////////////////////////////////////////////////////////////////////
  * inclusion control
