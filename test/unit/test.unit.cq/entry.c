@@ -35,6 +35,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void);
 static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void);
 static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void);
 static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void);
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL(void);
 
 static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void);
 
@@ -61,6 +62,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD);
         XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR);
         XTESTS_RUN_CASE(TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS);
+        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL);
 
         XTESTS_RUN_CASE(TEST_HEAP_ADD_WITHOUT_WRAP_1);
 
@@ -736,13 +738,29 @@ static void fn_accumulate_on_free(
 ,   void*   param_element_free
 )
 {
-    int* const  p_el = (int*)el_ptr;
-    long* const p_sum = (long*)param_element_free;
+    int* const  p_el    =   (int*)el_ptr;
+    long* const p_sum   =   (long*)param_element_free;
 
     ((void)&el_size);
     ((void)&el_index);
 
     *p_sum += *p_el;
+}
+
+static void fn_record_most_recent_overwrite(
+    size_t  el_size
+,   size_t  el_index
+,   void*   el_ptr
+,   void*   param_element_free
+)
+{
+    int* const  p_el    =   (int*)el_ptr;
+    int* const  p_rec   =   (int*)param_element_free;
+
+    ((void)&el_size);
+    ((void)&el_index);
+
+    *p_rec = *p_el;
 }
 
 static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
@@ -836,6 +854,156 @@ static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void)
             TEST_INT_EQ(10, CLC_CQ_len(q));
 
             clc_cq_free_storage(&q);
+        }
+    }
+}
+
+static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL(void)
+{
+    {
+        int array[8];
+        int previous = -1;
+
+        COLLECT_C_CIRCQ_define_on_stack_with_callback(q, array, fn_record_most_recent_overwrite, &previous);
+
+        q.flags |= CLC_CQ_F_OVERWRITE_FRONT_WHEN_FULL;
+
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(8, CLC_CQ_spare(q));
+
+        /* add el[0] */
+        {
+            int const   el  =   101;
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(1, CLC_CQ_len(q));
+            TEST_INT_EQ(7, CLC_CQ_spare(q));
+        }
+
+        /* add el[1] */
+        {
+            int const   el  =   202;
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(2, CLC_CQ_len(q));
+            TEST_INT_EQ(6, CLC_CQ_spare(q));
+        }
+
+        /* add el[2] */
+        {
+            int const   el  =   303;
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(3, CLC_CQ_len(q));
+            TEST_INT_EQ(5, CLC_CQ_spare(q));
+        }
+
+        /* add el[3] */
+        {
+            int const   el  =   404;
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(4, CLC_CQ_len(q));
+            TEST_INT_EQ(4, CLC_CQ_spare(q));
+        }
+
+        /* add el[4] */
+        {
+            int const   el  =   505;
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(5, CLC_CQ_len(q));
+            TEST_INT_EQ(3, CLC_CQ_spare(q));
+        }
+
+        /* add el[5] */
+        {
+            int const   el  =   606;
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(6, CLC_CQ_len(q));
+            TEST_INT_EQ(2, CLC_CQ_spare(q));
+        }
+
+        /* add el[6] */
+        {
+            int const   el  =   707;
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(7, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        /* add el[7] */
+        {
+            int const   el  =   808;
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        {
+            TEST_INT_EQ(-1, previous);
+
+            TEST_INT_EQ(101, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 2));
+            TEST_INT_EQ(404, *(int const*)CLC_CQ_at(q, 3));
+            TEST_INT_EQ(505, *(int const*)CLC_CQ_at(q, 4));
+            TEST_INT_EQ(606, *(int const*)CLC_CQ_at(q, 5));
+            TEST_INT_EQ(707, *(int const*)CLC_CQ_at(q, 6));
+            TEST_INT_EQ(808, *(int const*)CLC_CQ_at(q, 7));
+        }
+
+        /* add "el[8]" -> overwrite el[0] */
+        {
+            int const   el  =   909;
+            int const   r   =   CLC_CQ_push_by_ref(q, &el);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        {
+            TEST_INT_EQ(101, previous);
+
+            TEST_INT_EQ(202, *(int const*)CLC_CQ_at(q, 0));
+            TEST_INT_EQ(303, *(int const*)CLC_CQ_at(q, 1));
+            TEST_INT_EQ(404, *(int const*)CLC_CQ_at(q, 2));
+            TEST_INT_EQ(505, *(int const*)CLC_CQ_at(q, 3));
+            TEST_INT_EQ(606, *(int const*)CLC_CQ_at(q, 4));
+            TEST_INT_EQ(707, *(int const*)CLC_CQ_at(q, 5));
+            TEST_INT_EQ(808, *(int const*)CLC_CQ_at(q, 6));
+            TEST_INT_EQ(909, *(int const*)CLC_CQ_at(q, 7));
         }
     }
 }

@@ -21,8 +21,10 @@
  */
 
 #define CLC_CQ_F_USE_STACK_ARRAY                            COLLECT_C_CIRCQ_F_USE_STACK_ARRAY
+#define CLC_CQ_F_OVERWRITE_FRONT_WHEN_FULL                  COLLECT_C_CIRCQ_F_OVERWRITE_FRONT_WHEN_FULL
 
 #define CLC_CQ_define_empty                                 COLLECT_C_CIRCQ_define_empty
+#define CLC_CQ_define_empty_with_cb                         COLLECT_C_CIRCQ_define_empty_with_callback
 #define CLC_CQ_define_on_stack                              COLLECT_C_CIRCQ_define_on_stack
 #define CLC_CQ_define_on_stack_with_cb                      COLLECT_C_CIRCQ_define_on_stack_with_callback
 
