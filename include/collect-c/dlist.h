@@ -159,20 +159,28 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
                                                                             \
     collect_c_dlist_t l_name = COLLECT_C_DLIST_EMPTY_INITIALIZER_(l_el_type, 0, NULL, NULL, 0)
 
+#define COLLECT_C_DLIST_get_l_ptr_(l)                       _Generic((l),   \
+                                                                            \
+             collect_c_dlist_t* :  (l),                                     \
+       collect_c_dlist_t const* :  (l),                                     \
+                        default : &(l)                                      \
+)
 
-#define COLLECT_C_DLIST_is_empty(l_name)                    (0 == (l_name).size)
-#define COLLECT_C_DLIST_len(l_name)                         ((l_name).size)
-#define COLLECT_C_DLIST_spare(l_name)                       ((l_name).num_spares)
+#define COLLECT_C_DLIST_is_empty(l_name)                    (0 == COLLECT_C_DLIST_get_l_ptr_((l_name))->size)
+#define COLLECT_C_DLIST_len(l_name)                         (COLLECT_C_DLIST_get_l_ptr_((l_name))->size)
+#define COLLECT_C_DLIST_spare(l_name)                       (COLLECT_C_DLIST_get_l_ptr_((l_name))->num_spares)
 
-#define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)    (assert(sizeof(t_el) == (l_name).el_size), collect_c_dlist_push_back_by_ref(&(l_name), &((t_el){(new_el)})))
-#define COLLECT_DLIST_push_front_by_val(l_name, t_el, new_el)   (assert(sizeof(t_el) == (l_name).el_size), collect_c_dlist_push_front_by_ref(&(l_name), &((t_el){(new_el)})))
+#define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)    \
+                                                            (assert(sizeof(t_el) == COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size), collect_c_dlist_push_back_by_ref(&(l_name), &((t_el){(new_el)})))
+#define COLLECT_DLIST_push_front_by_val(l_name, t_el, new_el)   \
+                                                            (assert(sizeof(t_el) == COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size), collect_c_dlist_push_front_by_ref(&(l_name), &((t_el){(new_el)})))
 
 #define COLLECT_C_DLIST_clear_1_(l_name)                    collect_c_dlist_clear(&(l_name), NULL, NULL, NULL)
 #define COLLECT_C_DLIST_clear_2_(l_name, p)                 collect_c_dlist_clear(&(l_name), NULL, NULL, (p))
 
-#define COLLECT_C_DLIST_clear_GET_MACRO_(_1, _2, macro, ...)    macro
+#define COLLECT_C_DLIST_GET_MACRO_1_or_2_(_1, _2, mac, ...) mac
 
-#define COLLECT_C_DLIST_clear(...)                          COLLECT_C_DLIST_clear_GET_MACRO_(__VA_ARGS__, COLLECT_C_DLIST_clear_2_, COLLECT_C_DLIST_clear_1_, NULL)(__VA_ARGS__)
+#define COLLECT_C_DLIST_clear(...)                          COLLECT_C_DLIST_GET_MACRO_1_or_2_(__VA_ARGS__, COLLECT_C_DLIST_clear_2_, COLLECT_C_DLIST_clear_1_, NULL)(__VA_ARGS__)
 
 #define COLLECT_C_DLIST_erase_node(l_name, node)            collect_c_dlist_erase_node((l_name), (node))
 

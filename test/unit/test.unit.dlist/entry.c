@@ -311,6 +311,36 @@ static void TEST_push_front_1_ELEMENT_THEN_clear(void)
 
         if (0 == r)
         {
+            TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+            TEST_INT_EQ(1, CLC_DL_len(l));
+            TEST_INT_EQ(0, CLC_DL_spare(l));
+
+            TEST_INT_EQ(101, accumulate_l2_forward(&l, 0));
+            TEST_INT_EQ(101, accumulate_l2_backward(&l, 0));
+
+            {
+                int const r2 = CLC_DL_clear(l);
+
+                TEST_INT_EQ(0, r2);
+
+                TEST_BOOLEAN_TRUE(CLC_DL_is_empty(l));
+                TEST_INT_EQ(0, CLC_DL_len(l));
+                TEST_INT_EQ(1, CLC_DL_spare(l));
+            }
+
+            clc_dlist_free_storage(&l);
+        }
+    }
+
+    {
+        CLC_DL_define_empty(int, l);
+
+        int const r = CLC_DL_push_front_by_val(l, int, 101);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
             size_t num_dropped;
 
             TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
