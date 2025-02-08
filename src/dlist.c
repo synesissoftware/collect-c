@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 7th February 2025
+ * Updated: 8th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -74,19 +74,32 @@ clc_dlist_free_storage(
 {
     assert(NULL != l);
 
-    for (collect_c_dlist_node_t* n = l->head; NULL != n; )
     {
-        collect_c_dlist_node_t* const n2 = n;
+        for (collect_c_dlist_node_t* n = l->head; NULL != n; )
+        {
+            collect_c_dlist_node_t* const n2 = n;
 
-        n = n->next;
+            n = n->next;
 
-        free(n2);
+            free(n2);
+        }
+
+        l->head = l->tail = NULL;
+        l->size = 0;
+
+        for (collect_c_dlist_node_t* n = l->spares; NULL != n; )
+        {
+            collect_c_dlist_node_t* const n2 = n;
+
+            n = n->next;
+
+            free(n2);
+        }
+
+        l->spares = NULL;
+
+        return 0;
     }
-
-    l->head = l->tail = NULL;
-    l->size = 0;
-
-    return 0;
 }
 
 int
