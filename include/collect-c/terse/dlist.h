@@ -20,6 +20,8 @@
  * terse-form macros
  */
 
+#define CLC_DL_F_NO_SPARES                                  COLLECT_C_DLIST_F_NO_SPARES
+
 #define CLC_DL_define_empty                                 COLLECT_C_DLIST_define_empty
 
 #define CLC_DL_is_empty                                     COLLECT_C_DLIST_is_empty
@@ -30,6 +32,7 @@
 #define CLC_DL_push_front_by_val                            COLLECT_DLIST_push_front_by_val
 
 #define CLC_DL_clear                                        COLLECT_C_DLIST_clear
+#define CLC_DL_erase_node                                   COLLECT_C_DLIST_erase_node
 
 
 /* /////////////////////////////////////////////////////////////////////////

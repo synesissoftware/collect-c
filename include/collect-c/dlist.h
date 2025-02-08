@@ -50,6 +50,14 @@
 
 
 /* /////////////////////////////////////////////////////////////////////////
+ * API constants
+ */
+
+/** Suppresses collection of erased nodes as spares. */
+#define COLLECT_C_DLIST_F_NO_SPARES                         (0x00000001)
+
+
+/* /////////////////////////////////////////////////////////////////////////
  * API types
  */
 
@@ -166,6 +174,7 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
 
 #define COLLECT_C_DLIST_clear(...)                          COLLECT_C_DLIST_clear_GET_MACRO_(__VA_ARGS__, COLLECT_C_DLIST_clear_2_, COLLECT_C_DLIST_clear_1_, NULL)(__VA_ARGS__)
 
+#define COLLECT_C_DLIST_erase_node(l_name, node)            collect_c_dlist_erase_node((l_name), (node))
 
 
 
@@ -213,6 +222,12 @@ collect_c_dlist_clear(
 ,   void*               reserved0
 ,   void*               reserved1
 ,   size_t*             num_dropped
+);
+
+int
+collect_c_dlist_erase_node(
+    collect_c_dlist_t*      l
+,   collect_c_dlist_node_t* node
 );
 
 /** Performs a forward search of the list for a node matching the search

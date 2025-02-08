@@ -156,6 +156,79 @@ collect_c_dlist_clear(
 }
 
 int
+collect_c_dlist_erase_node(
+    collect_c_dlist_t*      l
+,   collect_c_dlist_node_t* node
+)
+{
+    assert(NULL != l);
+    assert(NULL != node);
+
+    {
+        /* simple set of actions:
+         *
+         * 1. "destruct" element;
+         * 2. unhook;
+         * 3. destroy (or make spare);
+         */
+
+        if (NULL != l->pfn_element_free)
+        {
+            (*l->pfn_element_free)(l->el_size, 0, &node->data->data[0], l->param_element_free);
+        }
+
+        {
+            assert(NULL != node->prev || l->head == node);
+            assert(NULL != node->next || l->tail == node);
+
+            /* four aspects:
+             *
+             * 1. if node is head, then replace head with node->next; else
+             * 2.
+             *
+             * 3.
+             * 4.
+             */
+
+            if (NULL != node->prev)
+            {
+                node->prev->next = node->next;
+            }
+            else
+            {
+                l->head = node->next;
+            }
+
+            if (NULL != node->next)
+            {
+                node->next->prev = node->prev;
+            }
+            else
+            {
+                l->tail = node->prev;
+            }
+
+            --l->size;
+
+            if (0 != (COLLECT_C_DLIST_F_NO_SPARES & l->flags))
+            {
+                free(node);
+            }
+            else
+            {
+                node->next = node->prev = l->spares;
+
+                l->spares = node;
+
+                ++l->num_spares;
+            }
+        }
+
+        return 0;
+    }
+}
+
+int
 collect_c_dlist_find_node(
     collect_c_dlist_t const*        l
 ,   collect_c_dlist_pfn_compare_t   pfn
