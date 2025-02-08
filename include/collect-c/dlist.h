@@ -105,7 +105,7 @@ struct collect_c_dlist_t
     void*                       param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free */
     void                      (*pfn_element_free)(
         size_t  el_size
-    ,   size_t  el_index
+    ,   size_t  el_index    /* always 0 */
     ,   void*   el_ptr
     ,   void*   param_element_free
     );                                              /*! Custom function to be invoked when */
@@ -113,6 +113,27 @@ struct collect_c_dlist_t
 #ifndef __cplusplus
 typedef struct collect_c_dlist_t        collect_c_dlist_t;
 #endif
+
+/** T.B.C.
+ *
+ * @param l Pointer to the list. Will not be NULL;
+ * @param p_lhs Pointer to the lhs element. Will not be NULL;
+ * @param p_rhs Pointer to the lhs element. Will not be NULL;
+ *
+ * @retval <0 The element referred to by p_lhs is "less than" the element
+ *  referred to by p_rhs;
+ * @retval 0 A matching element is found;
+ * @retval >0 The element referred to by p_lhs is "greater than" the element
+ *  referred to by p_rhs;
+ *
+ * @note No modifications to l are permitted.
+ */
+typedef int (*collect_c_dlist_pfn_compare_t)(
+    collect_c_dlist_t const*    l
+,   void const*                 p_lhs
+,   void const*                 p_rhs
+);
+
 
 /* /////////////////////////////////////////////////////////////////////////
  * API functions & macros
@@ -192,6 +213,66 @@ collect_c_dlist_clear(
 ,   void*               reserved0
 ,   void*               reserved1
 ,   size_t*             num_dropped
+);
+
+/** Performs a forward search of the list for a node matching the search
+ * criteria.
+ *
+ * @param l Pointer to the list. May not be NULL;
+ * @param pfn Comparison function that will be used to identify a node. The
+ *  comparison function's lhs is provided by p_lhs, and its rhs values will
+ *  be provided during this API function's execution. May not be NULL;
+ * @param p_lhs Caller-supplied parameter to be passed back to pfn for
+ *  identifying the node(s) to be found. May not be NULL, and must point to
+ *  a value suitable to act as the "lhs" for pfn;
+ * @param skip_found Number of matched nodes to ignore before a node is
+ *  designated as being found;
+ * @param node Pointer to a variable to receive the found node. May not be
+ *  NULL;
+ * @param num_searched Optional pointer to obtain the number of elements
+ *  traversed in the search including, if found, the matching element;
+ *
+ * @retval 0 An element was found matching the given criteria;
+ * @retval ENOENT No element was found matching the given criteria;
+ */
+int
+collect_c_dlist_find_node(
+    collect_c_dlist_t const*        l
+,   collect_c_dlist_pfn_compare_t   pfn
+,   void const*                     p_lhs
+,   size_t                          skip_count
+,   collect_c_dlist_node_t**        node
+,   size_t*                         num_searched
+);
+
+/** Performs a reverse search of the list for a node matching the search
+ * criteria.
+ *
+ * @param l Pointer to the list. May not be NULL;
+ * @param pfn Comparison function that will be used to identify a node. The
+ *  comparison function's lhs is provided by p_lhs, and its rhs values will
+ *  be provided during this API function's execution. May not be NULL;
+ * @param p_lhs Caller-supplied parameter to be passed back to pfn for
+ *  identifying the node(s) to be found. May not be NULL, and must point to
+ *  a value suitable to act as the "lhs" for pfn;
+ * @param skip_found Number of matched nodes to ignore before a node is
+ *  designated as being found;
+ * @param node Pointer to a variable to receive the found node. May not be
+ *  NULL;
+ * @param num_searched Optional pointer to obtain the number of elements
+ *  traversed in the search including, if found, the matching element;
+ *
+ * @retval 0 An element was found matching the given criteria;
+ * @retval ENOENT No element was found matching the given criteria;
+ */
+int
+collect_c_dlist_rfind_node(
+    collect_c_dlist_t const*        l
+,   collect_c_dlist_pfn_compare_t   pfn
+,   void const*                     p_lhs
+,   size_t                          skip_count
+,   collect_c_dlist_node_t**        node
+,   size_t*                         num_searched
 );
 
 int

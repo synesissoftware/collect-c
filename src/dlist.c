@@ -156,6 +156,102 @@ collect_c_dlist_clear(
 }
 
 int
+collect_c_dlist_find_node(
+    collect_c_dlist_t const*        l
+,   collect_c_dlist_pfn_compare_t   pfn
+,   void const*                     p_lhs
+,   size_t                          skip_count
+,   collect_c_dlist_node_t**        node
+,   size_t*                         num_searched
+)
+{
+    assert(NULL != l);
+    assert(NULL != pfn);
+    assert(NULL != p_lhs);
+    assert(NULL != node);
+
+    *node = NULL;
+
+    {
+        size_t dummy;
+
+        if (NULL == num_searched)
+        {
+            num_searched = &dummy;
+        }
+
+        *num_searched = 0;
+
+        for (collect_c_dlist_node_t* n = l->head; NULL != n; n = n->next)
+        {
+            int const r = (*pfn)(l, p_lhs, &n->data->data[0]);
+
+            ++*num_searched;
+
+            if (0 == r)
+            {
+                if (0 == skip_count--)
+                {
+                    *node = n;
+
+                    return 0;
+                }
+            }
+        }
+
+        return ENOENT;
+    }
+}
+
+int
+collect_c_dlist_rfind_node(
+    collect_c_dlist_t const*        l
+,   collect_c_dlist_pfn_compare_t   pfn
+,   void const*                     p_lhs
+,   size_t                          skip_count
+,   collect_c_dlist_node_t**        node
+,   size_t*                         num_searched
+)
+{
+    assert(NULL != l);
+    assert(NULL != pfn);
+    assert(NULL != p_lhs);
+    assert(NULL != node);
+
+    *node = NULL;
+
+    {
+        size_t dummy;
+
+        if (NULL == num_searched)
+        {
+            num_searched = &dummy;
+        }
+
+        *num_searched = 0;
+
+        for (collect_c_dlist_node_t* n = l->tail; NULL != n; n = n->prev)
+        {
+            int const r = (*pfn)(l, p_lhs, &n->data->data[0]);
+
+            ++*num_searched;
+
+            if (0 == r)
+            {
+                if (0 == skip_count--)
+                {
+                    *node = n;
+
+                    return 0;
+                }
+            }
+        }
+
+        return ENOENT;
+    }
+}
+
+int
 collect_c_dlist_push_back_by_ref(
     collect_c_dlist_t*  l
 ,   void const*         ptr_new_el

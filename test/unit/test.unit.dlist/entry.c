@@ -33,6 +33,8 @@ static void TEST_push_front_1_ELEMENT(void);
 static void TEST_push_front_9_ELEMENTS(void);
 static void TEST_push_front_1_ELEMENT_THEN_clear(void);
 static void TEST_push_front_9_ELEMENTS_THEN_clear(void);
+static void TEST_push_back_9_ELEMENTS_THEN_find(void);
+static void TEST_push_back_9_ELEMENTS_THEN_rfind(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -55,6 +57,8 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_push_front_9_ELEMENTS);
         XTESTS_RUN_CASE(TEST_push_front_1_ELEMENT_THEN_clear);
         XTESTS_RUN_CASE(TEST_push_front_9_ELEMENTS_THEN_clear);
+        XTESTS_RUN_CASE(TEST_push_back_9_ELEMENTS_THEN_find);
+        XTESTS_RUN_CASE(TEST_push_back_9_ELEMENTS_THEN_rfind);
 
         XTESTS_PRINT_RESULTS();
 
@@ -111,6 +115,31 @@ accumulate_l2_backward(
     }
 
     return r;
+}
+
+int compare_matching_int(
+    collect_c_dlist_t const*    l
+,   void const*                 p_lhs
+,   void const*                 p_rhs
+)
+{
+    int const* const    pi_lhs  =   (int const*)p_lhs;
+    int const* const    pi_rhs  =   (int const*)p_rhs;
+    int const           d       =   *pi_lhs - *pi_rhs;
+
+    ((void)&l);
+
+    if (d < 0)
+    {
+        return -1;
+    }
+
+    if (d > 0)
+    {
+        return +1;
+    }
+
+    return 0;
 }
 
 
@@ -349,6 +378,194 @@ static void TEST_push_front_9_ELEMENTS_THEN_clear(void)
                 TEST_BOOLEAN_TRUE(CLC_DL_is_empty(l));
                 TEST_INT_EQ(0, CLC_DL_len(l));
                 TEST_INT_EQ(9, CLC_DL_spare(l));
+            }
+        }
+
+        clc_dlist_free_storage(&l);
+    }
+}
+
+static void TEST_push_back_9_ELEMENTS_THEN_find(void)
+{
+    {
+        int const values[] =
+        {
+            1, 2, 3, 4, 5, 4, 3, 2, 1,
+        };
+
+        CLC_DL_define_empty(int, l);
+
+        size_t num_succeeded = 0;
+
+        for (size_t i = 0; STLSOFT_NUM_ELEMENTS(values) != i; ++i)
+        {
+            int const r = CLC_DL_push_back_by_val(l, int, values[i]);
+
+            TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+            if (0 == r)
+            {
+                ++num_succeeded;
+
+                TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+                TEST_INT_EQ(num_succeeded, CLC_DL_len(l));
+                TEST_INT_EQ(0, CLC_DL_spare(l));
+            }
+        }
+
+        if (STLSOFT_NUM_ELEMENTS(values) == num_succeeded)
+        {
+            TEST_INT_EQ(25, accumulate_l2_forward(&l, 0));
+            TEST_INT_EQ(25, accumulate_l2_backward(&l, 0));
+
+            /* find one that exists */
+            {
+                int const               v_1 =   1;
+
+                collect_c_dlist_node_t* node;
+                size_t                  num_searched;
+                int const               r = collect_c_dlist_find_node(&l, compare_matching_int, &v_1, 0, &node, &num_searched);
+
+                TEST_INT_EQ(0, r);
+
+                TEST_PTR_NE(NULL, node);
+                TEST_INT_EQ(1, num_searched);
+            }
+
+            /* find another that exists */
+            {
+                int const               v_3 =   3;
+
+                collect_c_dlist_node_t* node;
+                size_t                  num_searched;
+                int const               r = collect_c_dlist_find_node(&l, compare_matching_int, &v_3, 0, &node, &num_searched);
+
+                TEST_INT_EQ(0, r);
+
+                TEST_PTR_NE(NULL, node);
+                TEST_INT_EQ(3, num_searched);
+            }
+
+            /* find one that does not exist */
+            {
+                int const               v_6 =   6;
+
+                collect_c_dlist_node_t* node;
+                size_t                  num_searched;
+                int const               r = collect_c_dlist_find_node(&l, compare_matching_int, &v_6, 0, &node, &num_searched);
+
+                TEST_INT_NE(0, r);
+
+                TEST_PTR_EQ(NULL, node);
+                TEST_INT_EQ(9, num_searched);
+            }
+
+            /* find one that exists twice, getting the second one */
+            {
+                int const               v_4 =   4;
+
+                collect_c_dlist_node_t* node;
+                size_t                  num_searched;
+                int const               r = collect_c_dlist_find_node(&l, compare_matching_int, &v_4, 1, &node, &num_searched);
+
+                TEST_INT_EQ(0, r);
+
+                TEST_PTR_NE(NULL, node);
+                TEST_INT_EQ(6, num_searched);
+            }
+        }
+
+        clc_dlist_free_storage(&l);
+    }
+}
+
+static void TEST_push_back_9_ELEMENTS_THEN_rfind(void)
+{
+    {
+        int const values[] =
+        {
+            1, 2, 3, 4, 5, 1, 2, 3, 4,
+        };
+
+        CLC_DL_define_empty(int, l);
+
+        size_t num_succeeded = 0;
+
+        for (size_t i = 0; STLSOFT_NUM_ELEMENTS(values) != i; ++i)
+        {
+            int const r = CLC_DL_push_back_by_val(l, int, values[i]);
+
+            TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+            if (0 == r)
+            {
+                ++num_succeeded;
+
+                TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+                TEST_INT_EQ(num_succeeded, CLC_DL_len(l));
+                TEST_INT_EQ(0, CLC_DL_spare(l));
+            }
+        }
+
+        if (STLSOFT_NUM_ELEMENTS(values) == num_succeeded)
+        {
+            TEST_INT_EQ(25, accumulate_l2_forward(&l, 0));
+            TEST_INT_EQ(25, accumulate_l2_backward(&l, 0));
+
+            /* find one that exists */
+            {
+                int const               v_4 =   4;
+
+                collect_c_dlist_node_t* node;
+                size_t                  num_searched;
+                int const               r = collect_c_dlist_rfind_node(&l, compare_matching_int, &v_4, 0, &node, &num_searched);
+
+                TEST_INT_EQ(0, r);
+
+                TEST_PTR_NE(NULL, node);
+                TEST_INT_EQ(1, num_searched);
+            }
+
+            /* find another that exists */
+            {
+                int const               v_3 =   3;
+
+                collect_c_dlist_node_t* node;
+                size_t                  num_searched;
+                int const               r = collect_c_dlist_rfind_node(&l, compare_matching_int, &v_3, 0, &node, &num_searched);
+
+                TEST_INT_EQ(0, r);
+
+                TEST_PTR_NE(NULL, node);
+                TEST_INT_EQ(2, num_searched);
+            }
+
+            /* find one that does not exist */
+            {
+                int const               v_6 =   6;
+
+                collect_c_dlist_node_t* node;
+                size_t                  num_searched;
+                int const               r = collect_c_dlist_rfind_node(&l, compare_matching_int, &v_6, 0, &node, &num_searched);
+
+                TEST_INT_NE(0, r);
+
+                TEST_PTR_EQ(NULL, node);
+                TEST_INT_EQ(9, num_searched);
+            }
+
+            /* find one that exists twice, getting the second one */
+            {
+                int const               v_3 =   3;
+
+                collect_c_dlist_node_t* node;
+                size_t                  num_searched;
+                int const               r = collect_c_dlist_rfind_node(&l, compare_matching_int, &v_3, 1, &node, &num_searched);
+
+                TEST_INT_EQ(0, r);
+
+                TEST_PTR_NE(NULL, node);
+                TEST_INT_EQ(7, num_searched);
             }
         }
 
