@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 7th February 2025
+ * Updated: 8th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -138,6 +138,13 @@ typedef struct collect_c_dlist_t        collect_c_dlist_t;
 #define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)    (assert(sizeof(t_el) == (l_name).el_size), collect_c_dlist_push_back_by_ref(&(l_name), &((t_el){(new_el)})))
 #define COLLECT_DLIST_push_front_by_val(l_name, t_el, new_el)   (assert(sizeof(t_el) == (l_name).el_size), collect_c_dlist_push_front_by_ref(&(l_name), &((t_el){(new_el)})))
 
+#define COLLECT_C_DLIST_clear_1_(l_name)                    collect_c_dlist_clear(&(l_name), NULL, NULL, NULL)
+#define COLLECT_C_DLIST_clear_2_(l_name, p)                 collect_c_dlist_clear(&(l_name), NULL, NULL, (p))
+
+#define COLLECT_C_DLIST_clear_GET_MACRO_(_1, _2, macro, ...)    macro
+
+#define COLLECT_C_DLIST_clear(...)                          COLLECT_C_DLIST_clear_GET_MACRO_(__VA_ARGS__, COLLECT_C_DLIST_clear_2_, COLLECT_C_DLIST_clear_1_, NULL)(__VA_ARGS__)
+
 
 
 
@@ -166,6 +173,26 @@ clc_dlist_free_storage(
     collect_c_dlist_t*  l
 );
 
+/** Clears all elements from the list.
+ *
+ * @param l Pointer to the list. Must not be NULL;
+ * @param reserved0 Reserved. Must be 0;
+ * @param reserved1 Reserved. Must be 0;
+ * @param num_dropped Optional pointer to variable to retrieve number of
+ *  entries dropped;
+ *
+ * @pre (NULL != l);
+ * @pre (NULL != l->storage);
+ * @pre (0 == reserved0);
+ * @pre (0 == reserved1);
+ */
+int
+collect_c_dlist_clear(
+    collect_c_dlist_t*  l
+,   void*               reserved0
+,   void*               reserved1
+,   size_t*             num_dropped
+);
 
 int
 collect_c_dlist_push_back_by_ref(
@@ -178,8 +205,6 @@ collect_c_dlist_push_front_by_ref(
     collect_c_dlist_t*  l
 ,   void const*         ptr_new_el
 );
-
-
 
 #ifdef __cplusplus
 } /* extern "C" */

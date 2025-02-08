@@ -103,6 +103,59 @@ clc_dlist_free_storage(
 }
 
 int
+collect_c_dlist_clear(
+    collect_c_dlist_t*  l
+,   void*               reserved0
+,   void*               reserved1
+,   size_t*             num_dropped
+)
+{
+    ((void)&reserved0);
+    ((void)&reserved1);
+
+    assert(NULL != l);
+    assert(NULL == reserved0);
+    assert(NULL == reserved1);
+
+    {
+        size_t dummy;
+
+        if (NULL == num_dropped)
+        {
+            num_dropped = &dummy;
+        }
+
+        *num_dropped = 0;
+
+        for (collect_c_dlist_node_t* n = l->head; NULL != n; )
+        {
+            collect_c_dlist_node_t* const n2 = n;
+
+            n = n->next;
+
+#if 1
+
+            n2->next = n2->prev = l->spares;
+
+            l->spares = n2;
+
+            ++l->num_spares;
+#else
+
+            free(n2);
+#endif
+
+            ++*num_dropped;
+        }
+
+        l->head = l->tail = NULL;
+        l->size = 0;
+
+        return 0;
+    }
+}
+
+int
 collect_c_dlist_push_back_by_ref(
     collect_c_dlist_t*  l
 ,   void const*         ptr_new_el
