@@ -166,17 +166,35 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
                         default : &(l)                                      \
 )
 
-#define COLLECT_C_DLIST_is_empty(l_name)                    (0 == COLLECT_C_DLIST_get_l_ptr_((l_name))->size)
-#define COLLECT_C_DLIST_len(l_name)                         (COLLECT_C_DLIST_get_l_ptr_((l_name))->size)
-#define COLLECT_C_DLIST_spare(l_name)                       (COLLECT_C_DLIST_get_l_ptr_((l_name))->num_spares)
+#define COLLECT_C_DLIST_is_empty(l_name)                    (0 == COLLECT_C_DLIST_get_l_ptr_((l_name))->size      )
+#define COLLECT_C_DLIST_len(l_name)                         (     COLLECT_C_DLIST_get_l_ptr_((l_name))->size      )
+#define COLLECT_C_DLIST_spare(l_name)                       (     COLLECT_C_DLIST_get_l_ptr_((l_name))->num_spares)
+
+#define COLLECT_C_DLIST_node_data_(n)                       ((void      *)(&(n)->data[0].data[0]))
+#define COLLECT_C_DLIST_node_cdata_(n)                      ((void const*)(&(n)->data[0].data[0]))
+
+#define COLLECT_C_DLIST_head_(l_name)                       (assert(!COLLECT_C_DLIST_is_empty((l_name))), (COLLECT_C_DLIST_get_l_ptr_((l_name))->head))
+#define COLLECT_C_DLIST_tail_(l_name)                       (assert(!COLLECT_C_DLIST_is_empty((l_name))), (COLLECT_C_DLIST_get_l_ptr_((l_name))->tail))
+
+#define COLLECT_C_DLIST_front_v(l_name)                     COLLECT_C_DLIST_node_data_( COLLECT_C_DLIST_head_((l_name)))
+#define COLLECT_C_DLIST_back_v(l_name)                      COLLECT_C_DLIST_node_data_( COLLECT_C_DLIST_tail_((l_name)))
+
+#define COLLECT_C_DLIST_cfront_v(l_name)                    COLLECT_C_DLIST_node_cdata_(COLLECT_C_DLIST_head_((l_name)))
+#define COLLECT_C_DLIST_cback_v(l_name)                     COLLECT_C_DLIST_node_cdata_(COLLECT_C_DLIST_tail_((l_name)))
+
+#define COLLECT_C_DLIST_front_t(l_name, t_el)               ((t_el      *)(assert(sizeof(t_el)==COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size),  COLLECT_C_DLIST_front_v((l_name))))
+#define COLLECT_C_DLIST_back_t(l_name, t_el)                ((t_el      *)(assert(sizeof(t_el)==COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size),   COLLECT_C_DLIST_back_v((l_name))))
+
+#define COLLECT_C_DLIST_cfront_t(l_name, t_el)              ((t_el const*)(assert(sizeof(t_el)==COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size), COLLECT_C_DLIST_cfront_v((l_name))))
+#define COLLECT_C_DLIST_cback_t(l_name, t_el)               ((t_el const*)(assert(sizeof(t_el)==COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size),  COLLECT_C_DLIST_cback_v((l_name))))
 
 #define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)    \
-                                                            (assert(sizeof(t_el) == COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size), collect_c_dlist_push_back_by_ref(&(l_name), &((t_el){(new_el)})))
+                                                            (assert(sizeof(t_el)==COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size),  collect_c_dlist_push_back_by_ref(COLLECT_C_DLIST_get_l_ptr_((l_name)), &((t_el){(new_el)})))
 #define COLLECT_DLIST_push_front_by_val(l_name, t_el, new_el)   \
-                                                            (assert(sizeof(t_el) == COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size), collect_c_dlist_push_front_by_ref(&(l_name), &((t_el){(new_el)})))
+                                                            (assert(sizeof(t_el)==COLLECT_C_DLIST_get_l_ptr_((l_name))->el_size), collect_c_dlist_push_front_by_ref(COLLECT_C_DLIST_get_l_ptr_((l_name)), &((t_el){(new_el)})))
 
-#define COLLECT_C_DLIST_clear_1_(l_name)                    collect_c_dlist_clear(&(l_name), NULL, NULL, NULL)
-#define COLLECT_C_DLIST_clear_2_(l_name, p)                 collect_c_dlist_clear(&(l_name), NULL, NULL, (p))
+#define COLLECT_C_DLIST_clear_1_(l_name)                    collect_c_dlist_clear(COLLECT_C_DLIST_get_l_ptr_((l_name)), NULL, NULL, NULL)
+#define COLLECT_C_DLIST_clear_2_(l_name, p)                 collect_c_dlist_clear(COLLECT_C_DLIST_get_l_ptr_((l_name)), NULL, NULL,  (p))
 
 #define COLLECT_C_DLIST_GET_MACRO_1_or_2_(_1, _2, mac, ...) mac
 

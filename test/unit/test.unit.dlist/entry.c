@@ -196,6 +196,9 @@ static void TEST_push_back_1_ELEMENT(void)
             TEST_INT_EQ(101, accumulate_l2_forward(&l, 0));
             TEST_INT_EQ(101, accumulate_l2_backward(&l, 0));
 
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cback_t(l, int));
+
             clc_dlist_free_storage(&l);
         }
     }
@@ -292,6 +295,9 @@ static void TEST_push_front_9_ELEMENTS(void)
 
         if (STLSOFT_NUM_ELEMENTS(values) == num_succeeded)
         {
+            TEST_INT_EQ(9, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(1, *COLLECT_C_DLIST_cback_t(l, int));
+
             TEST_INT_EQ(45, accumulate_l2_forward(&l, 0));
             TEST_INT_EQ(45, accumulate_l2_backward(&l, 0));
         }
@@ -314,6 +320,9 @@ static void TEST_push_front_1_ELEMENT_THEN_clear(void)
             TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
             TEST_INT_EQ(1, CLC_DL_len(l));
             TEST_INT_EQ(0, CLC_DL_spare(l));
+
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cback_t(l, int));
 
             TEST_INT_EQ(101, accumulate_l2_forward(&l, 0));
             TEST_INT_EQ(101, accumulate_l2_backward(&l, 0));
@@ -346,6 +355,9 @@ static void TEST_push_front_1_ELEMENT_THEN_clear(void)
             TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
             TEST_INT_EQ(1, CLC_DL_len(l));
             TEST_INT_EQ(0, CLC_DL_spare(l));
+
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cback_t(l, int));
 
             TEST_INT_EQ(101, accumulate_l2_forward(&l, 0));
             TEST_INT_EQ(101, accumulate_l2_backward(&l, 0));
@@ -397,6 +409,9 @@ static void TEST_push_front_9_ELEMENTS_THEN_clear(void)
 
         if (STLSOFT_NUM_ELEMENTS(values) == num_succeeded)
         {
+            TEST_INT_EQ(9, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(1, *COLLECT_C_DLIST_cback_t(l, int));
+
             TEST_INT_EQ(45, accumulate_l2_forward(&l, 0));
             TEST_INT_EQ(45, accumulate_l2_backward(&l, 0));
 
@@ -638,6 +653,10 @@ static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase(void)
         if (STLSOFT_NUM_ELEMENTS(values) == num_succeeded)
         {
             TEST_INT_EQ(9, CLC_DL_len(l));
+
+            TEST_INT_EQ(1, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(9, *COLLECT_C_DLIST_cback_t(l, int));
+
             TEST_INT_EQ(45, accumulate_l2_forward(&l, 0));
             TEST_INT_EQ(45, accumulate_l2_backward(&l, 0));
 
@@ -661,6 +680,9 @@ static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase(void)
 
                     TEST_INT_EQ(8, CLC_DL_len(l));
                     TEST_INT_EQ(1, CLC_DL_spare(l));
+
+                    TEST_INT_EQ(1, *COLLECT_C_DLIST_cfront_t(l, int));
+                    TEST_INT_EQ(9, *COLLECT_C_DLIST_cback_t(l, int));
 
                     TEST_INT_EQ(39, accumulate_l2_forward(&l, 0));
                     TEST_INT_EQ(39, accumulate_l2_backward(&l, 0));
@@ -705,6 +727,10 @@ static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase_NO_SPARES(void)
         if (STLSOFT_NUM_ELEMENTS(values) == num_succeeded)
         {
             TEST_INT_EQ(9, CLC_DL_len(l));
+
+            TEST_INT_EQ(1, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(9, *COLLECT_C_DLIST_cback_t(l, int));
+
             TEST_INT_EQ(45, accumulate_l2_forward(&l, 0));
             TEST_INT_EQ(45, accumulate_l2_backward(&l, 0));
 
@@ -728,6 +754,9 @@ static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase_NO_SPARES(void)
 
                     TEST_INT_EQ(8, CLC_DL_len(l));
                     TEST_INT_EQ(0, CLC_DL_spare(l));
+
+                    TEST_INT_EQ(1, *COLLECT_C_DLIST_cfront_t(l, int));
+                    TEST_INT_EQ(9, *COLLECT_C_DLIST_cback_t(l, int));
 
                     TEST_INT_EQ(39, accumulate_l2_forward(&l, 0));
                     TEST_INT_EQ(39, accumulate_l2_backward(&l, 0));
