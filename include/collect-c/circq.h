@@ -25,7 +25,7 @@
  */
 
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
-#define COLLECT_C_CIRCQ_VER_MINOR       1
+#define COLLECT_C_CIRCQ_VER_MINOR       2
 #define COLLECT_C_CIRCQ_VER_PATCH       0
 #define COLLECT_C_CIRCQ_VER_ALPHABETA   1
 
@@ -255,6 +255,29 @@ int
 collect_c_cq_push_by_ref(
     collect_c_cq_t* q
 ,   void const*     ptr_new_el
+);
+
+/** Attempts to add a number of items to the (back of) the queue.
+ *
+ * @param q Pointer to the circular queue. Must not be NULL;
+ * @param num_els Number of items to add;
+ * @param ptr_new_els Pointer to the new elements. Must not be NULL;
+ * @param num_inserted Optional pointer to variable to retrieve number of
+ *  entries added;
+ *
+ * @retval 0 The item was added to the queue;
+ * @retval ENOSPC No space left in queue;
+ *
+ * @pre (NULL != q);
+ * @pre (NULL != q->storage);
+ * @pre (0 == num_els || NULL != ptr_new_els);
+ */
+int
+collect_c_cq_push_back_n_by_ref(
+    collect_c_cq_t* q
+,   size_t          num_els
+,   void const*     ptr_new_els
+,   size_t*         num_inserted
 );
 
 /** Clears all elements from the queue.
