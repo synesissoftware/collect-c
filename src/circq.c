@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 9th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -97,7 +97,7 @@ collect_c_cq_free_storage(
 }
 
 int
-collect_c_cq_push_by_ref(
+collect_c_cq_push_back_by_ref(
     collect_c_cq_t* q
 ,   void const*     ptr_new_el
 )
@@ -108,10 +108,9 @@ collect_c_cq_push_by_ref(
     {
         if (q->capacity == q->e - q->b)
         {
-            bool const overwrite_front_when_full = 0 != (COLLECT_C_CIRCQ_F_OVERWRITE_FRONT_WHEN_FULL & q->flags);
+            bool const overwrite_front_when_full = (0 != (COLLECT_C_CIRCQ_F_OVERWRITE_FRONT_WHEN_FULL & q->flags)) && (NULL != q->pfn_element_free);
 
-            if (!overwrite_front_when_full ||
-                NULL == q->pfn_element_free)
+            if (!overwrite_front_when_full)
             {
                 return ENOSPC;
             }
@@ -138,6 +137,69 @@ collect_c_cq_push_by_ref(
         }
     }
 }
+
+int
+collect_c_cq_push_back_n_by_ref(
+    collect_c_cq_t* q
+,   size_t          num_els
+,   void const*     ptr_new_els
+,   size_t*         num_inserted
+)
+{
+    assert(NULL != q);
+    assert(NULL != q->storage);
+    assert(0 == num_els || NULL != ptr_new_els);
+
+    {
+        bool const overwrite_front_when_full = (0 != (COLLECT_C_CIRCQ_F_OVERWRITE_FRONT_WHEN_FULL & q->flags)) && (NULL != q->pfn_element_free);
+
+        size_t dummy;
+
+        if (NULL == num_inserted)
+        {
+            num_inserted = &dummy;
+        }
+
+        *num_inserted = 0;
+
+        for (size_t i = 0; num_els != i; ++i)
+        {
+            if (q->capacity == q->e - q->b)
+            {
+                if (!overwrite_front_when_full)
+                {
+                    return ENOSPC;
+                }
+                else
+                {
+                    /* drop current front */
+
+                    size_t const    ix  =   q->b % q->capacity;
+                    void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+
+                    (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+
+                    ++q->b;
+                };
+            }
+
+            {
+                size_t const    ix      =   q->e % q->capacity;
+                void* const     pe_dst  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+                void const*     pe_src  =   (char*)ptr_new_els + (i * q->el_size);
+
+                memcpy(pe_dst, pe_src, q->el_size);
+
+                ++q->e;
+
+                *num_inserted += 1;
+            }
+        }
+
+        return 0;
+    }
+}
+
 
 int
 collect_c_cq_clear(
