@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 7th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -25,7 +25,7 @@
  */
 
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
-#define COLLECT_C_CIRCQ_VER_MINOR       1
+#define COLLECT_C_CIRCQ_VER_MINOR       2
 #define COLLECT_C_CIRCQ_VER_PATCH       0
 #define COLLECT_C_CIRCQ_VER_ALPHABETA   1
 
@@ -75,10 +75,10 @@ struct collect_c_cq_t
     void*   storage;            /*! Pointer to the storage. */
     void*   param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free */
     void  (*pfn_element_free)(
-        size_t  el_size
-    ,   size_t  el_index
-    ,   void*   el_ptr
-    ,   void*   param_element_free
+        size_t      el_size
+    ,   intptr_t    el_index
+    ,   void*       el_ptr
+    ,   void*       param_element_free
     );                          /*! Custom function to be invoked when */
 };
 #ifndef __cplusplus
@@ -154,11 +154,30 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 #define COLLECT_C_CIRCQ_len(cq_name)                            ((cq_name).e - (cq_name).b)
 #define COLLECT_C_CIRCQ_spare(cq_name)                          ((cq_name).capacity - COLLECT_C_CIRCQ_len(cq_name))
 
-#define COLLECT_C_CIRCQ_at(cq_name, el_ix)                      (((char*)(cq_name).storage) + ((((cq_name).b + (el_ix)) % (cq_name).capacity) * (cq_name).el_size))
-#define COLLECT_C_CIRCQ_element_index(cq_name, el_ix)           (((cq_name).b + (el_ix)) % (cq_name).capacity)
+#define COLLECT_C_CIRCQ_CANON_ARG_(v)                           (_Generic((v), collect_c_cq_t*: (v), collect_c_cq_t const*: (v), collect_c_cq_t: &(v), default: (void)))
 
-#define COLLECT_C_CIRCQ_push_by_ref(cq_name, ptr_new_el)        collect_c_cq_push_by_ref(&(cq_name), ptr_new_el)
-#define COLLECT_C_CIRCQ_push_by_value(cq_name, t_el, new_el)    (assert(sizeof(t_el) == (cq_name).el_size), collect_c_cq_push_by_ref(&(cq_name), &((t_el){(new_el)})))
+#define COLLECT_C_CIRCQ_assert_el_size_(cq_name, t_el)          assert(sizeof(t_el) == (cq_name).el_size)
+#define COLLECT_C_CIRCQ_assert_ix_(cq_name, ix)                 assert((ix) < COLLECT_C_CIRCQ_len(cq_name))
+#define COLLECT_C_CIRCQ_assert_NOT_is_empty_(cq_name)           assert(  0 != COLLECT_C_CIRCQ_len(cq_name))
+
+#define COLLECT_C_CIRCQ_at_v_(cq_name, ix)                      ((void      *)(((char      *)(cq_name).storage) + ((((cq_name).b + (ix)) % (cq_name).capacity) * (cq_name).el_size)))
+#define COLLECT_C_CIRCQ_cat_v_(cq_name, ix)                     ((void const*)(((char const*)(cq_name).storage) + ((((cq_name).b + (ix)) % (cq_name).capacity) * (cq_name).el_size)))
+
+#define COLLECT_C_CIRCQ_at_v(cq_name, ix)                       (COLLECT_C_CIRCQ_assert_ix_(cq_name, ix),  COLLECT_C_CIRCQ_at_v_(cq_name, ix))
+#define COLLECT_C_CIRCQ_cat_v(cq_name, ix)                      (COLLECT_C_CIRCQ_assert_ix_(cq_name, ix), COLLECT_C_CIRCQ_cat_v_(cq_name, ix))
+
+#define COLLECT_C_CIRCQ_at_t(cq_name, t_el, ix)                 ((t_el      *)(COLLECT_C_CIRCQ_assert_el_size_(cq_name, t_el),  COLLECT_C_CIRCQ_at_v(cq_name, ix)))
+#define COLLECT_C_CIRCQ_cat_t(cq_name, t_el, ix)                ((t_el const*)(COLLECT_C_CIRCQ_assert_el_size_(cq_name, t_el), COLLECT_C_CIRCQ_cat_v(cq_name, ix)))
+
+#define COLLECT_C_CIRCQ_front_t(cq_name, t_el)                  (COLLECT_C_CIRCQ_at_t( cq_name, t_el,                                0))
+#define COLLECT_C_CIRCQ_back_t(cq_name, t_el)                   (COLLECT_C_CIRCQ_at_t( cq_name, t_el, COLLECT_C_CIRCQ_len(cq_name) - 1))
+
+#define COLLECT_C_CIRCQ_cfront_t(cq_name, t_el)                 (COLLECT_C_CIRCQ_cat_t(cq_name, t_el,                                0))
+#define COLLECT_C_CIRCQ_cback_t(cq_name, t_el)                  (COLLECT_C_CIRCQ_cat_t(cq_name, t_el, COLLECT_C_CIRCQ_len(cq_name) - 1))
+
+#define COLLECT_C_CIRCQ_push_back_by_ref(cq_name, ptr_new_el)   collect_c_cq_push_back_by_ref(&(cq_name), ptr_new_el)
+#define COLLECT_C_CIRCQ_push_back_by_value(cq_name, t_el, new_el)   \
+                                                                (assert(sizeof(t_el) == (cq_name).el_size), collect_c_cq_push_back_by_ref(&(cq_name), &((t_el){(new_el)})))
 
 #define COLLECT_C_CIRCQ_pop_back(cq_name)                       collect_c_cq_pop_from_back_n(&(cq_name), 1, NULL)
 #define COLLECT_C_CIRCQ_pop_front(cq_name)                      collect_c_cq_pop_from_front_n(&(cq_name), 1, NULL)
@@ -169,6 +188,18 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 #define COLLECT_C_CIRCQ_clear_GET_MACRO_(_1, _2, macro, ...)    macro
 
 #define COLLECT_C_CIRCQ_clear(...)                              COLLECT_C_CIRCQ_clear_GET_MACRO_(__VA_ARGS__, COLLECT_C_CIRCQ_clear_2_, COLLECT_C_CIRCQ_clear_1_, NULL)(__VA_ARGS__)
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * API functions & macros (deprecated)
+ */
+
+#define COLLECT_C_CIRCQ_at(cq_name, el_ix)                      (((char*)(cq_name).storage) + ((((cq_name).b + (el_ix)) % (cq_name).capacity) * (cq_name).el_size))
+#define COLLECT_C_CIRCQ_element_index(cq_name, el_ix)           (((cq_name).b + (el_ix)) % (cq_name).capacity)
+
+#define collect_c_cq_push_by_ref                                collect_c_cq_push_back_by_ref
+#define COLLECT_C_CIRCQ_push_by_ref                             COLLECT_C_CIRCQ_push_back_by_ref
+#define COLLECT_C_CIRCQ_push_by_value                           COLLECT_C_CIRCQ_push_back_by_value
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -218,17 +249,42 @@ collect_c_cq_free_storage(
 /** Attempts to add an item to the (back of) the queue.
  *
  * @param q Pointer to the circular queue. Must not be NULL;
+ * @param ptr_new_el Pointer to the new element. Must not be NULL;
  *
  * @retval 0 The item was added to the queue;
  * @retval ENOSPC No space left in queue;
  *
  * @pre (NULL != q);
  * @pre (NULL != q->storage);
+ * @pre (NULL != ptr_new_el);
  */
 int
-collect_c_cq_push_by_ref(
+collect_c_cq_push_back_by_ref(
     collect_c_cq_t* q
 ,   void const*     ptr_new_el
+);
+
+/** Attempts to add a number of items to the (back of) the queue.
+ *
+ * @param q Pointer to the circular queue. Must not be NULL;
+ * @param num_els Number of items to add;
+ * @param ptr_new_els Pointer to the new elements. Must not be NULL;
+ * @param num_inserted Optional pointer to variable to retrieve number of
+ *  entries added;
+ *
+ * @retval 0 The item was added to the queue;
+ * @retval ENOSPC No space left in queue;
+ *
+ * @pre (NULL != q);
+ * @pre (NULL != q->storage);
+ * @pre (0 == num_els || NULL != ptr_new_els);
+ */
+int
+collect_c_cq_push_back_n_by_ref(
+    collect_c_cq_t* q
+,   size_t          num_els
+,   void const*     ptr_new_els
+,   size_t*         num_inserted
 );
 
 /** Clears all elements from the queue.

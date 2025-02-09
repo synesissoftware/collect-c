@@ -5,7 +5,7 @@
 # Purpose:  CMake lists file for collect-c library
 #
 # Created:  4th February 2025
-# Updated:  7th February 2025
+# Updated:  9th February 2025
 #
 # ######################################################################## #
 
@@ -56,8 +56,9 @@ add_library(core
 # header files from sub-directories, so this is done below in an additional
 # `install()` step
 set(CORE_PUBLIC_HEADERS
-	"${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME_LOWER}/common.hpp"
-	"${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME_LOWER}/internal/*.hpp"
+	"${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME_LOWER}/common/*.h"
+	"${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME_LOWER}/terse/*.h"
+	"${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME_LOWER}/*.h"
 )
 
 set_target_properties(core PROPERTIES
@@ -80,6 +81,10 @@ target_compile_options(core
 	PRIVATE
 		$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
 			-Werror -Wall -Wextra -pedantic
+
+			${GCC_WARN_NO_cxx11_long_long}
+		>
+		$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:
 		>
 		$<$<CXX_COMPILER_ID:MSVC>:
 			/WX /W4

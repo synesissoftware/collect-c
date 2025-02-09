@@ -4,7 +4,7 @@
  * Purpose: Unit-test for version(s).
  *
  * Created: 7th February 2025
- * Updated: 7th February 2025
+ * Updated: 9th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
     XTESTS_COMMANDLINE_PARSE_HELP_OR_VERBOSITY(argc, argv, &verbosity);
 
-    if (XTESTS_START_RUNNER("test.unit.cq", verbosity))
+    if (XTESTS_START_RUNNER("test.unit.version", verbosity))
     {
         XTESTS_RUN_CASE(TEST_LIBRARY_version);
         XTESTS_RUN_CASE(TEST_CIRCQ_version);

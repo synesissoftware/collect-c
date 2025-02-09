@@ -4,7 +4,7 @@
  * Purpose: Performance-test for circular queue.
  *
  * Created: 6th February 2025
- * Updated: 6th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -231,10 +231,10 @@ int main(int argc, char* /*argv*/[])
 namespace {
 
     void int_callback(
-        size_t  el_size
-    ,   size_t  el_index
-    ,   void*   el_ptr
-    ,   void*   param_element_free
+        size_t      el_size
+    ,   intptr_t    el_index
+    ,   void*       el_ptr
+    ,   void*       param_element_free
     )
     {
         ((void)&el_size);
@@ -360,10 +360,10 @@ namespace {
 
                     CLC_CQ_define_on_stack(q, ar);
 
-                    CLC_CQ_push_by_ref(q, &values[0]);
-                    CLC_CQ_push_by_ref(q, &values[1]);
-                    CLC_CQ_push_by_ref(q, &values[2]);
-                    CLC_CQ_push_by_ref(q, &values[3]);
+                    CLC_CQ_push_back_by_ref(q, &values[0]);
+                    CLC_CQ_push_back_by_ref(q, &values[1]);
+                    CLC_CQ_push_back_by_ref(q, &values[2]);
+                    CLC_CQ_push_back_by_ref(q, &values[3]);
 
                     anchor_value += CLC_CQ_spare(q);
                 }
@@ -412,7 +412,7 @@ namespace {
 
                     for (std::size_t j = 0; std::size(values) != j; ++j)
                     {
-                        CLC_CQ_push_by_ref(q, &values[j]);
+                        CLC_CQ_push_back_by_ref(q, &values[j]);
                     }
                     anchor_value += CLC_CQ_spare(q);
                 }
@@ -463,7 +463,7 @@ namespace {
                     {
                         for (std::size_t j = 0; std::size(values) != j; ++j)
                         {
-                            CLC_CQ_push_by_ref(q, &values[j]);
+                            CLC_CQ_push_back_by_ref(q, &values[j]);
                         }
                         anchor_value += CLC_CQ_spare(q);
 
@@ -521,7 +521,7 @@ namespace {
 
                     for (std::size_t j = 0; std::size(values) != j; ++j)
                     {
-                        CLC_CQ_push_by_ref(q, &values[j]);
+                        CLC_CQ_push_back_by_ref(q, &values[j]);
                     }
                     anchor_value += CLC_CQ_spare(q);
                 }
@@ -578,7 +578,7 @@ namespace {
                     {
                         for (std::size_t j = 0; std::size(values) != j; ++j)
                         {
-                            CLC_CQ_push_by_ref(q, &values[j]);
+                            CLC_CQ_push_back_by_ref(q, &values[j]);
                         }
                         anchor_value += CLC_CQ_spare(q);
 
@@ -636,7 +636,7 @@ namespace {
 
                     for (std::size_t j = 0; std::size(values) != j; ++j)
                     {
-                        CLC_CQ_push_by_ref(q, &values[j]);
+                        CLC_CQ_push_back_by_ref(q, &values[j]);
                     }
                     anchor_value += CLC_CQ_spare(q);
 
@@ -698,7 +698,7 @@ namespace {
                     {
                         for (std::size_t j = 0; std::size(values) != j; ++j)
                         {
-                            CLC_CQ_push_by_ref(q, &values[j]);
+                            CLC_CQ_push_back_by_ref(q, &values[j]);
                         }
                         anchor_value += CLC_CQ_spare(q);
 
@@ -766,7 +766,7 @@ namespace {
                         {
                             int const value = static_cast<int>(j);
 
-                            CLC_CQ_push_by_ref(q, &value);
+                            CLC_CQ_push_back_by_ref(q, &value);
                         }
                         anchor_value += CLC_CQ_spare(q);
 
