@@ -211,14 +211,14 @@ collect_c_cq_pop_from_back_n(
 
         *num_dropped = 0;
 
-        for (; q->e != q->b && 0 != num_to_drop; --num_to_drop)
+        for (size_t lix = 0; q->e != q->b && 0 != num_to_drop; --num_to_drop, ++lix)
         {
             if (NULL != q->pfn_element_free)
             {
                 size_t const    ix  =   (q->e - 1) % q->capacity;
                 void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-                (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+                (*q->pfn_element_free)(q->el_size, lix, pe, q->param_element_free);
             }
 
             --q->e;
@@ -248,14 +248,14 @@ collect_c_cq_pop_from_front_n(
 
         *num_dropped = 0;
 
-        for (size_t i = q->b; q->e != i && 0 != num_to_drop; --num_to_drop)
+        for (size_t lix = 0; q->e != q->b && 0 != num_to_drop; --num_to_drop, ++lix)
         {
             if (NULL != q->pfn_element_free)
             {
-                size_t const    ix  =   i % q->capacity;
+                size_t const    ix  =   q->b % q->capacity;
                 void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-                (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+                (*q->pfn_element_free)(q->el_size, lix, pe, q->param_element_free);
             }
 
             ++q->b;

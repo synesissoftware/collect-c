@@ -40,7 +40,7 @@ static void TEST_STACK_AND_push_by_value_AND_clear_WITH_CB(void);
 static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL(void);
 
 static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void);
-static void TEST_HEAP_AND_CALLBACK_INDEXES(void);
+static void TEST_HEAP_AND_CALLBACK_INDEXES_1(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL);
 
         XTESTS_RUN_CASE(TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP);
-        XTESTS_RUN_CASE(TEST_HEAP_AND_CALLBACK_INDEXES);
+        XTESTS_RUN_CASE(TEST_HEAP_AND_CALLBACK_INDEXES_1);
 
         XTESTS_PRINT_RESULTS();
 
@@ -1062,7 +1062,7 @@ static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void)
     }
 }
 
-static void TEST_HEAP_AND_CALLBACK_INDEXES(void)
+static void TEST_HEAP_AND_CALLBACK_INDEXES_1(void)
 {
     /* clc_cq_free_storage(): run straight through allocated spaces and then deallocate */
     {
@@ -1174,6 +1174,9 @@ static void TEST_HEAP_AND_CALLBACK_INDEXES(void)
                 q.param_element_free    =   &checks[0];
 
                 clc_cq_free_storage(&q);
+
+                q.pfn_element_free      =   NULL;
+                q.param_element_free    =   NULL;
             }
 
 
@@ -1314,6 +1317,9 @@ static void TEST_HEAP_AND_CALLBACK_INDEXES(void)
 
                     TEST_INT_EQ(0, CLC_CQ_len(q));
                 }
+
+                q.pfn_element_free      =   NULL;
+                q.param_element_free    =   NULL;
             }
 
 
