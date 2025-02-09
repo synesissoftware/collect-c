@@ -97,7 +97,7 @@ collect_c_cq_free_storage(
 }
 
 int
-collect_c_cq_push_by_ref(
+collect_c_cq_push_back_by_ref(
     collect_c_cq_t* q
 ,   void const*     ptr_new_el
 )

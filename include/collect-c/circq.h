@@ -181,8 +181,14 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 /* TODO: deprecate this */
 #define COLLECT_C_CIRCQ_element_index(cq_name, el_ix)           (((cq_name).b + (el_ix)) % (cq_name).capacity)
 
-#define COLLECT_C_CIRCQ_push_by_ref(cq_name, ptr_new_el)        collect_c_cq_push_by_ref(&(cq_name), ptr_new_el)
-#define COLLECT_C_CIRCQ_push_by_value(cq_name, t_el, new_el)    (assert(sizeof(t_el) == (cq_name).el_size), collect_c_cq_push_by_ref(&(cq_name), &((t_el){(new_el)})))
+/* TODO: deprecate this */
+#define collect_c_cq_push_by_ref                                collect_c_cq_push_back_by_ref
+#define COLLECT_C_CIRCQ_push_by_ref                             COLLECT_C_CIRCQ_push_back_by_ref
+#define COLLECT_C_CIRCQ_push_by_value                           COLLECT_C_CIRCQ_push_back_by_value
+
+#define COLLECT_C_CIRCQ_push_back_by_ref(cq_name, ptr_new_el)   collect_c_cq_push_back_by_ref(&(cq_name), ptr_new_el)
+#define COLLECT_C_CIRCQ_push_back_by_value(cq_name, t_el, new_el)   \
+                                                                (assert(sizeof(t_el) == (cq_name).el_size), collect_c_cq_push_back_by_ref(&(cq_name), &((t_el){(new_el)})))
 
 #define COLLECT_C_CIRCQ_pop_back(cq_name)                       collect_c_cq_pop_from_back_n(&(cq_name), 1, NULL)
 #define COLLECT_C_CIRCQ_pop_front(cq_name)                      collect_c_cq_pop_from_front_n(&(cq_name), 1, NULL)
@@ -252,7 +258,7 @@ collect_c_cq_free_storage(
  * @pre (NULL != ptr_new_el);
  */
 int
-collect_c_cq_push_by_ref(
+collect_c_cq_push_back_by_ref(
     collect_c_cq_t* q
 ,   void const*     ptr_new_el
 );
