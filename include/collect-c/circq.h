@@ -25,9 +25,9 @@
  */
 
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
-#define COLLECT_C_CIRCQ_VER_MINOR       0
+#define COLLECT_C_CIRCQ_VER_MINOR       1
 #define COLLECT_C_CIRCQ_VER_PATCH       0
-#define COLLECT_C_CIRCQ_VER_ALPHABETA   2
+#define COLLECT_C_CIRCQ_VER_ALPHABETA   1
 
 #define COLLECT_C_CIRCQ_VER \
     (0\
@@ -55,6 +55,9 @@
 
 /** Causes allocation to be on the heap. */
 #define COLLECT_C_CIRCQ_F_USE_STACK_ARRAY                   (0x00000001)
+
+/** Causes adding to a full instance to overwrite the front element. Requires also that a callback function is provided. */
+#define COLLECT_C_CIRCQ_F_OVERWRITE_FRONT_WHEN_FULL         (0x00000002)
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -99,6 +102,20 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 #define COLLECT_C_CIRCQ_define_empty(cq_el_type, cq_name, cq_cap)           \
                                                                             \
     collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, 0, NULL, NULL, 0)
+
+
+/** @def COLLECT_C_CIRCQ_define_empty_with_callback(cq_el_type, cq_name, cq_cap, elf_fn, elf_param)
+ *
+ * Declares and defines an empty queue instance. The instance will need to
+ * be further set-up via collect_c_cq_allocate_storage().
+ *
+ * @param cq_el_type The type of the elements to be stored;
+ * @param cq_name The name of the instance;
+ * @param cq_cap The capacity that the instance should have;
+ */
+#define COLLECT_C_CIRCQ_define_empty_with_callback(cq_el_type, cq_name, cq_cap, elf_fn, elf_param)  \
+                                                                                                    \
+    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, 0, NULL, elf_fn, elf_param)
 
 
 /** @def COLLECT_C_CIRCQ_define_on_stack(cq_name, cq_array)

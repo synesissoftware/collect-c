@@ -17,6 +17,7 @@
 
 #include <errno.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -62,7 +63,6 @@ collect_c_cq_allocate_storage(
     }
 }
 
-
 void
 collect_c_cq_free_storage(
     collect_c_cq_t* q
@@ -71,29 +71,30 @@ collect_c_cq_free_storage(
     assert(NULL != q);
     assert(NULL != q->storage);
 
-    if (NULL != q->pfn_element_free)
     {
-        for (; q->e != q->b; )
+        if (NULL != q->pfn_element_free)
         {
-            size_t const    ix  =   q->b % q->capacity;
-            void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+            for (; q->e != q->b; )
+            {
+                size_t const    ix  =   q->b % q->capacity;
+                void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+                (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
 
-            ++q->b;
+                ++q->b;
+            }
         }
+
+        if (0 == (COLLECT_C_CIRCQ_F_USE_STACK_ARRAY & q->flags))
+        {
+            free(q->storage);
+
+            q->storage = NULL;
+        }
+
+        q->b = q->e = 0;
     }
-
-    if (0 == (COLLECT_C_CIRCQ_F_USE_STACK_ARRAY & q->flags))
-    {
-        free(q->storage);
-
-        q->storage = NULL;
-    }
-
-    q->b = q->e = 0;
 }
-
 
 int
 collect_c_cq_push_by_ref(
@@ -104,20 +105,37 @@ collect_c_cq_push_by_ref(
     assert(NULL != q);
     assert(NULL != q->storage);
 
-    if (q->capacity == q->e - q->b)
     {
-        return ENOSPC;
-    }
-    else
-    {
-        size_t const    ix  =   q->e % q->capacity;
-        void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+        if (q->capacity == q->e - q->b)
+        {
+            bool const overwrite_front_when_full = 0 != (COLLECT_C_CIRCQ_F_OVERWRITE_FRONT_WHEN_FULL & q->flags);
 
-        memcpy(pe, ptr_new_el, q->el_size);
+            if (!overwrite_front_when_full ||
+                NULL == q->pfn_element_free)
+            {
+                return ENOSPC;
+            }
+            else
+            {
+                size_t const    ix  =   q->b % q->capacity;
+                void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-        ++q->e;
+                (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
 
-        return 0;
+                ++q->b;
+            }
+        }
+
+        {
+            size_t const    ix  =   q->e % q->capacity;
+            void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+
+            memcpy(pe, ptr_new_el, q->el_size);
+
+            ++q->e;
+
+            return 0;
+        }
     }
 }
 
@@ -129,8 +147,6 @@ collect_c_cq_clear(
 ,   size_t*         num_dropped
 )
 {
-    size_t dummy;
-
     ((void)&reserved0);
     ((void)&reserved1);
 
@@ -139,36 +155,40 @@ collect_c_cq_clear(
     assert(NULL == reserved0);
     assert(NULL == reserved1);
 
-    if (NULL == num_dropped)
     {
-        num_dropped = &dummy;
-    }
+        size_t dummy;
 
-    *num_dropped = 0;
-
-    if (NULL != q->pfn_element_free)
-    {
-        for (; q->e != q->b; ++*num_dropped)
+        if (NULL == num_dropped)
         {
-            size_t const    ix  =   q->b % q->capacity;
-            void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
-
-            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
-
-            ++q->b;
+            num_dropped = &dummy;
         }
-    }
-    else
-    {
-        for (; q->e != q->b; ++*num_dropped)
+
+        *num_dropped = 0;
+
+        if (NULL != q->pfn_element_free)
         {
-            ++q->b;
+            for (; q->e != q->b; ++*num_dropped)
+            {
+                size_t const    ix  =   q->b % q->capacity;
+                void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+
+                (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+
+                ++q->b;
+            }
         }
+        else
+        {
+            for (; q->e != q->b; ++*num_dropped)
+            {
+                ++q->b;
+            }
+        }
+
+        q->b = q->e = 0;
+
+        return 0;
     }
-
-    q->b = q->e = 0;
-
-    return 0;
 }
 
 int
@@ -178,32 +198,34 @@ collect_c_cq_pop_from_back_n(
 ,   size_t*         num_dropped
 )
 {
-    size_t dummy;
-
     assert(NULL != q);
     assert(NULL != q->storage);
 
-    if (NULL == num_dropped)
     {
-        num_dropped = &dummy;
-    }
+        size_t dummy;
 
-    *num_dropped = 0;
-
-    for (; q->e != q->b && 0 != num_to_drop; --num_to_drop)
-    {
-        if (NULL != q->pfn_element_free)
+        if (NULL == num_dropped)
         {
-            size_t const    ix  =   (q->e - 1) % q->capacity;
-            void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
-
-            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+            num_dropped = &dummy;
         }
 
-        --q->e;
-    }
+        *num_dropped = 0;
 
-    return 0;
+        for (; q->e != q->b && 0 != num_to_drop; --num_to_drop)
+        {
+            if (NULL != q->pfn_element_free)
+            {
+                size_t const    ix  =   (q->e - 1) % q->capacity;
+                void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+
+                (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+            }
+
+            --q->e;
+        }
+
+        return 0;
+    }
 }
 
 int
@@ -213,32 +235,34 @@ collect_c_cq_pop_from_front_n(
 ,   size_t*         num_dropped
 )
 {
-    size_t dummy;
-
     assert(NULL != q);
     assert(NULL != q->storage);
 
-    if (NULL == num_dropped)
     {
-        num_dropped = &dummy;
-    }
+        size_t dummy;
 
-    *num_dropped = 0;
-
-    for (size_t i = q->b; q->e != i && 0 != num_to_drop; --num_to_drop)
-    {
-        if (NULL != q->pfn_element_free)
+        if (NULL == num_dropped)
         {
-            size_t const    ix  =   i % q->capacity;
-            void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
-
-            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+            num_dropped = &dummy;
         }
 
-        ++q->b;
-    }
+        *num_dropped = 0;
 
-    return 0;
+        for (size_t i = q->b; q->e != i && 0 != num_to_drop; --num_to_drop)
+        {
+            if (NULL != q->pfn_element_free)
+            {
+                size_t const    ix  =   i % q->capacity;
+                void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
+
+                (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+            }
+
+            ++q->b;
+        }
+
+        return 0;
+    }
 }
 
 
