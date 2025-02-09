@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 9th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -169,11 +169,11 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 #define COLLECT_C_CIRCQ_at_t(cq_name, t_el, ix)                 ((t_el      *)(COLLECT_C_CIRCQ_assert_el_size_(cq_name, t_el),  COLLECT_C_CIRCQ_at_v(cq_name, ix)))
 #define COLLECT_C_CIRCQ_cat_t(cq_name, t_el, ix)                ((t_el const*)(COLLECT_C_CIRCQ_assert_el_size_(cq_name, t_el), COLLECT_C_CIRCQ_cat_v(cq_name, ix)))
 
-#define COLLECT_C_CIRCQ_front_t(cq_name, t_el)                  (COLLECT_C_CIRCQ_at_t( cq_name, t_el,                  0))
-#define COLLECT_C_CIRCQ_back_t(cq_name, t_el)                   (COLLECT_C_CIRCQ_at_t( cq_name, t_el, (cq_name).size - 1))
+#define COLLECT_C_CIRCQ_front_t(cq_name, t_el)                  (COLLECT_C_CIRCQ_at_t( cq_name, t_el,                                0))
+#define COLLECT_C_CIRCQ_back_t(cq_name, t_el)                   (COLLECT_C_CIRCQ_at_t( cq_name, t_el, COLLECT_C_CIRCQ_len(cq_name) - 1))
 
-#define COLLECT_C_CIRCQ_cfront_t(cq_name, t_el)                 (COLLECT_C_CIRCQ_cat_t(cq_name, t_el,                  0))
-#define COLLECT_C_CIRCQ_cback_t(cq_name, t_el)                  (COLLECT_C_CIRCQ_cat_t(cq_name, t_el, (cq_name).size - 1))
+#define COLLECT_C_CIRCQ_cfront_t(cq_name, t_el)                 (COLLECT_C_CIRCQ_cat_t(cq_name, t_el,                                0))
+#define COLLECT_C_CIRCQ_cback_t(cq_name, t_el)                  (COLLECT_C_CIRCQ_cat_t(cq_name, t_el, COLLECT_C_CIRCQ_len(cq_name) - 1))
 
 
 /* TODO: deprecate this */
