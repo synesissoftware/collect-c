@@ -4,7 +4,7 @@
  * Purpose: Unit-test for circular queue.
  *
  * Created: 5th February 2025
- * Updated: 7th February 2025
+ * Updated: 9th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -30,13 +30,14 @@ static void TEST_define_empty(void);
 static void TEST_define_AND_allocate(void);
 
 static void TEST_CQ_define_on_stack(void);
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void);
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void);
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void);
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void);
-static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void);
+static void TEST_CQ_define_on_stack_with_cb(void);
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref(void);
+static void TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value(void);
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_pop_back_THEN_push_by_ref(void);
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_clear(void);
+static void TEST_push_by_value_AND_clear_WITH_CALLBACKS(void);
 
-static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void);
+static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -56,13 +57,14 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_define_AND_allocate);
 
         XTESTS_RUN_CASE(TEST_CQ_define_on_stack);
-        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD);
-        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD);
-        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD);
-        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR);
-        XTESTS_RUN_CASE(TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS);
+        XTESTS_RUN_CASE(TEST_CQ_define_on_stack_with_cb);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_pop_back_THEN_push_by_ref);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_clear);
+        XTESTS_RUN_CASE(TEST_push_by_value_AND_clear_WITH_CALLBACKS);
 
-        XTESTS_RUN_CASE(TEST_HEAP_ADD_WITHOUT_WRAP_1);
+        XTESTS_RUN_CASE(TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP);
 
         XTESTS_PRINT_RESULTS();
 
@@ -84,6 +86,19 @@ struct custom_t
     uint64_t    z;
 };
 typedef struct custom_t custom_t;
+
+void  pfn_element_free_stub(
+    size_t  el_size
+,   size_t  el_index
+,   void*   el_ptr
+,   void*   param_element_free
+)
+{
+    ((void)&el_size);
+    ((void)&el_index);
+    ((void)&el_ptr);
+    ((void)&param_element_free);
+}
 
 
 static void TEST_define_empty(void)
@@ -140,7 +155,23 @@ static void TEST_CQ_define_on_stack(void)
     }
 }
 
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
+static void TEST_CQ_define_on_stack_with_cb(void)
+{
+    {
+        int array[32];
+
+        CLC_CQ_define_on_stack_with_cb(q, array, pfn_element_free_stub, &array[0]);
+
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(32, CLC_CQ_spare(q));
+
+        TEST_POINTER_EQUAL(&array[0], q.param_element_free);
+        TEST_FUNCTION_POINTER_EQUAL(pfn_element_free_stub, q.pfn_element_free);
+    }
+}
+
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref(void)
 {
     {
         int array[8];
@@ -261,7 +292,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
     }
 }
 
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
+static void TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value(void)
 {
     {
         int array[4];
@@ -409,7 +440,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
     }
 }
 
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_pop_back_THEN_push_by_ref(void)
 {
     {
         int array[4];
@@ -564,7 +595,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
     }
 }
 
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_clear(void)
 {
     {
         int array[4];
@@ -745,7 +776,7 @@ static void fn_accumulate_on_free(
     *p_sum += *p_el;
 }
 
-static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
+static void TEST_push_by_value_AND_clear_WITH_CALLBACKS(void)
 {
     {
         long    sum = 0;
@@ -812,7 +843,7 @@ static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
     }
 }
 
-static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void)
+static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void)
 {
     {
         CLC_CQ_define_empty(int, q, 32);
