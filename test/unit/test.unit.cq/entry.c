@@ -4,7 +4,7 @@
  * Purpose: Unit-test for circular queue.
  *
  * Created: 5th February 2025
- * Updated: 7th February 2025
+ * Updated: 9th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -27,17 +27,19 @@
  */
 
 static void TEST_define_empty(void);
-static void TEST_define_AND_allocate(void);
+static void TEST_define_empty_AND_allocate(void);
 
-static void TEST_CQ_define_on_stack(void);
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void);
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void);
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void);
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void);
-static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void);
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL(void);
+static void TEST_define_on_stack(void);
+static void TEST_define_on_stack_with_cb(void);
 
-static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void);
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref(void);
+static void TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value(void);
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_pop_back_THEN_push_by_ref(void);
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_clear(void);
+static void TEST_STACK_AND_push_by_value_AND_clear_WITH_CB(void);
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL(void);
+
+static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -54,17 +56,19 @@ int main(int argc, char* argv[])
     if (XTESTS_START_RUNNER("test.unit.cq", verbosity))
     {
         XTESTS_RUN_CASE(TEST_define_empty);
-        XTESTS_RUN_CASE(TEST_define_AND_allocate);
+        XTESTS_RUN_CASE(TEST_define_empty_AND_allocate);
 
-        XTESTS_RUN_CASE(TEST_CQ_define_on_stack);
-        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD);
-        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD);
-        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD);
-        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR);
-        XTESTS_RUN_CASE(TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS);
-        XTESTS_RUN_CASE(TEST_STACK_AND_ADD_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL);
+        XTESTS_RUN_CASE(TEST_define_on_stack);
+        XTESTS_RUN_CASE(TEST_define_on_stack_with_cb);
 
-        XTESTS_RUN_CASE(TEST_HEAP_ADD_WITHOUT_WRAP_1);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_pop_back_THEN_push_by_ref);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_clear);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_value_AND_clear_WITH_CB);
+        XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL);
+
+        XTESTS_RUN_CASE(TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP);
 
         XTESTS_PRINT_RESULTS();
 
@@ -76,7 +80,7 @@ int main(int argc, char* argv[])
 
 
 /* /////////////////////////////////////////////////////////////////////////
- * test function definitions
+ * test helpers
  */
 
 struct custom_t
@@ -87,6 +91,56 @@ struct custom_t
 };
 typedef struct custom_t custom_t;
 
+
+static void fn_element_free_accumulate_on_free(
+    size_t      el_size
+,   intptr_t    el_index
+,   void*       el_ptr
+,   void*       param_element_free
+)
+{
+    int* const  p_el    =   (int*)el_ptr;
+    long* const p_sum   =   (long*)param_element_free;
+
+    ((void)&el_size);
+    ((void)&el_index);
+
+    *p_sum += *p_el;
+}
+
+static void fn_element_free_record_most_recent_overwrite(
+    size_t      el_size
+,   intptr_t    el_index
+,   void*       el_ptr
+,   void*       param_element_free
+)
+{
+    int* const  p_el    =   (int*)el_ptr;
+    int* const  p_rec   =   (int*)param_element_free;
+
+    ((void)&el_size);
+    ((void)&el_index);
+
+    *p_rec = *p_el;
+}
+
+static void fn_element_free_stub(
+    size_t      el_size
+,   intptr_t    el_index
+,   void*       el_ptr
+,   void*       param_element_free
+)
+{
+    ((void)&el_size);
+    ((void)&el_index);
+    ((void)&el_ptr);
+    ((void)&param_element_free);
+}
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * test function definitions
+ */
 
 static void TEST_define_empty(void)
 {
@@ -115,7 +169,7 @@ static void TEST_define_empty(void)
     }
 }
 
-static void TEST_define_AND_allocate(void)
+static void TEST_define_empty_AND_allocate(void)
 {
     {
         CLC_CQ_define_empty(int, q, 32);
@@ -131,7 +185,7 @@ static void TEST_define_AND_allocate(void)
     }
 }
 
-static void TEST_CQ_define_on_stack(void)
+static void TEST_define_on_stack(void)
 {
     {
         int array[32];
@@ -142,7 +196,23 @@ static void TEST_CQ_define_on_stack(void)
     }
 }
 
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
+static void TEST_define_on_stack_with_cb(void)
+{
+    {
+        int array[32];
+
+        CLC_CQ_define_on_stack_with_cb(q, array, fn_element_free_stub, &array[0]);
+
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(32, CLC_CQ_spare(q));
+
+        TEST_POINTER_EQUAL(&array[0], q.param_element_free);
+        TEST_FUNCTION_POINTER_EQUAL(fn_element_free_stub, q.pfn_element_free);
+    }
+}
+
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref(void)
 {
     {
         int array[8];
@@ -263,7 +333,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_FAIL_TO_ADD(void)
     }
 }
 
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
+static void TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value(void)
 {
     {
         int array[4];
@@ -411,7 +481,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_FRONT_TWO_THEN_ADD(void)
     }
 }
 
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_pop_back_THEN_push_by_ref(void)
 {
     {
         int array[4];
@@ -566,7 +636,7 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_POP_BACK_TWO_THEN_ADD(void)
     }
 }
 
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_clear(void)
 {
     {
         int array[4];
@@ -730,47 +800,14 @@ static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_CLEAR(void)
     }
 }
 
-
-static void fn_accumulate_on_free(
-    size_t  el_size
-,   size_t  el_index
-,   void*   el_ptr
-,   void*   param_element_free
-)
-{
-    int* const  p_el    =   (int*)el_ptr;
-    long* const p_sum   =   (long*)param_element_free;
-
-    ((void)&el_size);
-    ((void)&el_index);
-
-    *p_sum += *p_el;
-}
-
-static void fn_record_most_recent_overwrite(
-    size_t  el_size
-,   size_t  el_index
-,   void*   el_ptr
-,   void*   param_element_free
-)
-{
-    int* const  p_el    =   (int*)el_ptr;
-    int* const  p_rec   =   (int*)param_element_free;
-
-    ((void)&el_size);
-    ((void)&el_index);
-
-    *p_rec = *p_el;
-}
-
-static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
+static void TEST_STACK_AND_push_by_value_AND_clear_WITH_CB(void)
 {
     {
         long    sum = 0;
         size_t  num_removed;
 
         int     array[8];
-        CLC_CQ_define_on_stack_with_cb(q, array, fn_accumulate_on_free, &sum);
+        CLC_CQ_define_on_stack_with_cb(q, array, fn_element_free_accumulate_on_free, &sum);
 
         TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
         TEST_INT_EQ(0, CLC_CQ_len(q));
@@ -830,7 +867,7 @@ static void TEST_ADD_REMOVE_CLEAR_WITH_CALLBACKS(void)
     }
 }
 
-static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void)
+static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void)
 {
     {
         CLC_CQ_define_empty(int, q, 32);
@@ -858,13 +895,13 @@ static void TEST_HEAP_ADD_WITHOUT_WRAP_1(void)
     }
 }
 
-static void TEST_STACK_AND_ADD_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL(void)
+static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_F_OVERWRITE_FRONT_WHEN_FULL(void)
 {
     {
         int array[8];
         int previous = -1;
 
-        COLLECT_C_CIRCQ_define_on_stack_with_callback(q, array, fn_record_most_recent_overwrite, &previous);
+        COLLECT_C_CIRCQ_define_on_stack_with_callback(q, array, fn_element_free_record_most_recent_overwrite, &previous);
 
         q.flags |= CLC_CQ_F_OVERWRITE_FRONT_WHEN_FULL;
 

@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 7th February 2025
+ * Updated: 9th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -75,10 +75,10 @@ struct collect_c_cq_t
     void*   storage;            /*! Pointer to the storage. */
     void*   param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free */
     void  (*pfn_element_free)(
-        size_t  el_size
-    ,   size_t  el_index
-    ,   void*   el_ptr
-    ,   void*   param_element_free
+        size_t      el_size
+    ,   intptr_t    el_index
+    ,   void*       el_ptr
+    ,   void*       param_element_free
     );                          /*! Custom function to be invoked when */
 };
 #ifndef __cplusplus
