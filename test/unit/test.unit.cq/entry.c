@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 
 
 /* /////////////////////////////////////////////////////////////////////////
- * test function definitions
+ * test helpers
  */
 
 struct custom_t
@@ -100,6 +100,26 @@ void  pfn_element_free_stub(
     ((void)&param_element_free);
 }
 
+static void fn_accumulate_on_free(
+    size_t      el_size
+,   intptr_t    el_index
+,   void*       el_ptr
+,   void*       param_element_free
+)
+{
+    int* const  p_el = (int*)el_ptr;
+    long* const p_sum = (long*)param_element_free;
+
+    ((void)&el_size);
+    ((void)&el_index);
+
+    *p_sum += *p_el;
+}
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * test function definitions
+ */
 
 static void TEST_define_empty(void)
 {
@@ -757,23 +777,6 @@ static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_clear(void)
             TEST_INT_EQ(4, CLC_CQ_spare(q));
         }
     }
-}
-
-
-static void fn_accumulate_on_free(
-    size_t      el_size
-,   intptr_t    el_index
-,   void*       el_ptr
-,   void*       param_element_free
-)
-{
-    int* const  p_el = (int*)el_ptr;
-    long* const p_sum = (long*)param_element_free;
-
-    ((void)&el_size);
-    ((void)&el_index);
-
-    *p_sum += *p_el;
 }
 
 static void TEST_push_by_value_AND_clear_WITH_CALLBACKS(void)
