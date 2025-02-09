@@ -137,6 +137,10 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 #define COLLECT_C_CIRCQ_len(cq_name)                            ((cq_name).e - (cq_name).b)
 #define COLLECT_C_CIRCQ_spare(cq_name)                          ((cq_name).capacity - COLLECT_C_CIRCQ_len(cq_name))
 
+#define COLLECT_C_CIRCQ_cat_v_(cq_name, ix)                     ((void const*)(((char const*)(cq_name).storage) + ((((cq_name).b + (ix)) % (cq_name).capacity) * (cq_name).el_size)))
+
+#define COLLECT_C_CIRCQ_cat_t(cq_name, t_el, ix)                (assert(sizeof(t_el) == (cq_name).el_size), (t_el const*)COLLECT_C_CIRCQ_cat_v_((cq_name), (ix)))
+
 #define COLLECT_C_CIRCQ_at(cq_name, el_ix)                      (((char*)(cq_name).storage) + ((((cq_name).b + (el_ix)) % (cq_name).capacity) * (cq_name).el_size))
 #define COLLECT_C_CIRCQ_element_index(cq_name, el_ix)           (((cq_name).b + (el_ix)) % (cq_name).capacity)
 

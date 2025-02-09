@@ -73,12 +73,12 @@ collect_c_cq_free_storage(
 
     if (NULL != q->pfn_element_free)
     {
-        for (; q->e != q->b; )
+        for (size_t lix = 0; q->e != q->b; ++lix)
         {
             size_t const    ix  =   q->b % q->capacity;
             void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+            (*q->pfn_element_free)(q->el_size, lix, pe, q->param_element_free);
 
             ++q->b;
         }
@@ -148,12 +148,12 @@ collect_c_cq_clear(
 
     if (NULL != q->pfn_element_free)
     {
-        for (; q->e != q->b; ++*num_dropped)
+        for (size_t lix = 0; q->e != q->b; ++lix, ++*num_dropped)
         {
             size_t const    ix  =   q->b % q->capacity;
             void* const     pe  =   COLLECT_C_CIRCQ_INTERNAL_el_ptr_from_ix_(q, ix);
 
-            (*q->pfn_element_free)(q->el_size, ix, pe, q->param_element_free);
+            (*q->pfn_element_free)(q->el_size, lix, pe, q->param_element_free);
 
             ++q->b;
         }

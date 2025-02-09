@@ -38,6 +38,7 @@ static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_clear(void);
 static void TEST_push_by_value_AND_clear_WITH_CALLBACKS(void);
 
 static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void);
+static void TEST_HEAP_AND_CALLBACK_INDEXES(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -65,6 +66,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_push_by_value_AND_clear_WITH_CALLBACKS);
 
         XTESTS_RUN_CASE(TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP);
+        XTESTS_RUN_CASE(TEST_HEAP_AND_CALLBACK_INDEXES);
 
         XTESTS_PRINT_RESULTS();
 
@@ -114,6 +116,21 @@ static void fn_accumulate_on_free(
     ((void)&el_index);
 
     *p_sum += *p_el;
+}
+
+static void fn_store_in_array(
+    size_t      el_size
+,   intptr_t    el_index
+,   void*       el_ptr
+,   void*       param_element_free
+)
+{
+    int* const          ar_int  =   (int*)param_element_free;
+    int const* const    p_el    =   (int const*)el_ptr;
+
+    ((void)&el_size);
+
+    ar_int[el_index] = *p_el;
 }
 
 
@@ -868,6 +885,274 @@ static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void)
             }
 
             TEST_INT_EQ(10, CLC_CQ_len(q));
+
+            clc_cq_free_storage(&q);
+        }
+    }
+}
+
+static void TEST_HEAP_AND_CALLBACK_INDEXES(void)
+{
+    /* clc_cq_free_storage(): run straight through allocated spaces and then deallocate */
+    {
+        CLC_CQ_define_empty(int, q, 16);
+
+        int const r = clc_cq_allocate_storage(&q);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            int const   values[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, };
+            int         checks[16];
+
+            q.pfn_element_free      =   fn_store_in_array;
+            q.param_element_free    =   &checks[0];
+
+            /* load values */
+
+            { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(values) != i; ++i)
+            {
+                int const r2 = CLC_CQ_push_by_ref(q, &values[i]);
+
+                TEST_INT_EQ(0, r2); // there is space, so should always work
+
+                TEST_INT_EQ(1 + i, CLC_CQ_len(q));
+
+                checks[i] = -1;
+            }}
+
+
+            /* check values in place */
+
+            { for (size_t i = 0; CLC_CQ_len(q) != i; ++i)
+            {
+                int const v_at_i = *CLC_CQ_cat_t(q, int, i);
+
+                TEST_INT_EQ((int)(1 + i), v_at_i);
+            }}
+
+
+            /* clear queue */
+            clc_cq_free_storage(&q);
+
+
+            /* check cleared values that were recorded */
+
+            { for (size_t i = 0; CLC_CQ_len(q) != i; ++i)
+            {
+                TEST_INT_EQ((int)(1 + i), checks[i]);
+            }}
+        }
+    }
+
+    /* clc_cq_free_storage(): run straight through allocated spaces, pop front, push back one more, and then deallocate */
+    {
+        CLC_CQ_define_empty(int, q, 16);
+
+        int const r = clc_cq_allocate_storage(&q);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            int const   values[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, };
+            int         checks[16];
+
+            /* load values */
+            {
+                { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(values) != i; ++i)
+                {
+                    int const r2 = CLC_CQ_push_by_ref(q, &values[i]);
+
+                    TEST_INT_EQ(0, r2); // there is space, so should always work
+
+                    TEST_INT_EQ(1 + i, CLC_CQ_len(q));
+
+                    checks[i] = -1;
+                }}
+
+                {
+                    int const r3 = CLC_CQ_pop_front(q);
+
+                    TEST_INT_EQ(0, r3);
+                }
+
+                {
+                    int const r4 = CLC_CQ_push_by_value(q, int, 17);
+
+                    TEST_INT_EQ(0, r4);
+                }
+            }
+
+
+            /* check values in place */
+            { for (size_t i = 0; CLC_CQ_len(q) != i; ++i)
+            {
+                int const v_at_i = *CLC_CQ_cat_t(q, int, i);
+
+                TEST_INT_EQ((int)(2 + i), v_at_i);
+
+                TEST_INT_EQ(-1, checks[i]);
+            }}
+
+
+            /* clear queue */
+            {
+                q.pfn_element_free      =   fn_store_in_array;
+                q.param_element_free    =   &checks[0];
+
+                clc_cq_free_storage(&q);
+            }
+
+
+            /* check cleared values that were recorded */
+            { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(checks) != i; ++i)
+            {
+                TEST_INT_EQ((int)(2 + i), checks[i]);
+            }}
+        }
+    }
+
+    /* clear(): run straight through allocated spaces and then clear */
+    {
+        CLC_CQ_define_empty(int, q, 16);
+
+        int const r = clc_cq_allocate_storage(&q);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            int const   values[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, };
+            int         checks[16];
+
+            q.pfn_element_free      =   fn_store_in_array;
+            q.param_element_free    =   &checks[0];
+
+            /* load values */
+
+            { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(values) != i; ++i)
+            {
+                int const r2 = CLC_CQ_push_by_ref(q, &values[i]);
+
+                TEST_INT_EQ(0, r2); // there is space, so should always work
+
+                TEST_INT_EQ(1 + i, CLC_CQ_len(q));
+
+                checks[i] = -1;
+            }}
+
+
+            /* check values in place */
+
+            { for (size_t i = 0; CLC_CQ_len(q) != i; ++i)
+            {
+                int const v_at_i = *CLC_CQ_cat_t(q, int, i);
+
+                TEST_INT_EQ((int)(1 + i), v_at_i);
+            }}
+
+
+            /* clear queue */
+            {
+                size_t      num_removed;
+                int const   r3 = CLC_CQ_clear(q, &num_removed);
+
+                TEST_INT_EQ(0, r3);
+                TEST_INT_EQ(16, num_removed);
+
+                TEST_INT_EQ(0, CLC_CQ_len(q));
+            }
+
+
+            /* check cleared values that were recorded */
+
+            { for (size_t i = 0; CLC_CQ_len(q) != i; ++i)
+            {
+                TEST_INT_EQ((int)(1 + i), checks[i]);
+            }}
+
+
+            clc_cq_free_storage(&q);
+        }
+    }
+
+    /* clear(): run straight through allocated spaces, pop front, push back one more, and then clear */
+    {
+        CLC_CQ_define_empty(int, q, 16);
+
+        int const r = clc_cq_allocate_storage(&q);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            int const   values[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, };
+            int         checks[16];
+
+            /* load values */
+
+            {
+                { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(values) != i; ++i)
+                {
+                    int const r2 = CLC_CQ_push_by_ref(q, &values[i]);
+
+                    TEST_INT_EQ(0, r2); // there is space, so should always work
+
+                    TEST_INT_EQ(1 + i, CLC_CQ_len(q));
+
+                    checks[i] = -1;
+                }}
+
+                {
+                    int const r3 = CLC_CQ_pop_front(q);
+
+                    TEST_INT_EQ(0, r3);
+                }
+
+                {
+                    int const r4 = CLC_CQ_push_by_value(q, int, 17);
+
+                    TEST_INT_EQ(0, r4);
+                }
+            }
+
+
+            /* check values in place */
+
+            { for (size_t i = 0; CLC_CQ_len(q) != i; ++i)
+            {
+                int const v_at_i = *CLC_CQ_cat_t(q, int, i);
+
+                TEST_INT_EQ((int)(2 + i), v_at_i);
+            }}
+
+
+            /* clear queue */
+            {
+                q.pfn_element_free      =   fn_store_in_array;
+                q.param_element_free    =   &checks[0];
+
+                {
+                    size_t      num_removed;
+                    int const   r3 = CLC_CQ_clear(q, &num_removed);
+
+                    TEST_INT_EQ(0, r3);
+                    TEST_INT_EQ(16, num_removed);
+
+                    TEST_INT_EQ(0, CLC_CQ_len(q));
+                }
+            }
+
+
+            /* check cleared values that were recorded */
+
+            { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(checks) != i; ++i)
+            {
+                TEST_INT_EQ((int)(2 + i), checks[i]);
+            }}
+
 
             clc_cq_free_storage(&q);
         }
