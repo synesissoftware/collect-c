@@ -175,17 +175,6 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 #define COLLECT_C_CIRCQ_cfront_t(cq_name, t_el)                 (COLLECT_C_CIRCQ_cat_t(cq_name, t_el,                                0))
 #define COLLECT_C_CIRCQ_cback_t(cq_name, t_el)                  (COLLECT_C_CIRCQ_cat_t(cq_name, t_el, COLLECT_C_CIRCQ_len(cq_name) - 1))
 
-
-/* TODO: deprecate this */
-#define COLLECT_C_CIRCQ_at(cq_name, el_ix)                      (((char*)(cq_name).storage) + ((((cq_name).b + (el_ix)) % (cq_name).capacity) * (cq_name).el_size))
-/* TODO: deprecate this */
-#define COLLECT_C_CIRCQ_element_index(cq_name, el_ix)           (((cq_name).b + (el_ix)) % (cq_name).capacity)
-
-/* TODO: deprecate this */
-#define collect_c_cq_push_by_ref                                collect_c_cq_push_back_by_ref
-#define COLLECT_C_CIRCQ_push_by_ref                             COLLECT_C_CIRCQ_push_back_by_ref
-#define COLLECT_C_CIRCQ_push_by_value                           COLLECT_C_CIRCQ_push_back_by_value
-
 #define COLLECT_C_CIRCQ_push_back_by_ref(cq_name, ptr_new_el)   collect_c_cq_push_back_by_ref(&(cq_name), ptr_new_el)
 #define COLLECT_C_CIRCQ_push_back_by_value(cq_name, t_el, new_el)   \
                                                                 (assert(sizeof(t_el) == (cq_name).el_size), collect_c_cq_push_back_by_ref(&(cq_name), &((t_el){(new_el)})))
@@ -199,6 +188,18 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 #define COLLECT_C_CIRCQ_clear_GET_MACRO_(_1, _2, macro, ...)    macro
 
 #define COLLECT_C_CIRCQ_clear(...)                              COLLECT_C_CIRCQ_clear_GET_MACRO_(__VA_ARGS__, COLLECT_C_CIRCQ_clear_2_, COLLECT_C_CIRCQ_clear_1_, NULL)(__VA_ARGS__)
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * API functions & macros (deprecated)
+ */
+
+#define COLLECT_C_CIRCQ_at(cq_name, el_ix)                      (((char*)(cq_name).storage) + ((((cq_name).b + (el_ix)) % (cq_name).capacity) * (cq_name).el_size))
+#define COLLECT_C_CIRCQ_element_index(cq_name, el_ix)           (((cq_name).b + (el_ix)) % (cq_name).capacity)
+
+#define collect_c_cq_push_by_ref                                collect_c_cq_push_back_by_ref
+#define COLLECT_C_CIRCQ_push_by_ref                             COLLECT_C_CIRCQ_push_back_by_ref
+#define COLLECT_C_CIRCQ_push_by_value                           COLLECT_C_CIRCQ_push_back_by_value
 
 
 /* /////////////////////////////////////////////////////////////////////////
