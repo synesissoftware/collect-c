@@ -4,7 +4,7 @@
  * Purpose: Performance-test for circular queue.
  *
  * Created: 6th February 2025
- * Updated: 6th February 2025
+ * Updated: 9th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -223,10 +223,10 @@ int main(int argc, char* /*argv*/[])
 namespace {
 
     void int_callback(
-        size_t  el_size
-    ,   size_t  el_index
-    ,   void*   el_ptr
-    ,   void*   param_element_free
+        size_t      el_size
+    ,   intptr_t    el_index
+    ,   void*       el_ptr
+    ,   void*       param_element_free
     )
     {
         ((void)&el_size);

@@ -88,10 +88,10 @@ struct custom_t
 typedef struct custom_t custom_t;
 
 void  pfn_element_free_stub(
-    size_t  el_size
-,   size_t  el_index
-,   void*   el_ptr
-,   void*   param_element_free
+    size_t      el_size
+,   intptr_t    el_index
+,   void*       el_ptr
+,   void*       param_element_free
 )
 {
     ((void)&el_size);
@@ -761,10 +761,10 @@ static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_clear(void)
 
 
 static void fn_accumulate_on_free(
-    size_t  el_size
-,   size_t  el_index
-,   void*   el_ptr
-,   void*   param_element_free
+    size_t      el_size
+,   intptr_t    el_index
+,   void*       el_ptr
+,   void*       param_element_free
 )
 {
     int* const  p_el = (int*)el_ptr;
