@@ -4,7 +4,7 @@
  * Purpose: Vector container terse api.
  *
  * Created: 5th February 2025
- * Updated: 10th February 2025
+ * Updated: 11th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -27,6 +27,8 @@
 #define CLC_V_define_empty                                  COLLECT_C_VEC_define_empty
 #define CLC_V_define_empty_with_cb                          COLLECT_C_VEC_define_empty_with_callback
 #define CLC_V_define_on_stack                               COLLECT_C_VEC_define_on_stack
+
+#define CLC_V_clear                                         COLLECT_C_VEC_clear
 
 #define CLC_V_push_back_by_ref                              COLLECT_C_VEC_push_back_by_ref
 #define CLC_V_push_back_by_value                            COLLECT_C_VEC_push_back_by_value

@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 10th February 2025
+ * Updated: 11th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -27,7 +27,7 @@
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
 #define COLLECT_C_CIRCQ_VER_MINOR       2
 #define COLLECT_C_CIRCQ_VER_PATCH       0
-#define COLLECT_C_CIRCQ_VER_ALPHABETA   2
+#define COLLECT_C_CIRCQ_VER_ALPHABETA   3
 
 #define COLLECT_C_CIRCQ_VER \
     (0\
@@ -107,7 +107,6 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 
 #define COLLECT_C_CIRCQ_clear_1_(cq_name)                       collect_c_cq_clear(&(cq_name), NULL, NULL, NULL)
 #define COLLECT_C_CIRCQ_clear_2_(cq_name, p)                    collect_c_cq_clear(&(cq_name), NULL, NULL, (p))
-#define COLLECT_C_CIRCQ_clear_GET_MACRO_(_1, _2, macro, ...)    macro
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -179,7 +178,7 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
 
 /* modifiers */
 
-#define COLLECT_C_CIRCQ_clear(...)                              COLLECT_C_CIRCQ_clear_GET_MACRO_(__VA_ARGS__, COLLECT_C_CIRCQ_clear_2_, COLLECT_C_CIRCQ_clear_1_, NULL)(__VA_ARGS__)
+#define COLLECT_C_CIRCQ_clear(...)                              COLLECT_C_UTIL_GET_MACRO_1_or_2_(__VA_ARGS__, COLLECT_C_CIRCQ_clear_2_, COLLECT_C_CIRCQ_clear_1_, NULL)(__VA_ARGS__)
 
 #define COLLECT_C_CIRCQ_push_back_by_ref(cq_name, ptr_new_el)   collect_c_cq_push_back_by_ref(&(cq_name), ptr_new_el)
 #define COLLECT_C_CIRCQ_push_back_by_value(cq_name, t_el, new_el)   \
