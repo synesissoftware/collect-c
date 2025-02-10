@@ -20,6 +20,20 @@ T.B.C.
 
 ## Components
 
+### APIs
+
+#### Circular Queue
+
+T.B.C.
+
+
+#### Doubly-linked List
+
+T.B.C.
+
+
+#### Vector
+
 T.B.C.
 
 
