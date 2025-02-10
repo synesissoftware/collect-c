@@ -27,7 +27,7 @@
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
 #define COLLECT_C_CIRCQ_VER_MINOR       2
 #define COLLECT_C_CIRCQ_VER_PATCH       0
-#define COLLECT_C_CIRCQ_VER_ALPHABETA   3
+#define COLLECT_C_CIRCQ_VER_ALPHABETA   4
 
 #define COLLECT_C_CIRCQ_VER \
     (0\
@@ -64,22 +64,27 @@
  * API types
  */
 
+/** Callback function that, if attached to instance, will be called back for
+ * each element upon its erasure or replacement by any of the API functions.
+ */
+typedef void (*collect_c_circq_pfn_free)(
+    size_t      el_size
+,   intptr_t    el_index
+,   void*       el_ptr
+,   void*       param_element_free
+);
+
 struct collect_c_cq_t
 {
-    size_t  el_size;            /*! The element size. */
-    size_t  capacity;           /*! The capacity. */
-    size_t  b;                  /*! The pseudo-index of el[0]. */
-    size_t  e;                  /*! The pseudo-index of el[size]. */
-    int32_t flags;              /*! Control flags. */
-    int32_t reserved0;          /*! Reserved field. */
-    void*   storage;            /*! Pointer to the storage. */
-    void*   param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free */
-    void  (*pfn_element_free)(
-        size_t      el_size
-    ,   intptr_t    el_index
-    ,   void*       el_ptr
-    ,   void*       param_element_free
-    );                          /*! Custom function to be invoked when */
+    size_t                      el_size;            /*! The element size. */
+    size_t                      capacity;           /*! The capacity. */
+    size_t                      b;                  /*! The pseudo-index of el[0]. */
+    size_t                      e;                  /*! The pseudo-index of el[size]. */
+    int32_t                     flags;              /*! Control flags. */
+    int32_t                     reserved0;          /*! Reserved field. */
+    void*                       storage;            /*! Pointer to the storage. */
+    void*                       param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free. */
+    collect_c_circq_pfn_free    pfn_element_free;   /*! Custom function to be invoked when element erased/replaced. */
 };
 #ifndef __cplusplus
 typedef struct collect_c_cq_t   collect_c_cq_t;

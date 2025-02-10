@@ -27,7 +27,7 @@
 #define COLLECT_C_VEC_VER_MAJOR     0
 #define COLLECT_C_VEC_VER_MINOR     0
 #define COLLECT_C_VEC_VER_PATCH     0
-#define COLLECT_C_VEC_VER_ALPHABETA 2
+#define COLLECT_C_VEC_VER_ALPHABETA 3
 
 #define COLLECT_C_VEC_VER \
     (0\
@@ -68,6 +68,16 @@
  * API types
  */
 
+/** Callback function that, if attached to instance, will be called back for
+ * each element upon its erasure or replacement by any of the API functions.
+ */
+typedef void (*collect_c_vec_pfn_free)(
+    size_t  el_size
+,   size_t  el_index    /* always 0 */
+,   void*   el_ptr
+,   void*   param_element_free
+);
+
 /** Represents a classic vector container.
  *
  * @note This type supports what we refer to as "base-offset optimisation",
@@ -84,20 +94,15 @@
  */
 struct collect_c_vec_t
 {
-    size_t  el_size;            /*! The element size. */
-    size_t  capacity;           /*! The capacity. */
-    size_t  offset;             /*! The base offset. */
-    size_t  size;               /*! The size. */
-    int32_t flags;              /*! Control flags. */
-    int32_t reserved0;          /*! Reserved field. */
-    void*   storage;            /*! Pointer to the storage. */
-    void*   param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free */
-    void  (*pfn_element_free)(
-        size_t  el_size
-    ,   size_t  el_index
-    ,   void*   el_ptr
-    ,   void*   param_element_free
-    );                          /*! Custom function to be invoked when */
+    size_t                  el_size;            /*! The element size. */
+    size_t                  capacity;           /*! The capacity. */
+    size_t                  offset;             /*! The base offset. */
+    size_t                  size;               /*! The size. */
+    int32_t                 flags;              /*! Control flags. */
+    int32_t                 reserved0;          /*! Reserved field. */
+    void*                   storage;            /*! Pointer to the storage. */
+    void*                   param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free. */
+    collect_c_vec_pfn_free  pfn_element_free;   /*! Custom function to be invoked when element erased/replaced. */
 };
 #ifndef __cplusplus
 typedef struct collect_c_vec_t  collect_c_vec_t;
