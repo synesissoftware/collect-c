@@ -4,7 +4,7 @@
  * Purpose: Vector container.
  *
  * Created: 5th February 2025
- * Updated: 7th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -42,7 +42,7 @@
  * includes
  */
 
-// #include <collect-c/common.h>
+#include <collect-c/common.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -103,6 +103,33 @@ struct collect_c_vec_t
 typedef struct collect_c_vec_t  collect_c_vec_t;
 #endif
 
+
+/* /////////////////////////////////////////////////////////////////////////
+ * API functions & macros (internal)
+ */
+
+#define COLLECT_C_VEC_get_l_ptr_(v)                         _Generic((v),   \
+                                                                            \
+              collect_c_vec_t* :  (v),                                      \
+        collect_c_vec_t const* :  (v),                                      \
+                       default : &(v)                                       \
+)
+
+#define COLLECT_C_VEC_assert_el_size_(v_name, t_el)         assert(sizeof(t_el) == COLLECT_C_VEC_get_l_ptr_(v_name)->el_size)
+#define COLLECT_C_VEC_assert_ix_(v_name, ix)                assert((ix) < COLLECT_C_VEC_get_l_ptr_(v_name)->size)
+#define COLLECT_C_VEC_assert_not_empty_(v_name)             assert(0 != COLLECT_C_VEC_get_l_ptr_(v_name)->size)
+#define COLLECT_C_VEC_assert_not_null_(v_name)              assert(NULL != (v_name))
+
+#define COLLECT_C_VEC_at_v_(v_name, ix)                     ((void      *)(((char      *)COLLECT_C_VEC_get_l_ptr_(v_name)->storage) + ((COLLECT_C_VEC_get_l_ptr_(v_name)->offset + (ix)) * COLLECT_C_VEC_get_l_ptr_(v_name)->el_size)))
+#define COLLECT_C_VEC_cat_v_(v_name, ix)                    ((void const*)(((char const*)COLLECT_C_VEC_get_l_ptr_(v_name)->storage) + ((COLLECT_C_VEC_get_l_ptr_(v_name)->offset + (ix)) * COLLECT_C_VEC_get_l_ptr_(v_name)->el_size)))
+
+#define COLLECT_C_VEC_cbegin_(v_name)                       COLLECT_C_VEC_cat_v_(v_name,                                      0)
+#define COLLECT_C_VEC_cend_(v_name)                         COLLECT_C_VEC_cat_v_(v_name, COLLECT_C_VEC_get_l_ptr_(v_name)->size)
+
+#define COLLECT_C_VEC_begin_(v_name)                        COLLECT_C_VEC_at_v_( v_name,                                      0)
+#define COLLECT_C_VEC_end_(v_name)                          COLLECT_C_VEC_at_v_( v_name, COLLECT_C_VEC_get_l_ptr_(v_name)->size)
+
+
 /* /////////////////////////////////////////////////////////////////////////
  * API functions & macros
  */
@@ -115,7 +142,9 @@ typedef struct collect_c_vec_t  collect_c_vec_t;
  * @param el_type The type of the elements to be stored;
  * @param v_name The name of the instance;
  */
-#define COLLECT_C_VEC_define_empty(el_type, v_name)         collect_c_vec_t v_name = { .el_size = sizeof(el_type), }
+#define COLLECT_C_VEC_define_empty(el_type, v_name)         \
+                                                            \
+    collect_c_vec_t v_name = { .el_size = sizeof(el_type), }
 
 
 /** @def COLLECT_C_VEC_define_empty_with_callback(el_type, v_name, elf_fn, elf_param)
@@ -143,47 +172,48 @@ typedef struct collect_c_vec_t  collect_c_vec_t;
  * @param ar_name The name of the array instance that will serve as the
  *  memory of the vector instance;
  */
-#define COLLECT_C_VEC_define_on_stack(v_name, ar_name)      collect_c_vec_t v_name = COLLECT_C_VEC_EMPTY_INITIALIZER_(((ar_name)[0]), (sizeof((ar_name)) / sizeof((ar_name)[0])), COLLECT_C_VEC_F_USE_STACK_ARRAY, &(ar_name)[0], NULL, 0)
+#define COLLECT_C_VEC_define_on_stack(v_name, ar_name)      \
+                                                            \
+    collect_c_vec_t v_name = COLLECT_C_VEC_EMPTY_INITIALIZER_(((ar_name)[0]), (sizeof((ar_name)) / sizeof((ar_name)[0])), COLLECT_C_VEC_F_USE_STACK_ARRAY, &(ar_name)[0], NULL, 0)
 
-#define COLLECT_C_VEC_push_back_by_ref(v_name, ptr_new_el)  collect_c_v_push_back_by_ref(&(v_name), (ptr_new_el))
+
+/* modifiers */
+
+#define COLLECT_C_VEC_push_back_by_ref(v_name, ptr_new_el)  collect_c_v_push_back_by_ref(COLLECT_C_VEC_get_l_ptr_(v_name), (ptr_new_el))
 #define COLLECT_C_VEC_push_back_by_value(v_name, t_el, new_el)  \
                                                                 \
-                                                            (assert(sizeof(t_el) == (v_name).el_size), collect_c_v_push_back_by_ref(&(v_name), &((t_el){(new_el)})))
+                                                            (COLLECT_C_VEC_assert_el_size_(v_name, t_el), collect_c_v_push_back_by_ref(COLLECT_C_VEC_get_l_ptr_(v_name), &((t_el){(new_el)})))
+
+#define COLLECT_C_VEC_push_front_by_ref(v_name, ptr_new_el)  collect_c_v_push_front_by_ref(COLLECT_C_VEC_get_l_ptr_(v_name), (ptr_new_el))
+#define COLLECT_C_VEC_push_front_by_value(v_name, t_el, new_el) \
+                                                                \
+                                                            (COLLECT_C_VEC_assert_el_size_(v_name, t_el), collect_c_v_push_front_by_ref(COLLECT_C_VEC_get_l_ptr_(v_name)->, &((t_el){(new_el)})))
+
+#define COLLECT_C_VEC_shrink_to_fit(v_name)                 collect_c_vec_shrink_to_fit(COLLECT_C_VEC_get_l_ptr_(v_name))
+
+/* attributes */
 
 #define COLLECT_C_VEC_is_empty(v_name)                      (0 == COLLECT_C_VEC_len((v_name)))
-#define COLLECT_C_VEC_len(v_name)                           ((v_name).size)
-#define COLLECT_C_VEC_spare(v_name)                         ((v_name).capacity - (v_name).size)
-#define COLLECT_C_VEC_spare_back(v_name)                    ((v_name).capacity - ((v_name).offset + (v_name).size))
-#define COLLECT_C_VEC_spare_front(v_name)                   ((v_name).offset)
+#define COLLECT_C_VEC_len(v_name)                           (COLLECT_C_VEC_get_l_ptr_(v_name)->size)
+#define COLLECT_C_VEC_spare(v_name)                         (COLLECT_C_VEC_get_l_ptr_(v_name)->capacity - COLLECT_C_VEC_get_l_ptr_(v_name)->size)
+#define COLLECT_C_VEC_spare_back(v_name)                    (COLLECT_C_VEC_get_l_ptr_(v_name)->capacity - (COLLECT_C_VEC_get_l_ptr_(v_name)->offset + COLLECT_C_VEC_get_l_ptr_(v_name)->size))
+#define COLLECT_C_VEC_spare_front(v_name)                   (COLLECT_C_VEC_get_l_ptr_(v_name)->offset)
 
-#define COLLECT_C_VEC_CANON_ARG_(v)                         (_Generic((v), collect_c_vec_t*: (v), collect_c_vec_t const*: (v), collect_c_vec_t: &(v), default: (void)))
-
-#define COLLECT_C_VEC_assert_el_size_(v_name, t_el)         assert(sizeof(t_el) == (v_name).el_size)
-#define COLLECT_C_VEC_assert_ix_(v_name, ix)                assert((ix) < (v_name).size)
-#define COLLECT_C_VEC_assert_NOT_is_empty_(v_name)          assert(0 != (v_name).size)
-
-#define COLLECT_C_VEC_at_cv_(v_name, ix)                    ((void const*)(((char const*)(v_name).storage) + (((v_name).offset + (ix)) * (v_name).el_size)))
-#define COLLECT_C_VEC_at_v_(v_name, ix)                     ((void      *)(((char      *)(v_name).storage) + (((v_name).offset + (ix)) * (v_name).el_size)))
-
-#define COLLECT_C_VEC_cbegin_(v_name)                       COLLECT_C_VEC_at_cv_(v_name,             0)
-#define COLLECT_C_VEC_cend_(v_name)                         COLLECT_C_VEC_at_cv_(v_name, (v_name).size)
-
-#define COLLECT_C_VEC_begin_(v_name)                        COLLECT_C_VEC_at_v_( v_name,             0)
-#define COLLECT_C_VEC_end_(v_name)                          COLLECT_C_VEC_at_v_( v_name, (v_name).size)
-
+/* accessors */
 
 #define COLLECT_C_VEC_at_v(v_name, ix)                      (COLLECT_C_VEC_assert_ix_(v_name, ix),  COLLECT_C_VEC_at_v_(v_name, ix))
-#define COLLECT_C_VEC_cat_v(v_name, ix)                     (COLLECT_C_VEC_assert_ix_(v_name, ix), COLLECT_C_VEC_at_cv_(v_name, ix))
+#define COLLECT_C_VEC_cat_v(v_name, ix)                     (COLLECT_C_VEC_assert_ix_(v_name, ix), COLLECT_C_VEC_cat_v_(v_name, ix))
 
 #define COLLECT_C_VEC_at_t(v_name, t_el, ix)                ((t_el      *)(COLLECT_C_VEC_assert_el_size_(v_name, t_el), COLLECT_C_VEC_assert_ix_(v_name, ix),  COLLECT_C_VEC_at_v_(v_name, ix)))
-#define COLLECT_C_VEC_cat_t(v_name, t_el, ix)               ((t_el const*)(COLLECT_C_VEC_assert_el_size_(v_name, t_el), COLLECT_C_VEC_assert_ix_(v_name, ix), COLLECT_C_VEC_at_cv_(v_name, ix)))
+#define COLLECT_C_VEC_cat_t(v_name, t_el, ix)               ((t_el const*)(COLLECT_C_VEC_assert_el_size_(v_name, t_el), COLLECT_C_VEC_assert_ix_(v_name, ix), COLLECT_C_VEC_cat_v_(v_name, ix)))
 
-#define COLLECT_C_VEC_front_t(v_name, t_el)                 (COLLECT_C_VEC_assert_NOT_is_empty_(v_name), COLLECT_C_VEC_at_t( v_name, t_el,                 0))
-#define COLLECT_C_VEC_back_t(v_name, t_el)                  (COLLECT_C_VEC_assert_NOT_is_empty_(v_name), COLLECT_C_VEC_at_t( v_name, t_el, (v_name).size - 1))
+#define COLLECT_C_VEC_front_t(v_name, t_el)                 (COLLECT_C_VEC_assert_not_empty_(v_name), COLLECT_C_VEC_at_t( v_name, t_el,                 0))
+#define COLLECT_C_VEC_back_t(v_name, t_el)                  (COLLECT_C_VEC_assert_not_empty_(v_name), COLLECT_C_VEC_at_t( v_name, t_el, COLLECT_C_VEC_get_l_ptr_(v_name)->size - 1))
 
-#define COLLECT_C_VEC_cfront_t(v_name, t_el)                (COLLECT_C_VEC_assert_NOT_is_empty_(v_name), COLLECT_C_VEC_cat_t(v_name, t_el,                 0))
-#define COLLECT_C_VEC_cback_t(v_name, t_el)                 (COLLECT_C_VEC_assert_NOT_is_empty_(v_name), COLLECT_C_VEC_cat_t(v_name, t_el, (v_name).size - 1))
+#define COLLECT_C_VEC_cfront_t(v_name, t_el)                (COLLECT_C_VEC_assert_not_empty_(v_name), COLLECT_C_VEC_cat_t(v_name, t_el,                 0))
+#define COLLECT_C_VEC_cback_t(v_name, t_el)                 (COLLECT_C_VEC_assert_not_empty_(v_name), COLLECT_C_VEC_cat_t(v_name, t_el, COLLECT_C_VEC_get_l_ptr_(v_name)->size - 1))
 
+/* iteration */
 
 #define COLLECT_C_VEC_begin_v(v_name)                       COLLECT_C_VEC_begin_(v_name)
 #define COLLECT_C_VEC_end_v(v_name)                           COLLECT_C_VEC_end_(v_name)
@@ -225,7 +255,6 @@ collect_c_vec_version(void);
  * @pre (NULL != v);
  * @pre (NULL == v->storage);
  */
-
 int
 collect_c_vec_allocate_storage(
     collect_c_vec_t*    v
@@ -243,12 +272,6 @@ collect_c_vec_allocate_storage(
 void
 collect_c_vec_free_storage(
     collect_c_vec_t*    v
-);
-
-int
-collect_c_v_push_back_by_ref(
-    collect_c_vec_t*    v
-,   void const*         ptr_new_el
 );
 
 /** Clears all elements from the vector.
@@ -275,9 +298,35 @@ collect_c_vec_clear(
 ,   size_t*             num_dropped
 );
 
+/** T.B.C.
+ *
+ * @param v T.B.C.
+ */
 int
 collect_c_vec_shrink_to_fit(
     collect_c_vec_t*    v
+);
+
+/** T.B.C.
+ *
+ * @param v T.B.C.
+ * @param ptr_new_el T.B.C.
+ */
+int
+collect_c_v_push_back_by_ref(
+    collect_c_vec_t*    v
+,   void const*         ptr_new_el
+);
+
+/** T.B.C.
+ *
+ * @param v T.B.C.
+ * @param ptr_new_el T.B.C.
+ */
+int
+collect_c_v_push_front_by_ref(
+    collect_c_vec_t*    v
+,   void const*         ptr_new_el
 );
 
 #ifdef __cplusplus

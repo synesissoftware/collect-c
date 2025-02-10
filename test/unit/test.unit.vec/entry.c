@@ -4,7 +4,7 @@
  * Purpose: Unit-test for vector.
  *
  * Created: 5th February 2025
- * Updated: 7th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -31,7 +31,10 @@ static void TEST_V_define_empty_with_cb(void);
 static void TEST_V_define_empty_THEN_allocate_storage(void);
 static void TEST_V_define_on_stack(void);
 static void TEST_V_define_on_stack_AND_push_back_UNTIL_FULL_THEN_FAIL(void);
+static void TEST_V_define_empty_AND_push_back_UNTIL_FULL_THEN_clear_THEN_push_front_UNTIL_FULL_AND_VERIFY_NO_REALLOCATION(void);
+static void TEST_V_define_empty_AND_allocate_storage_VERY_LARGE_THEN_push_back_1_ELEMENT_THEN_shrink_to_fit(void);
 static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_back_UNTIL_FULL_THEN_reallocate(void);
+static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL_THEN_reallocate(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -52,7 +55,10 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_V_define_empty_THEN_allocate_storage);
         XTESTS_RUN_CASE(TEST_V_define_on_stack);
         XTESTS_RUN_CASE(TEST_V_define_on_stack_AND_push_back_UNTIL_FULL_THEN_FAIL);
+        XTESTS_RUN_CASE(TEST_V_define_empty_AND_push_back_UNTIL_FULL_THEN_clear_THEN_push_front_UNTIL_FULL_AND_VERIFY_NO_REALLOCATION);
+        XTESTS_RUN_CASE(TEST_V_define_empty_AND_allocate_storage_VERY_LARGE_THEN_push_back_1_ELEMENT_THEN_shrink_to_fit);
         XTESTS_RUN_CASE(TEST_V_define_empty_THEN_allocate_storage_THEN_push_back_UNTIL_FULL_THEN_reallocate);
+        XTESTS_RUN_CASE(TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL_THEN_reallocate);
 
         XTESTS_PRINT_RESULTS();
 
@@ -347,6 +353,145 @@ static void TEST_V_define_on_stack_AND_push_back_UNTIL_FULL_THEN_FAIL(void)
     }
 }
 
+static void TEST_V_define_empty_AND_push_back_UNTIL_FULL_THEN_clear_THEN_push_front_UNTIL_FULL_AND_VERIFY_NO_REALLOCATION(void)
+{
+    CLC_V_define_empty(int, v);
+
+    v.flags |= CLC_V_F_NO_BOO;
+
+    int const r = collect_c_vec_allocate_storage(&v, 32);
+
+    TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+    if (0 == r)
+    {
+        void* const start_storage = v.storage;
+
+        TEST_BOOLEAN_TRUE(CLC_V_is_empty(v));
+        TEST_INT_EQ( 0, CLC_V_len(v));
+        TEST_INT_EQ( 0, CLC_V_spare_front(v));
+        TEST_INT_EQ(32, CLC_V_spare_back(v));
+        TEST_INT_EQ(32, CLC_V_spare(v));
+
+        /* add 32 elements, then assert that no reallocation occured */
+        {
+            for (int i = 0; 32 != i; ++i)
+            {
+                int const r2 = CLC_V_push_back_by_ref(v, &i);
+
+                TEST_INT_EQ(0, r2);
+
+                TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                TEST_INT_EQ(i, *CLC_V_cat_t(v, int, CLC_V_len(v) - 1));
+            }
+
+            TEST_INT_EQ(32, CLC_V_len(v));
+            TEST_INT_EQ( 0, CLC_V_spare_front(v));
+            TEST_INT_EQ( 0, CLC_V_spare_back(v));
+            TEST_INT_EQ( 0, CLC_V_spare(v));
+
+            TEST_INT_EQ(496, accumulate_v2(&v, 0));
+            TEST_INT_EQ(496, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+            void* const curr_storage = v.storage;
+
+            TEST_PTR_EQ(start_storage, curr_storage);
+        }
+
+        /* clear */
+        {
+            collect_c_vec_clear(&v, NULL, NULL, NULL);
+
+            TEST_INT_EQ( 0, CLC_V_len(v));
+            TEST_INT_EQ( 0, CLC_V_spare_front(v));
+            TEST_INT_EQ(32, CLC_V_spare_back(v));
+            TEST_INT_EQ(32, CLC_V_spare(v));
+
+            void* const curr_storage = v.storage;
+
+            TEST_PTR_EQ(start_storage, curr_storage);
+        }
+
+        /* add 32 elements, then assert that no reallocation occured */
+        {
+            for (int i = 0; 32 != i; ++i)
+            {
+                int const r2 = CLC_V_push_back_by_ref(v, &i);
+
+                TEST_INT_EQ(0, r2);
+
+                TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                TEST_INT_EQ(i, *CLC_V_cat_t(v, int, CLC_V_len(v) - 1));
+            }
+
+            TEST_INT_EQ(32, CLC_V_len(v));
+            TEST_INT_EQ( 0, CLC_V_spare_front(v));
+            TEST_INT_EQ( 0, CLC_V_spare_back(v));
+            TEST_INT_EQ( 0, CLC_V_spare(v));
+
+            TEST_INT_EQ(496, accumulate_v2(&v, 0));
+            TEST_INT_EQ(496, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+            void* const curr_storage = v.storage;
+
+            TEST_PTR_EQ(start_storage, curr_storage);
+        }
+
+        collect_c_vec_free_storage(&v);
+    }
+}
+
+static void TEST_V_define_empty_AND_allocate_storage_VERY_LARGE_THEN_push_back_1_ELEMENT_THEN_shrink_to_fit(void)
+{
+    {
+        CLC_V_define_empty(int, v);
+
+        int const r = collect_c_vec_allocate_storage(&v, 100000);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            void* const     start_storage   =   v.storage;
+            // size_t const    start_capacity  =   v.capacity;
+
+            TEST_BOOLEAN_TRUE(CLC_V_is_empty(v));
+            TEST_INT_EQ( 0, CLC_V_len(v));
+            TEST_INT_GE(100000, CLC_V_spare(v));
+
+
+            /* add 1 element */
+            {
+                int const r2 = CLC_V_push_back_by_value(v, int, 101);
+
+                TEST_INT_EQ(0, r2);
+
+                TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+                TEST_INT_EQ( 1, CLC_V_len(v));
+                TEST_INT_GE(99999, CLC_V_spare(v));
+                // TEST_INT_NE(start_capacity, CLC_V_spare(v));
+
+                void* const curr_storage = v.storage;
+
+                TEST_PTR_EQ(start_storage, curr_storage);
+            }
+
+
+            /* shrink to fit */
+            {
+                int const r3 = CLC_V_shrink_to_fit(v);
+
+                TEST_INT_EQ(0, r3);
+            }
+
+
+            collect_c_vec_free_storage(&v);
+        }
+    }
+}
+
 static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_back_UNTIL_FULL_THEN_reallocate(void)
 {
     {
@@ -466,6 +611,159 @@ static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_back_UNTIL_FULL_
                 TEST_INT_NE( 0, CLC_V_spare_front(v));
                 TEST_INT_NE( 0, CLC_V_spare_back(v));
                 TEST_INT_GE(20, CLC_V_spare(v));
+
+                TEST_INT_EQ(820, accumulate_v2(&v, 0));
+                TEST_INT_EQ(820, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+                void* const     curr_storage    =   v.storage;
+
+#if 0 /* This test might fail if reallocate gives back same (albeit extended) block */
+
+                TEST_PTR_NE(start_storage, curr_storage);
+#else
+
+                ((void)&start_storage);
+                ((void)&curr_storage);
+#endif
+            }
+
+            collect_c_vec_free_storage(&v);
+        }
+    }
+}
+
+static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL_THEN_reallocate(void)
+{
+    {
+        CLC_V_define_empty(int, v);
+
+        int const r = collect_c_vec_allocate_storage(&v, 32);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            TEST_BOOLEAN_TRUE(CLC_V_is_empty(v));
+            TEST_INT_EQ( 0, CLC_V_len(v));
+            TEST_INT_EQ( 8, CLC_V_spare_front(v));
+            TEST_INT_EQ(32, CLC_V_spare_back(v));
+            TEST_INT_EQ(40, CLC_V_spare(v));
+
+            /* add 32 elements, then assert that no reallocation occured */
+            {
+                void* const     start_storage   =   v.storage;
+
+                for (int i = 0; 32 != i; ++i)
+                {
+                    int const r2 = CLC_V_push_front_by_ref(v, &i);
+
+                    TEST_INT_EQ(0, r2);
+
+                    TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                    TEST_INT_EQ(i, *CLC_V_cfront_t(v, int));
+                    TEST_INT_EQ(0, *CLC_V_cback_t(v, int));
+
+                    TEST_INT_NE(-1, accumulate_v2(&v, 0));
+                }
+
+                TEST_INT_EQ(32, CLC_V_len(v));
+                TEST_INT_EQ( 1, CLC_V_spare_front(v));
+                TEST_INT_EQ( 7, CLC_V_spare_back(v));
+                TEST_INT_EQ( 8, CLC_V_spare(v));
+
+                TEST_INT_EQ(496, accumulate_v2(&v, 0));
+                TEST_INT_EQ(496, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+                void* const     curr_storage    =   v.storage;
+
+                TEST_PTR_EQ(start_storage, curr_storage);
+            }
+
+            /* add 1 more element, then assert that reallocation occured */
+            {
+                int const       v32             =   32;
+
+                void* const     start_storage   =   v.storage;
+
+                CLC_V_push_front_by_ref(v, &v32);
+
+                TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                TEST_INT_EQ(v32, *CLC_V_cat_t(v, int, 0));
+
+                TEST_INT_EQ(33, CLC_V_len(v));
+                TEST_INT_EQ( 0, CLC_V_spare_front(v));
+                TEST_INT_EQ( 7, CLC_V_spare_back(v));
+                TEST_INT_EQ( 7, CLC_V_spare(v));
+
+                TEST_INT_EQ(528, accumulate_v2(&v, 0));
+                TEST_INT_EQ(528, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+                void* const     curr_storage    =   v.storage;
+
+#if 0 /* This test might fail if reallocate gives back same (albeit extended) block */
+
+                TEST_PTR_NE(start_storage, curr_storage);
+#else
+
+                ((void)&start_storage);
+                ((void)&curr_storage);
+#endif
+            }
+
+            /* add 7 more elements, then assert that reallocation occured */
+            {
+                void* const     start_storage   =   v.storage;
+
+                for (int i = 0; 7 != i; ++i)
+                {
+                    int const   v3x =   33 + i;
+                    int const   r2  =   CLC_V_push_front_by_ref(v, &v3x);
+
+                    TEST_INT_EQ(0, r2);
+
+                    TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                    TEST_INT_EQ(v3x, *CLC_V_cfront_t(v, int));
+
+                    TEST_INT_EQ((size_t)(33 + (i + 1)), CLC_V_len(v));
+                    TEST_INT_EQ( 0, CLC_V_spare_front(v));
+                    TEST_INT_EQ((size_t)(7 - (i + 1)), CLC_V_spare_back(v));
+                    TEST_INT_EQ((size_t)(7 - (i + 1)), CLC_V_spare(v));
+                }
+
+                TEST_INT_EQ(780, accumulate_v2(&v, 0));
+                TEST_INT_EQ(780, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+                void* const     curr_storage    =   v.storage;
+
+#if 0 /* This test might fail if reallocate gives back same (albeit extended) block */
+
+                TEST_PTR_NE(start_storage, curr_storage);
+#else
+
+                ((void)&start_storage);
+                ((void)&curr_storage);
+#endif
+            }
+
+            /* add 1 more element, then assert that reallocation occured */
+            {
+                int const       v40             =   40;
+
+                void* const     start_storage   =   v.storage;
+
+                CLC_V_push_front_by_ref(v, &v40);
+
+                TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                TEST_INT_EQ(v40, *CLC_V_cfront_t(v, int));
+
+                TEST_INT_EQ(41, CLC_V_len(v));
+                TEST_INT_EQ(14, CLC_V_spare_front(v));
+                TEST_INT_NE( 0, CLC_V_spare_back(v));
+                TEST_INT_NE( 0, CLC_V_spare(v));
 
                 TEST_INT_EQ(820, accumulate_v2(&v, 0));
                 TEST_INT_EQ(820, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
