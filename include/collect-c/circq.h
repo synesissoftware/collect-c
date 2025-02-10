@@ -235,7 +235,7 @@ collect_c_cq_version(void);
 
 /** Allocates storage for an instance from the heap.
  *
- * @param q Pointer to the queue. Must not be NULL. Must not point to an
+ * @param q Pointer to the queue. May not be NULL. May not point to an
  *  instance that has already been successfully allocated;
  *
  * @return Indicates whether operation succeeded.
@@ -253,7 +253,7 @@ collect_c_cq_allocate_storage(
 /** Frees storage associated with the instance. Must be called if the
  * instance's allocation was obtained via collect_c_cq_allocate_storage().
  *
- * @param q Pointer to the circular queue. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
  *
  * @pre (NULL != q);
  * @pre (NULL != q->storage);
@@ -265,8 +265,8 @@ collect_c_cq_free_storage(
 
 /** Attempts to add an item to the (back of) the queue.
  *
- * @param q Pointer to the circular queue. Must not be NULL;
- * @param ptr_new_el Pointer to the new element. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
+ * @param ptr_new_el Pointer to the new element. May not be NULL;
  *
  * @retval 0 The item was added to the queue;
  * @retval ENOSPC No space left in queue;
@@ -283,9 +283,9 @@ collect_c_cq_push_back_by_ref(
 
 /** Attempts to add a number of items to the (back of) the queue.
  *
- * @param q Pointer to the circular queue. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
  * @param num_els Number of items to add;
- * @param ptr_new_els Pointer to the new elements. Must not be NULL;
+ * @param ptr_new_els Pointer to the new elements. May not be NULL;
  * @param num_inserted Optional pointer to variable to retrieve number of
  *  entries added;
  *
@@ -306,7 +306,7 @@ collect_c_cq_push_back_n_by_ref(
 
 /** Clears all elements from the queue.
  *
- * @param q Pointer to the circular queue. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
  * @param reserved0 Reserved. Must be 0;
  * @param reserved1 Reserved. Must be 0;
  * @param num_dropped Optional pointer to variable to retrieve number of
@@ -327,7 +327,7 @@ collect_c_cq_clear(
 
 /** Attempts to drop a number of elements from the back of the queue.
  *
- * @param q Pointer to the circular queue. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
  * @param num_to_drop Maximum number of elements to drop working from the
  *  back of the queue;
  * @param num_dropped Optional pointer to variable to retrieve number of

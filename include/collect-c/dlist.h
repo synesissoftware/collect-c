@@ -244,7 +244,7 @@ collect_c_dlist_version(void);
 
 /** Frees storage associated with the instance.
  *
- * @param l Pointer to the list. Must not be NULL;
+ * @param l Pointer to the list. May not be NULL;
  *
  * @pre (NULL != l);
  */
@@ -255,7 +255,7 @@ clc_dlist_free_storage(
 
 /** Clears all elements from the list.
  *
- * @param l Pointer to the list. Must not be NULL;
+ * @param l Pointer to the list. May not be NULL;
  * @param reserved0 Reserved. Must be 0;
  * @param reserved1 Reserved. Must be 0;
  * @param num_dropped Optional pointer to variable to retrieve number of

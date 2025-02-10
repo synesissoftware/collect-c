@@ -249,7 +249,7 @@ collect_c_vec_version(void);
 
 /** Allocates storage for an instance from the heap.
  *
- * @param v Pointer to the vector. Must not be NULL. Must not point to an
+ * @param v Pointer to the vector. May not be NULL. May not point to an
  *  instance that has already been successfully allocated;
  * @param initial_capacity The initial capacity to be allocated;
  *
@@ -269,7 +269,7 @@ collect_c_vec_allocate_storage(
 /** Frees storage associated with the instance. Must be called if the
  * instance's allocation was obtained via collect_c_vec_allocate_storage().
  *
- * @param v Pointer to the vector. Must not be NULL;
+ * @param v Pointer to the vector. May not be NULL;
  *
  * @pre (NULL != v);
  * @pre (NULL != v->storage);
@@ -281,7 +281,7 @@ collect_c_vec_free_storage(
 
 /** Clears all elements from the vector.
  *
- * @param v Pointer to the vector. Must not be NULL;
+ * @param v Pointer to the vector. May not be NULL;
  * @param reserved0 Reserved. Must be 0;
  * @param reserved1 Reserved. Must be 0;
  * @param num_dropped Optional pointer to variable to retrieve number of
