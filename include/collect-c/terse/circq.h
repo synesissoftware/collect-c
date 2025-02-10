@@ -1,5 +1,5 @@
 /* /////////////////////////////////////////////////////////////////////////
- * File:    collect-c//terse/circq.h
+ * File:    collect-c/terse/circq.h
  *
  * Purpose: Circular-queue container terse api.
  *
