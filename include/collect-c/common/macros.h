@@ -1,9 +1,9 @@
 /* /////////////////////////////////////////////////////////////////////////
- * File:    collect-c/common.h
+ * File:    collect-c/common/macros.h
  *
- * Purpose: Common elements.
+ * Purpose: Common macros.
  *
- * Created: 5th February 2025
+ * Created: 11th February 2025
  * Updated: 11th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
@@ -13,15 +13,18 @@
  * includes
  */
 
-#include <collect-c/common/macros.h>
-#ifndef __cplusplus
-# include <collect-c/common/version.h>
-#endif
-
 
 /* /////////////////////////////////////////////////////////////////////////
  * compatibility
  */
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * API functions & macros (internal)
+ */
+
+#define COLLECT_C_UTIL_GET_MACRO_1_or_2_(_1, _2, mac, ...)          mac
+#define COLLECT_C_UTIL_GET_MACRO_3_or_4_(_1, _2, _3, _4, mac, ...)  mac
 
 
 /* /////////////////////////////////////////////////////////////////////////
