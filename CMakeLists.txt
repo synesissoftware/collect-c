@@ -5,7 +5,7 @@
 # Purpose:  Top-level CMake lists file for collect-c
 #
 # Created:  4th February 2025
-# Updated:  4th February 2025
+# Updated:  11fth February 2025
 #
 # ######################################################################## #
 
@@ -39,7 +39,7 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 # handle version number
-set(RX_PROJ_TAG "COLLECT_CXX")
+set(RX_PROJ_TAG "COLLECT_C")
 set(RX_WS "[ \t]")
 file(READ "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME_LOWER}/common/version.h" _header_file)
 string(REGEX MATCH "#${RX_WS}*define${RX_WS}+_?${RX_PROJ_TAG}_VER_MAJOR${RX_WS}+([0-9]+)" MAJOR_DUMMY ${_header_file})
@@ -61,7 +61,7 @@ set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON) # GNU extensions and POSIX standard
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
@@ -105,7 +105,6 @@ option(BUILD_EXAMPLES "Build examples" ON)
 # optional:
 # - shwild - required for testing;
 #
-
 
 
 # ############################
@@ -283,5 +282,4 @@ message(NOTICE "Generating CMake build scripts for ${PROJECT_NAME} ${PROJECT_VER
 
 
 # ############################## end of file ############################# #
-
 

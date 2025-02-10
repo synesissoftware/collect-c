@@ -4,10 +4,14 @@
  * Purpose: Common elements for collect-c library.
  *
  * Created: 4th February 2025
- * Updated: 4th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
+
+/* /////////////////////////////////////////////////////////////////////////
+ * compatibility
+ */
 
 #ifdef __cplusplus
 # error All collect-c components are C only
@@ -22,10 +26,14 @@
 #endif
 
 
+/* /////////////////////////////////////////////////////////////////////////
+ * version
+ */
+
 #define COLLECT_C_VER_MAJOR         0
-#define COLLECT_C_VER_MINOR         0
+#define COLLECT_C_VER_MINOR         1
 #define COLLECT_C_VER_PATCH         0
-#define COLLECT_C_VER_ALPHABETA     1
+#define COLLECT_C_VER_ALPHABETA     41
 
 #define COLLECT_C_VER \
     (0\
@@ -36,9 +44,16 @@
     )
 
 
+/* /////////////////////////////////////////////////////////////////////////
+ * includes
+ */
 
 #include <stdint.h>
 
+
+/* /////////////////////////////////////////////////////////////////////////
+ * API functions
+ */
 
 /** Obtains the value of COLLECT_C_VER at the time of compilation of the
  * library.
@@ -48,4 +63,12 @@ collect_c_api_version(void);
 
 
 
+/* /////////////////////////////////////////////////////////////////////////
+ * inclusion control
+ */
+
 #pragma once
+
+
+/* ///////////////////////////// end of file //////////////////////////// */
+
