@@ -126,8 +126,8 @@ struct collect_c_dlist_t
 typedef struct collect_c_dlist_t        collect_c_dlist_t;
 #endif
 
-/** Callback function that, if attached to instance, will be called back for
- * each element upon its erasure or replacement by any of the API functions.
+/** Callback function that performs comparison between elements for the
+ * purpose of search.
  *
  * @param l Pointer to the list. Will not be NULL;
  * @param p_lhs Pointer to the lhs element. Will not be NULL;
