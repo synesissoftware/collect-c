@@ -235,15 +235,15 @@ collect_c_cq_version(void);
 
 /** Allocates storage for an instance from the heap.
  *
- * @param q Pointer to the queue. Must not be NULL. Must not point to an
- *  instance that has already been successfully allocated;
+ * @param q Pointer to the circular queue. May not be NULL. May not point to
+ *  an instance that has already been successfully allocated;
  *
  * @return Indicates whether operation succeeded.
  * @retval 0 Operation succeed;
  * @retval ENOMEM Sufficient memory not available;
  *
- * @pre (NULL != q);
- * @pre (NULL == q->storage);
+ * @pre (NULL != q)
+ * @pre (NULL == q->storage)
  */
 int
 collect_c_cq_allocate_storage(
@@ -253,10 +253,10 @@ collect_c_cq_allocate_storage(
 /** Frees storage associated with the instance. Must be called if the
  * instance's allocation was obtained via collect_c_cq_allocate_storage().
  *
- * @param q Pointer to the circular queue. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
  */
 void
 collect_c_cq_free_storage(
@@ -265,15 +265,15 @@ collect_c_cq_free_storage(
 
 /** Attempts to add an item to the (back of) the queue.
  *
- * @param q Pointer to the circular queue. Must not be NULL;
- * @param ptr_new_el Pointer to the new element. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
+ * @param ptr_new_el Pointer to the new element. May not be NULL;
  *
  * @retval 0 The item was added to the queue;
  * @retval ENOSPC No space left in queue;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_cq_push_back_by_ref(
@@ -283,18 +283,18 @@ collect_c_cq_push_back_by_ref(
 
 /** Attempts to add a number of items to the (back of) the queue.
  *
- * @param q Pointer to the circular queue. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
  * @param num_els Number of items to add;
- * @param ptr_new_els Pointer to the new elements. Must not be NULL;
+ * @param ptr_new_els Pointer to the new elements. May not be NULL;
  * @param num_inserted Optional pointer to variable to retrieve number of
  *  entries added;
  *
  * @retval 0 The item was added to the queue;
  * @retval ENOSPC No space left in queue;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
- * @pre (0 == num_els || NULL != ptr_new_els);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
+ * @pre (0 == num_els || NULL != ptr_new_els)
  */
 int
 collect_c_cq_push_back_n_by_ref(
@@ -306,16 +306,16 @@ collect_c_cq_push_back_n_by_ref(
 
 /** Clears all elements from the queue.
  *
- * @param q Pointer to the circular queue. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
  * @param reserved0 Reserved. Must be 0;
  * @param reserved1 Reserved. Must be 0;
  * @param num_dropped Optional pointer to variable to retrieve number of
  *  entries dropped;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
- * @pre (0 == reserved0);
- * @pre (0 == reserved1);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
+ * @pre (0 == reserved0)
+ * @pre (0 == reserved1)
  */
 int
 collect_c_cq_clear(
@@ -327,14 +327,14 @@ collect_c_cq_clear(
 
 /** Attempts to drop a number of elements from the back of the queue.
  *
- * @param q Pointer to the circular queue. Must not be NULL;
+ * @param q Pointer to the circular queue. May not be NULL;
  * @param num_to_drop Maximum number of elements to drop working from the
  *  back of the queue;
  * @param num_dropped Optional pointer to variable to retrieve number of
  *  entries dropped;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
  */
 int
 collect_c_cq_pop_from_back_n(
@@ -351,8 +351,8 @@ collect_c_cq_pop_from_back_n(
  * @param num_dropped Optional pointer to variable to retrieve number of
  *  entries dropped;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
  */
 int
 collect_c_cq_pop_from_front_n(

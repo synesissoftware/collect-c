@@ -68,7 +68,7 @@
  * API types
  */
 
-/** T.B.C.
+/** Represents a classic vector container.
  *
  * @note This type supports what we refer to as "base-offset optimisation",
  *  which means that the front of the vector is managed such that inserting
@@ -249,7 +249,7 @@ collect_c_vec_version(void);
 
 /** Allocates storage for an instance from the heap.
  *
- * @param v Pointer to the vector. Must not be NULL. Must not point to an
+ * @param v Pointer to the vector. May not be NULL. May not point to an
  *  instance that has already been successfully allocated;
  * @param initial_capacity The initial capacity to be allocated;
  *
@@ -257,8 +257,8 @@ collect_c_vec_version(void);
  * @retval 0 Operation succeed;
  * @retval ENOMEM Sufficient memory not available;
  *
- * @pre (NULL != v);
- * @pre (NULL == v->storage);
+ * @pre (NULL != v)
+ * @pre (NULL == v->storage)
  */
 int
 collect_c_vec_allocate_storage(
@@ -269,10 +269,10 @@ collect_c_vec_allocate_storage(
 /** Frees storage associated with the instance. Must be called if the
  * instance's allocation was obtained via collect_c_vec_allocate_storage().
  *
- * @param v Pointer to the vector. Must not be NULL;
+ * @param v Pointer to the vector. May not be NULL;
  *
- * @pre (NULL != v);
- * @pre (NULL != v->storage);
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
  */
 void
 collect_c_vec_free_storage(
@@ -281,7 +281,7 @@ collect_c_vec_free_storage(
 
 /** Clears all elements from the vector.
  *
- * @param v Pointer to the vector. Must not be NULL;
+ * @param v Pointer to the vector. May not be NULL;
  * @param reserved0 Reserved. Must be 0;
  * @param reserved1 Reserved. Must be 0;
  * @param num_dropped Optional pointer to variable to retrieve number of
@@ -290,10 +290,10 @@ collect_c_vec_free_storage(
  * @note This function does not change the allocated memory underlying the
  *  instance. To do this, call collect_c_vec_shrink_to_fit().
  *
- * @pre (NULL != v);
- * @pre (NULL != vq->storage);
- * @pre (0 == reserved0);
- * @pre (0 == reserved1);
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
+ * @pre (0 == reserved0)
+ * @pre (0 == reserved1)
  */
 int
 collect_c_vec_clear(
@@ -303,19 +303,27 @@ collect_c_vec_clear(
 ,   size_t*             num_dropped
 );
 
-/** T.B.C.
+/** Causes all currently unused storage to be offered back to the underlying
+ * memory layer, such that the actual allocation may well be shrunk.
  *
- * @param v T.B.C.
+ * @param v Pointer to the vector. May not be NULL;
+ *
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
  */
 int
 collect_c_vec_shrink_to_fit(
     collect_c_vec_t*    v
 );
 
-/** T.B.C.
+/** Attempts to add an item to the back of the vector.
  *
- * @param v T.B.C.
- * @param ptr_new_el T.B.C.
+ * @param v Pointer to the vector. May not be NULL;
+ * @param ptr_new_el Pointer to the new element to be added. May not be
+ *  NULL;
+ *
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
  */
 int
 collect_c_v_push_back_by_ref(
@@ -323,10 +331,14 @@ collect_c_v_push_back_by_ref(
 ,   void const*         ptr_new_el
 );
 
-/** T.B.C.
+/** Attempts to add an item to the front of the vector.
  *
- * @param v T.B.C.
- * @param ptr_new_el T.B.C.
+ * @param v Pointer to the vector. May not be NULL;
+ * @param ptr_new_el Pointer to the new element to be added. May not be
+ *  NULL;
+ *
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
  */
 int
 collect_c_v_push_front_by_ref(

@@ -244,9 +244,9 @@ collect_c_dlist_version(void);
 
 /** Frees storage associated with the instance.
  *
- * @param l Pointer to the list. Must not be NULL;
+ * @param l Pointer to the list. May not be NULL;
  *
- * @pre (NULL != l);
+ * @pre (NULL != l)
  */
 int
 clc_dlist_free_storage(
@@ -255,16 +255,16 @@ clc_dlist_free_storage(
 
 /** Clears all elements from the list.
  *
- * @param l Pointer to the list. Must not be NULL;
+ * @param l Pointer to the list. May not be NULL;
  * @param reserved0 Reserved. Must be 0;
  * @param reserved1 Reserved. Must be 0;
  * @param num_dropped Optional pointer to variable to retrieve number of
  *  entries dropped;
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (0 == reserved0);
- * @pre (0 == reserved1);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (0 == reserved0)
+ * @pre (0 == reserved1)
  */
 int
 collect_c_dlist_clear(
@@ -274,10 +274,17 @@ collect_c_dlist_clear(
 ,   size_t*             num_dropped
 );
 
-/** T.B.C.
+/** Erases a node from the list.
  *
- * @param l T.B.C.
- * @param node T.B.C.
+ * @param l Pointer to the list. May not be NULL;
+ * @param node Pointer to the element to be erased. May not be NULL. Must
+ *  point to an element that is currently in the list. Invalidated by a
+ *  successful call;
+ *
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (NULL != node)
+ * @pre (node is in l);
  */
 int
 collect_c_dlist_erase_node(
@@ -345,17 +352,19 @@ collect_c_dlist_rfind_node(
 ,   size_t*                         num_searched
 );
 
-/** T.B.C.
+/** Inserts a new element into the list immediately after a reference node.
  *
- * @param l T.B.C.
- * @param reference_node T.B.C.
- * @param ptr_new_el T.B.C.
+ * @param l Pointer to the list. May not be NULL;
+ * @param reference_node Pointer to the reference node, after which the new
+ *  node will be inserted. May not be NULL;
+ * @param ptr_new_el Pointer to the new element. May not be NULL;
  * @param new_node Optional pointer to the created node;
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (NULL != reference_node);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (NULL != reference_node)
+ * @pre (reference_node is in l);
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_dlist_insert_after(
@@ -365,17 +374,19 @@ collect_c_dlist_insert_after(
 ,   collect_c_dlist_node_t**    new_node
 );
 
-/** T.B.C.
+/** Inserts a new element into the list immediately before a reference node.
  *
- * @param l T.B.C.
- * @param reference_node T.B.C.
- * @param ptr_new_el T.B.C.
+ * @param l Pointer to the list. May not be NULL;
+ * @param reference_node Pointer to the reference node, before which the new
+ *  node will be inserted. May not be NULL;
+ * @param ptr_new_el Pointer to the new element. May not be NULL;
  * @param new_node Optional pointer to the created node;
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (NULL != reference_node);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (NULL != reference_node)
+ * @pre (reference_node is in l);
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_dlist_insert_before(
@@ -385,14 +396,14 @@ collect_c_dlist_insert_before(
 ,   collect_c_dlist_node_t**    new_node
 );
 
-/** T.B.C.
+/** Attempts to add an item to the back of the list.
  *
- * @param l T.B.C.
- * @param ptr_new_el T.B.C.
+ * @param l Pointer to the list. May not be NULL;
+ * @param ptr_new_el Pointer to the new element. May not be NULL;
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_dlist_push_back_by_ref(
@@ -400,14 +411,14 @@ collect_c_dlist_push_back_by_ref(
 ,   void const*         ptr_new_el
 );
 
-/** T.B.C.
+/** Attempts to add an item to the front of the list.
  *
- * @param l T.B.C.
- * @param ptr_new_el T.B.C.
+ * @param l Pointer to the list. May not be NULL;
+ * @param ptr_new_el Pointer to the new element. May not be NULL;
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_dlist_push_front_by_ref(
