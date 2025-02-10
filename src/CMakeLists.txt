@@ -42,6 +42,7 @@ endif()
 set(CORE_SRCS
 	circq.c
 	dlist.c
+	vec.c
 	version.c
 )
 

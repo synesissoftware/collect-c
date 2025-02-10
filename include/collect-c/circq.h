@@ -123,8 +123,8 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
  * @param cq_name The name of the instance;
  * @param cq_cap The capacity that the instance should have;
  */
-#define COLLECT_C_CIRCQ_define_empty(cq_el_type, cq_name, cq_cap)           \
-                                                                            \
+#define COLLECT_C_CIRCQ_define_empty(cq_el_type, cq_name, cq_cap)   \
+                                                                    \
     collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, 0, NULL, NULL, 0)
 
 
@@ -136,42 +136,45 @@ typedef struct collect_c_cq_t   collect_c_cq_t;
  * @param cq_el_type The type of the elements to be stored;
  * @param cq_name The name of the instance;
  * @param cq_cap The capacity that the instance should have;
+ * @param elf_fn Callback function to be invoked when element is
+ *  erased/removed/overwritte;
+ * @param elf_param Parameter to be given to the callback function;
  */
 #define COLLECT_C_CIRCQ_define_empty_with_callback(cq_el_type, cq_name, cq_cap, elf_fn, elf_param)  \
                                                                                                     \
     collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, 0, NULL, elf_fn, elf_param)
 
 
-/** @def COLLECT_C_CIRCQ_define_on_stack(cq_name, cq_array)
+/** @def COLLECT_C_CIRCQ_define_on_stack(cq_name, ar_name)
  *
  * Declares and defines a queue instance that uses for its memory the given
  * array instance.
  *
  * @param cq_name The name of the instance;
- * @param cq_array The name of the array instance that will serve as the
+ * @param ar_name The name of the array instance that will serve as the
  *  memory of the queue instance;
  */
-#define COLLECT_C_CIRCQ_define_on_stack(cq_name, cq_array)                  \
-                                                                            \
-    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((cq_array)[0], sizeof((cq_array)) / sizeof((cq_array)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, cq_array, NULL, 0)
+#define COLLECT_C_CIRCQ_define_on_stack(cq_name, ar_name)   \
+                                                            \
+    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((ar_name)[0], sizeof((ar_name)) / sizeof((ar_name)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, ar_name, NULL, 0)
 
 
-/** @def COLLECT_C_CIRCQ_define_on_stack_with_callback(cq_name, cq_array, elf_fn, elf_param)
+/** @def COLLECT_C_CIRCQ_define_on_stack_with_callback(cq_name, ar_name, elf_fn, elf_param)
  *
  * Declares and defines a queue instance that uses for its memory the given
  * array instance, and specifies a callback function to be invoked each time
  * an API function causes an element to be erased/removed/overwritte.
  *
  * @param cq_name The name of the instance;
- * @param cq_array The name of the array instance that will serve as the
+ * @param ar_name The name of the array instance that will serve as the
  *  memory of the queue instance;
  * @param elf_fn Callback function to be invoked when element is
  *  erased/removed/overwritte;
  * @param elf_param Parameter to be given to the callback function;
  */
-#define COLLECT_C_CIRCQ_define_on_stack_with_callback(cq_name, cq_array, elf_fn, elf_param) \
+#define COLLECT_C_CIRCQ_define_on_stack_with_callback(cq_name, ar_name, elf_fn, elf_param)  \
                                                                                             \
-    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((cq_array)[0], sizeof((cq_array)) / sizeof((cq_array)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, cq_array, elf_fn, elf_param)
+    collect_c_cq_t cq_name = COLLECT_C_CIRCQ_EMPTY_INITIALIZER_((ar_name)[0], sizeof((ar_name)) / sizeof((ar_name)[0]), COLLECT_C_CIRCQ_F_USE_STACK_ARRAY, ar_name, elf_fn, elf_param)
 
 
 /* modifiers */
