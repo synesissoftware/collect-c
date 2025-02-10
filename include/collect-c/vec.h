@@ -25,9 +25,9 @@
  */
 
 #define COLLECT_C_VEC_VER_MAJOR     0
-#define COLLECT_C_VEC_VER_MINOR     0
+#define COLLECT_C_VEC_VER_MINOR     1
 #define COLLECT_C_VEC_VER_PATCH     0
-#define COLLECT_C_VEC_VER_ALPHABETA 3
+#define COLLECT_C_VEC_VER_ALPHABETA 41
 
 #define COLLECT_C_VEC_VER \
     (0\
