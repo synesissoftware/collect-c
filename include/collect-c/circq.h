@@ -242,8 +242,8 @@ collect_c_cq_version(void);
  * @retval 0 Operation succeed;
  * @retval ENOMEM Sufficient memory not available;
  *
- * @pre (NULL != q);
- * @pre (NULL == q->storage);
+ * @pre (NULL != q)
+ * @pre (NULL == q->storage)
  */
 int
 collect_c_cq_allocate_storage(
@@ -255,8 +255,8 @@ collect_c_cq_allocate_storage(
  *
  * @param q Pointer to the circular queue. May not be NULL;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
  */
 void
 collect_c_cq_free_storage(
@@ -271,9 +271,9 @@ collect_c_cq_free_storage(
  * @retval 0 The item was added to the queue;
  * @retval ENOSPC No space left in queue;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_cq_push_back_by_ref(
@@ -292,9 +292,9 @@ collect_c_cq_push_back_by_ref(
  * @retval 0 The item was added to the queue;
  * @retval ENOSPC No space left in queue;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
- * @pre (0 == num_els || NULL != ptr_new_els);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
+ * @pre (0 == num_els || NULL != ptr_new_els)
  */
 int
 collect_c_cq_push_back_n_by_ref(
@@ -312,10 +312,10 @@ collect_c_cq_push_back_n_by_ref(
  * @param num_dropped Optional pointer to variable to retrieve number of
  *  entries dropped;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
- * @pre (0 == reserved0);
- * @pre (0 == reserved1);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
+ * @pre (0 == reserved0)
+ * @pre (0 == reserved1)
  */
 int
 collect_c_cq_clear(
@@ -333,8 +333,8 @@ collect_c_cq_clear(
  * @param num_dropped Optional pointer to variable to retrieve number of
  *  entries dropped;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
  */
 int
 collect_c_cq_pop_from_back_n(
@@ -351,8 +351,8 @@ collect_c_cq_pop_from_back_n(
  * @param num_dropped Optional pointer to variable to retrieve number of
  *  entries dropped;
  *
- * @pre (NULL != q);
- * @pre (NULL != q->storage);
+ * @pre (NULL != q)
+ * @pre (NULL != q->storage)
  */
 int
 collect_c_cq_pop_from_front_n(

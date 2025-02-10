@@ -246,7 +246,7 @@ collect_c_dlist_version(void);
  *
  * @param l Pointer to the list. May not be NULL;
  *
- * @pre (NULL != l);
+ * @pre (NULL != l)
  */
 int
 clc_dlist_free_storage(
@@ -261,10 +261,10 @@ clc_dlist_free_storage(
  * @param num_dropped Optional pointer to variable to retrieve number of
  *  entries dropped;
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (0 == reserved0);
- * @pre (0 == reserved1);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (0 == reserved0)
+ * @pre (0 == reserved1)
  */
 int
 collect_c_dlist_clear(
@@ -352,10 +352,10 @@ collect_c_dlist_rfind_node(
  * @param ptr_new_el T.B.C.
  * @param new_node Optional pointer to the created node;
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (NULL != reference_node);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (NULL != reference_node)
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_dlist_insert_after(
@@ -372,10 +372,10 @@ collect_c_dlist_insert_after(
  * @param ptr_new_el T.B.C.
  * @param new_node Optional pointer to the created node;
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (NULL != reference_node);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (NULL != reference_node)
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_dlist_insert_before(
@@ -390,9 +390,9 @@ collect_c_dlist_insert_before(
  * @param l T.B.C.
  * @param ptr_new_el T.B.C.
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_dlist_push_back_by_ref(
@@ -405,9 +405,9 @@ collect_c_dlist_push_back_by_ref(
  * @param l T.B.C.
  * @param ptr_new_el T.B.C.
  *
- * @pre (NULL != l);
- * @pre (NULL != l->storage);
- * @pre (NULL != ptr_new_el);
+ * @pre (NULL != l)
+ * @pre (NULL != l->storage)
+ * @pre (NULL != ptr_new_el)
  */
 int
 collect_c_dlist_push_front_by_ref(

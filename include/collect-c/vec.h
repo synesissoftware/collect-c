@@ -257,8 +257,8 @@ collect_c_vec_version(void);
  * @retval 0 Operation succeed;
  * @retval ENOMEM Sufficient memory not available;
  *
- * @pre (NULL != v);
- * @pre (NULL == v->storage);
+ * @pre (NULL != v)
+ * @pre (NULL == v->storage)
  */
 int
 collect_c_vec_allocate_storage(
@@ -271,8 +271,8 @@ collect_c_vec_allocate_storage(
  *
  * @param v Pointer to the vector. May not be NULL;
  *
- * @pre (NULL != v);
- * @pre (NULL != v->storage);
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
  */
 void
 collect_c_vec_free_storage(
@@ -290,10 +290,10 @@ collect_c_vec_free_storage(
  * @note This function does not change the allocated memory underlying the
  *  instance. To do this, call collect_c_vec_shrink_to_fit().
  *
- * @pre (NULL != v);
- * @pre (NULL != vq->storage);
- * @pre (0 == reserved0);
- * @pre (0 == reserved1);
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
+ * @pre (0 == reserved0)
+ * @pre (0 == reserved1)
  */
 int
 collect_c_vec_clear(
