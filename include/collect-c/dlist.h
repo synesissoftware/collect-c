@@ -27,7 +27,7 @@
 #define COLLECT_C_DLIST_VER_MAJOR       0
 #define COLLECT_C_DLIST_VER_MINOR       0
 #define COLLECT_C_DLIST_VER_PATCH       0
-#define COLLECT_C_DLIST_VER_ALPHABETA   3
+#define COLLECT_C_DLIST_VER_ALPHABETA   4
 
 #define COLLECT_C_DLIST_VER \
     (0\
@@ -98,6 +98,15 @@ struct collect_c_dlist_block_t
     collect_c_dlist_node_t      nodes[1];
 };
 
+/** Callback function that, if attached to instance, will be called back for
+ * each element upon its erasure or replacement by any of the API functions.
+ */
+typedef void (*collect_c_dlist_pfn_free)(
+    size_t  el_size
+,   size_t  el_index    /* always 0 */
+,   void*   el_ptr
+,   void*   param_element_free
+);
 
 struct collect_c_dlist_t
 {
@@ -110,19 +119,15 @@ struct collect_c_dlist_t
     collect_c_dlist_node_t*     tail;               /*! */
     collect_c_dlist_node_t*     spares;             /*! */
     collect_c_dlist_block_t*    blocks;             /*! */
-    void*                       param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free */
-    void                      (*pfn_element_free)(
-        size_t  el_size
-    ,   size_t  el_index    /* always 0 */
-    ,   void*   el_ptr
-    ,   void*   param_element_free
-    );                                              /*! Custom function to be invoked when */
+    void*                       param_element_free; /*! Custom parameter to be passed to invocations of pfn_element_free. */
+    collect_c_dlist_pfn_free    pfn_element_free;   /*! Custom function to be invoked when element erased/replaced. */
 };
 #ifndef __cplusplus
 typedef struct collect_c_dlist_t        collect_c_dlist_t;
 #endif
 
-/** T.B.C.
+/** Callback function that performs comparison between elements for the
+ * purpose of search.
  *
  * @param l Pointer to the list. Will not be NULL;
  * @param p_lhs Pointer to the lhs element. Will not be NULL;
