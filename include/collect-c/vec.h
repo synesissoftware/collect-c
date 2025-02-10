@@ -68,7 +68,7 @@
  * API types
  */
 
-/** T.B.C.
+/** Represents a classic vector container.
  *
  * @note This type supports what we refer to as "base-offset optimisation",
  *  which means that the front of the vector is managed such that inserting
@@ -303,19 +303,27 @@ collect_c_vec_clear(
 ,   size_t*             num_dropped
 );
 
-/** T.B.C.
+/** Causes all currently unused storage to be offered back to the underlying
+ * memory layer, such that the actual allocation may well be shrunk.
  *
- * @param v T.B.C.
+ * @param v Pointer to the vector. May not be NULL;
+ *
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
  */
 int
 collect_c_vec_shrink_to_fit(
     collect_c_vec_t*    v
 );
 
-/** T.B.C.
+/** Attempts to add an item to the back of the vector.
  *
- * @param v T.B.C.
- * @param ptr_new_el T.B.C.
+ * @param v Pointer to the vector. May not be NULL;
+ * @param ptr_new_el Pointer to the new element to be added. May not be
+ *  NULL;
+ *
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
  */
 int
 collect_c_v_push_back_by_ref(
@@ -323,10 +331,14 @@ collect_c_v_push_back_by_ref(
 ,   void const*         ptr_new_el
 );
 
-/** T.B.C.
+/** Attempts to add an item to the front of the vector.
  *
- * @param v T.B.C.
- * @param ptr_new_el T.B.C.
+ * @param v Pointer to the vector. May not be NULL;
+ * @param ptr_new_el Pointer to the new element to be added. May not be
+ *  NULL;
+ *
+ * @pre (NULL != v)
+ * @pre (NULL != v->storage)
  */
 int
 collect_c_v_push_front_by_ref(

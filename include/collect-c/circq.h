@@ -235,8 +235,8 @@ collect_c_cq_version(void);
 
 /** Allocates storage for an instance from the heap.
  *
- * @param q Pointer to the queue. May not be NULL. May not point to an
- *  instance that has already been successfully allocated;
+ * @param q Pointer to the circular queue. May not be NULL. May not point to
+ *  an instance that has already been successfully allocated;
  *
  * @return Indicates whether operation succeeded.
  * @retval 0 Operation succeed;
