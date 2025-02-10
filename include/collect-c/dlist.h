@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 10th February 2025
+ * Updated: 11th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -27,7 +27,7 @@
 #define COLLECT_C_DLIST_VER_MAJOR       0
 #define COLLECT_C_DLIST_VER_MINOR       0
 #define COLLECT_C_DLIST_VER_PATCH       0
-#define COLLECT_C_DLIST_VER_ALPHABETA   2
+#define COLLECT_C_DLIST_VER_ALPHABETA   3
 
 #define COLLECT_C_DLIST_VER \
     (0\
@@ -174,9 +174,6 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
 #define COLLECT_C_DLIST_insert_before_3_(l_name, ref_node, new_el)               collect_c_dlist_insert_before(COLLECT_C_DLIST_get_l_ptr_(l_name), (ref_node), (new_el), NULL)
 #define COLLECT_C_DLIST_insert_before_4_(l_name, ref_node, new_el, p_new_node)   collect_c_dlist_insert_before(COLLECT_C_DLIST_get_l_ptr_(l_name), (ref_node), (new_el), (p_new_node))
 
-#define COLLECT_C_DLIST_GET_MACRO_1_or_2_(_1, _2, mac, ...)         mac
-#define COLLECT_C_DLIST_GET_MACRO_3_or_4_(_1, _2, _3, _4, mac, ...) mac
-
 
 /* /////////////////////////////////////////////////////////////////////////
  * API functions & macros
@@ -197,13 +194,13 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
 
 /* modifiers */
 
-#define COLLECT_C_DLIST_clear(...)                          COLLECT_C_DLIST_GET_MACRO_1_or_2_(__VA_ARGS__, COLLECT_C_DLIST_clear_2_, COLLECT_C_DLIST_clear_1_, NULL)(__VA_ARGS__)
+#define COLLECT_C_DLIST_clear(...)                          COLLECT_C_UTIL_GET_MACRO_1_or_2_(__VA_ARGS__, COLLECT_C_DLIST_clear_2_, COLLECT_C_DLIST_clear_1_, NULL)(__VA_ARGS__)
 
 #define COLLECT_C_DLIST_erase_node(l_name, node)            collect_c_dlist_erase_node((l_name), (node))
 
-#define COLLECT_C_DLIST_insert_after(...)                   COLLECT_C_DLIST_GET_MACRO_3_or_4_(__VA_ARGS__, COLLECT_C_DLIST_insert_after_4_, COLLECT_C_DLIST_insert_after_3_, NULL)(__VA_ARGS__)
+#define COLLECT_C_DLIST_insert_after(...)                   COLLECT_C_UTIL_GET_MACRO_3_or_4_(__VA_ARGS__, COLLECT_C_DLIST_insert_after_4_, COLLECT_C_DLIST_insert_after_3_, NULL)(__VA_ARGS__)
 
-#define COLLECT_C_DLIST_insert_before(...)                  COLLECT_C_DLIST_GET_MACRO_3_or_4_(__VA_ARGS__, COLLECT_C_DLIST_insert_before_4_, COLLECT_C_DLIST_insert_before_3_, NULL)(__VA_ARGS__)
+#define COLLECT_C_DLIST_insert_before(...)                  COLLECT_C_UTIL_GET_MACRO_3_or_4_(__VA_ARGS__, COLLECT_C_DLIST_insert_before_4_, COLLECT_C_DLIST_insert_before_3_, NULL)(__VA_ARGS__)
 
 #define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)    \
                                                             (COLLECT_C_DLIST_assert_el_size_(l_name, t_el),  collect_c_dlist_push_back_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), &((t_el){(new_el)})))

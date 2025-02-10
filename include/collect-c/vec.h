@@ -4,7 +4,7 @@
  * Purpose: Vector container.
  *
  * Created: 5th February 2025
- * Updated: 10th February 2025
+ * Updated: 11th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -27,7 +27,7 @@
 #define COLLECT_C_VEC_VER_MAJOR     0
 #define COLLECT_C_VEC_VER_MINOR     0
 #define COLLECT_C_VEC_VER_PATCH     0
-#define COLLECT_C_VEC_VER_ALPHABETA 1
+#define COLLECT_C_VEC_VER_ALPHABETA 2
 
 #define COLLECT_C_VEC_VER \
     (0\
@@ -120,6 +120,9 @@ typedef struct collect_c_vec_t  collect_c_vec_t;
 #define COLLECT_C_VEC_assert_not_empty_(v_name)             assert(0 != COLLECT_C_VEC_get_l_ptr_(v_name)->size)
 #define COLLECT_C_VEC_assert_not_null_(v_name)              assert(NULL != (v_name))
 
+#define COLLECT_C_VEC_clear_1_(l_name)                      collect_c_vec_clear(COLLECT_C_VEC_get_l_ptr_(l_name), NULL, NULL, NULL)
+#define COLLECT_C_VEC_clear_2_(l_name, p)                   collect_c_vec_clear(COLLECT_C_VEC_get_l_ptr_(l_name), NULL, NULL,  (p))
+
 #define COLLECT_C_VEC_at_v_(v_name, ix)                     ((void      *)(((char      *)COLLECT_C_VEC_get_l_ptr_(v_name)->storage) + ((COLLECT_C_VEC_get_l_ptr_(v_name)->offset + (ix)) * COLLECT_C_VEC_get_l_ptr_(v_name)->el_size)))
 #define COLLECT_C_VEC_cat_v_(v_name, ix)                    ((void const*)(((char const*)COLLECT_C_VEC_get_l_ptr_(v_name)->storage) + ((COLLECT_C_VEC_get_l_ptr_(v_name)->offset + (ix)) * COLLECT_C_VEC_get_l_ptr_(v_name)->el_size)))
 
@@ -178,6 +181,8 @@ typedef struct collect_c_vec_t  collect_c_vec_t;
 
 
 /* modifiers */
+
+#define COLLECT_C_VEC_clear(...)                            COLLECT_C_UTIL_GET_MACRO_1_or_2_(__VA_ARGS__, COLLECT_C_VEC_clear_2_, COLLECT_C_VEC_clear_1_, NULL)(__VA_ARGS__)
 
 #define COLLECT_C_VEC_push_back_by_ref(v_name, ptr_new_el)  collect_c_v_push_back_by_ref(COLLECT_C_VEC_get_l_ptr_(v_name), (ptr_new_el))
 #define COLLECT_C_VEC_push_back_by_value(v_name, t_el, new_el)  \

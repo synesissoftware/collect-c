@@ -401,7 +401,7 @@ static void TEST_V_define_empty_AND_push_back_UNTIL_FULL_THEN_clear_THEN_push_fr
 
         /* clear */
         {
-            collect_c_vec_clear(&v, NULL, NULL, NULL);
+            COLLECT_C_VEC_clear(v);
 
             TEST_INT_EQ( 0, CLC_V_len(v));
             TEST_INT_EQ( 0, CLC_V_spare_front(v));
