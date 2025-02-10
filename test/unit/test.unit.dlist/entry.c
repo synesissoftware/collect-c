@@ -4,7 +4,7 @@
  * Purpose: Unit-test for doubly-linked list.
  *
  * Created: 7th February 2025
- * Updated: 8th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -37,6 +37,8 @@ static void TEST_push_back_9_ELEMENTS_THEN_find(void);
 static void TEST_push_back_9_ELEMENTS_THEN_rfind(void);
 static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase(void);
 static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase_NO_SPARES(void);
+static void TEST_push_front_1_ELEMENT_THEN_insert_after_1_ELEMENT(void);
+static void TEST_push_front_1_ELEMENT_THEN_insert_before_1_ELEMENT(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -63,6 +65,8 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_push_back_9_ELEMENTS_THEN_rfind);
         XTESTS_RUN_CASE(TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase);
         XTESTS_RUN_CASE(TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase_NO_SPARES);
+        XTESTS_RUN_CASE(TEST_push_front_1_ELEMENT_THEN_insert_after_1_ELEMENT);
+        XTESTS_RUN_CASE(TEST_push_front_1_ELEMENT_THEN_insert_before_1_ELEMENT);
 
         XTESTS_PRINT_RESULTS();
 
@@ -765,6 +769,148 @@ static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase_NO_SPARES(void)
         }
 
         clc_dlist_free_storage(&l);
+    }
+}
+
+static void TEST_push_front_1_ELEMENT_THEN_insert_after_1_ELEMENT(void)
+{
+    {
+        CLC_DL_define_empty(int, l);
+
+        int const r = CLC_DL_push_front_by_val(l, int, 101);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+            TEST_INT_EQ(1, CLC_DL_len(l));
+            TEST_INT_EQ(0, CLC_DL_spare(l));
+
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cback_t(l, int));
+
+            TEST_INT_EQ(101, accumulate_l2_forward(&l, 0));
+            TEST_INT_EQ(101, accumulate_l2_backward(&l, 0));
+
+            collect_c_dlist_node_t* new_node;
+
+            {
+                int const v2 = 202;
+                int const r2 = CLC_DL_insert_after(l, l.head, &v2, &new_node);
+
+                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r2);
+
+                if (0 == r)
+                {
+                    TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+                    TEST_INT_EQ(2, CLC_DL_len(l));
+                    TEST_INT_EQ(0, CLC_DL_spare(l));
+
+                    TEST_PTR_NE(NULL, new_node);
+
+                    TEST_INT_EQ(101, *COLLECT_C_DLIST_cfront_t(l, int));
+                    TEST_INT_EQ(202, *COLLECT_C_DLIST_cback_t(l, int));
+
+                    TEST_INT_EQ(303, accumulate_l2_forward(&l, 0));
+                    TEST_INT_EQ(303, accumulate_l2_backward(&l, 0));
+                }
+            }
+
+            if (2 == CLC_DL_len(l)) /* check that previous insert worked */
+            {
+                int const v2 = 303;
+                int const r2 = CLC_DL_insert_after(l, new_node, &v2);
+
+                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r2);
+
+                if (0 == r)
+                {
+                    TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+                    TEST_INT_EQ(3, CLC_DL_len(l));
+                    TEST_INT_EQ(0, CLC_DL_spare(l));
+
+                    TEST_INT_EQ(101, *COLLECT_C_DLIST_cfront_t(l, int));
+                    TEST_INT_EQ(303, *COLLECT_C_DLIST_cback_t(l, int));
+
+                    TEST_INT_EQ(606, accumulate_l2_forward(&l, 0));
+                    TEST_INT_EQ(606, accumulate_l2_backward(&l, 0));
+                }
+            }
+
+            clc_dlist_free_storage(&l);
+        }
+    }
+}
+
+static void TEST_push_front_1_ELEMENT_THEN_insert_before_1_ELEMENT(void)
+{
+    {
+        CLC_DL_define_empty(int, l);
+
+        int const r = CLC_DL_push_front_by_val(l, int, 101);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+            TEST_INT_EQ(1, CLC_DL_len(l));
+            TEST_INT_EQ(0, CLC_DL_spare(l));
+
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(101, *COLLECT_C_DLIST_cback_t(l, int));
+
+            TEST_INT_EQ(101, accumulate_l2_forward(&l, 0));
+            TEST_INT_EQ(101, accumulate_l2_backward(&l, 0));
+
+            collect_c_dlist_node_t* new_node;
+
+            {
+                int const v2 = 202;
+                int const r2 = CLC_DL_insert_before(l, l.tail, &v2, &new_node);
+
+                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r2);
+
+                if (0 == r)
+                {
+                    TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+                    TEST_INT_EQ(2, CLC_DL_len(l));
+                    TEST_INT_EQ(0, CLC_DL_spare(l));
+
+                    TEST_PTR_NE(NULL, new_node);
+
+                    TEST_INT_EQ(202, *COLLECT_C_DLIST_cfront_t(l, int));
+                    TEST_INT_EQ(101, *COLLECT_C_DLIST_cback_t(l, int));
+
+                    TEST_INT_EQ(303, accumulate_l2_forward(&l, 0));
+                    TEST_INT_EQ(303, accumulate_l2_backward(&l, 0));
+                }
+            }
+
+            if (2 == CLC_DL_len(l)) /* check that previous insert worked */
+            {
+                int const v2 = 303;
+                int const r2 = CLC_DL_insert_before(l, new_node, &v2);
+
+                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r2);
+
+                if (0 == r)
+                {
+                    TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+                    TEST_INT_EQ(3, CLC_DL_len(l));
+                    TEST_INT_EQ(0, CLC_DL_spare(l));
+
+                    TEST_INT_EQ(303, *COLLECT_C_DLIST_cfront_t(l, int));
+                    TEST_INT_EQ(101, *COLLECT_C_DLIST_cback_t(l, int));
+
+                    TEST_INT_EQ(606, accumulate_l2_forward(&l, 0));
+                    TEST_INT_EQ(606, accumulate_l2_backward(&l, 0));
+                }
+            }
+
+            clc_dlist_free_storage(&l);
+        }
     }
 }
 

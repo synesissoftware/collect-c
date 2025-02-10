@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 8th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -196,12 +196,22 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
 #define COLLECT_C_DLIST_clear_1_(l_name)                    collect_c_dlist_clear(COLLECT_C_DLIST_get_l_ptr_((l_name)), NULL, NULL, NULL)
 #define COLLECT_C_DLIST_clear_2_(l_name, p)                 collect_c_dlist_clear(COLLECT_C_DLIST_get_l_ptr_((l_name)), NULL, NULL,  (p))
 
+#define COLLECT_C_DLIST_insert_after_3_(l_name, ref_node, new_el)               collect_c_dlist_insert_after(COLLECT_C_DLIST_get_l_ptr_((l_name)), (ref_node), (new_el), NULL)
+#define COLLECT_C_DLIST_insert_after_4_(l_name, ref_node, new_el, p_new_node)   collect_c_dlist_insert_after(COLLECT_C_DLIST_get_l_ptr_((l_name)), (ref_node), (new_el), (p_new_node))
+
+#define COLLECT_C_DLIST_insert_before_3_(l_name, ref_node, new_el)               collect_c_dlist_insert_before(COLLECT_C_DLIST_get_l_ptr_((l_name)), (ref_node), (new_el), NULL)
+#define COLLECT_C_DLIST_insert_before_4_(l_name, ref_node, new_el, p_new_node)   collect_c_dlist_insert_before(COLLECT_C_DLIST_get_l_ptr_((l_name)), (ref_node), (new_el), (p_new_node))
+
 #define COLLECT_C_DLIST_GET_MACRO_1_or_2_(_1, _2, mac, ...) mac
+#define COLLECT_C_DLIST_GET_MACRO_3_or_4_(_1, _2, _3, _4, mac, ...) mac
 
 #define COLLECT_C_DLIST_clear(...)                          COLLECT_C_DLIST_GET_MACRO_1_or_2_(__VA_ARGS__, COLLECT_C_DLIST_clear_2_, COLLECT_C_DLIST_clear_1_, NULL)(__VA_ARGS__)
 
 #define COLLECT_C_DLIST_erase_node(l_name, node)            collect_c_dlist_erase_node((l_name), (node))
 
+#define COLLECT_C_DLIST_insert_after(...)                   COLLECT_C_DLIST_GET_MACRO_3_or_4_(__VA_ARGS__, COLLECT_C_DLIST_insert_after_4_, COLLECT_C_DLIST_insert_after_3_, NULL)(__VA_ARGS__)
+
+#define COLLECT_C_DLIST_insert_before(...)                   COLLECT_C_DLIST_GET_MACRO_3_or_4_(__VA_ARGS__, COLLECT_C_DLIST_insert_before_4_, COLLECT_C_DLIST_insert_before_3_, NULL)(__VA_ARGS__)
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -314,6 +324,22 @@ collect_c_dlist_rfind_node(
 ,   size_t                          skip_count
 ,   collect_c_dlist_node_t**        node
 ,   size_t*                         num_searched
+);
+
+int
+collect_c_dlist_insert_after(
+    collect_c_dlist_t*          l
+,   collect_c_dlist_node_t*     reference_node
+,   void const*                 ptr_new_el
+,   collect_c_dlist_node_t**    new_node
+);
+
+int
+collect_c_dlist_insert_before(
+    collect_c_dlist_t*          l
+,   collect_c_dlist_node_t*     reference_node
+,   void const*                 ptr_new_el
+,   collect_c_dlist_node_t**    new_node
 );
 
 int

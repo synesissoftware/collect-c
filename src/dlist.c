@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 8th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -321,6 +321,99 @@ collect_c_dlist_rfind_node(
         }
 
         return ENOENT;
+    }
+}
+
+int
+collect_c_dlist_insert_after(
+    collect_c_dlist_t*          l
+,   collect_c_dlist_node_t*     reference_node
+,   void const*                 ptr_new_el
+,   collect_c_dlist_node_t**    new_node
+)
+{
+    assert(NULL != l);
+    assert(NULL != reference_node);
+    assert(NULL != ptr_new_el);
+
+    {
+        collect_c_dlist_node_t* dummy;
+
+        if (NULL == new_node)
+        {
+            new_node = &dummy;
+        }
+
+        *new_node = clc_c_dl_make_node_(reference_node, reference_node->next, l->el_size, ptr_new_el);
+
+        if (NULL == *new_node)
+        {
+            return ENOMEM;
+        }
+        else
+        {
+            if (NULL != reference_node->next)
+            {
+                reference_node->next->prev = *new_node;
+            }
+            else
+            {
+                l->tail = *new_node;
+            }
+
+            reference_node->next = *new_node;
+
+            ++l->size;
+
+            return 0;
+        }
+    }
+}
+
+
+int
+collect_c_dlist_insert_before(
+    collect_c_dlist_t*          l
+,   collect_c_dlist_node_t*     reference_node
+,   void const*                 ptr_new_el
+,   collect_c_dlist_node_t**    new_node
+)
+{
+    assert(NULL != l);
+    assert(NULL != reference_node);
+    assert(NULL != ptr_new_el);
+
+    {
+        collect_c_dlist_node_t* dummy;
+
+        if (NULL == new_node)
+        {
+            new_node = &dummy;
+        }
+
+        *new_node = clc_c_dl_make_node_(reference_node->prev, reference_node, l->el_size, ptr_new_el);
+
+        if (NULL == *new_node)
+        {
+            return ENOMEM;
+        }
+        else
+        {
+            if (NULL != reference_node->prev)
+            {
+                reference_node->prev->next = *new_node;
+            }
+            else
+            {
+                l->head = *new_node;
+            }
+
+            reference_node->prev = *new_node;
+
+            ++l->size;
+
+            return 0;
+        }
     }
 }
 

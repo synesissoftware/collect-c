@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container terse api.
  *
  * Created: 7th February 2025
- * Updated: 8th February 2025
+ * Updated: 10th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -35,6 +35,8 @@
 
 #define CLC_DL_clear                                        COLLECT_C_DLIST_clear
 #define CLC_DL_erase_node                                   COLLECT_C_DLIST_erase_node
+#define CLC_DL_insert_after                                 COLLECT_C_DLIST_insert_after
+#define CLC_DL_insert_before                                COLLECT_C_DLIST_insert_before
 
 
 /* /////////////////////////////////////////////////////////////////////////
