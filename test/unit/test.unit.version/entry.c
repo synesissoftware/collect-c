@@ -4,7 +4,7 @@
  * Purpose: Unit-test for version(s).
  *
  * Created: 7th February 2025
- * Updated: 7th February 2025
+ * Updated: 9th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -15,6 +15,7 @@
 
 #include <collect-c/common/version.h>
 #include <collect-c/circq.h>
+#include <collect-c/dlist.h>
 
 #include <xtests/terse-api.h>
 
@@ -27,6 +28,7 @@
 
 static void TEST_LIBRARY_version(void);
 static void TEST_CIRCQ_version(void);
+static void TEST_DLIST_version(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -40,10 +42,11 @@ int main(int argc, char* argv[])
 
     XTESTS_COMMANDLINE_PARSE_HELP_OR_VERBOSITY(argc, argv, &verbosity);
 
-    if (XTESTS_START_RUNNER("test.unit.cq", verbosity))
+    if (XTESTS_START_RUNNER("test.unit.version", verbosity))
     {
         XTESTS_RUN_CASE(TEST_LIBRARY_version);
         XTESTS_RUN_CASE(TEST_CIRCQ_version);
+        XTESTS_RUN_CASE(TEST_DLIST_version);
 
         XTESTS_PRINT_RESULTS();
 
@@ -70,6 +73,13 @@ static void TEST_CIRCQ_version(void)
 {
     {
         TEST_INT_EQ(COLLECT_C_CIRCQ_VER, collect_c_cq_version());
+    }
+}
+
+static void TEST_DLIST_version(void)
+{
+    {
+        TEST_INT_EQ(COLLECT_C_DLIST_VER, collect_c_dlist_version());
     }
 }
 
