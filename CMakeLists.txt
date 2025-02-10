@@ -5,7 +5,7 @@
 # Purpose:  Top-level CMake lists file for collect-c
 #
 # Created:  4th February 2025
-# Updated:  11fth February 2025
+# Updated:  11th February 2025
 #
 # ######################################################################## #
 
