@@ -5,7 +5,7 @@
 # Purpose:  Top-level CMake lists file for collect-c
 #
 # Created:  4th February 2025
-# Updated:  6th February 2025
+# Updated:  10th February 2025
 #
 # ######################################################################## #
 
@@ -105,7 +105,6 @@ option(BUILD_EXAMPLES "Build examples" ON)
 # optional:
 # - shwild - required for testing;
 #
-
 
 
 # ############################
@@ -283,5 +282,4 @@ message(NOTICE "Generating CMake build scripts for ${PROJECT_NAME} ${PROJECT_VER
 
 
 # ############################## end of file ############################# #
-
 
