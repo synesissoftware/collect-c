@@ -4,7 +4,7 @@
  * Purpose: Unit-test for doubly-linked list.
  *
  * Created: 7th February 2025
- * Updated: 10th February 2025
+ * Updated: 14th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -415,6 +415,70 @@ static void TEST_push_front_9_ELEMENTS_THEN_clear(void)
         {
             TEST_INT_EQ(9, *COLLECT_C_DLIST_cfront_t(l, int));
             TEST_INT_EQ(1, *COLLECT_C_DLIST_cback_t(l, int));
+
+            TEST_INT_EQ(45, accumulate_l2_forward(&l, 0));
+            TEST_INT_EQ(45, accumulate_l2_backward(&l, 0));
+
+            {
+                size_t num_dropped;
+
+                int const r2 = CLC_DL_clear(l, &num_dropped);
+
+                TEST_INT_EQ(0, r2);
+
+                TEST_INT_EQ(9, num_dropped);
+
+                TEST_BOOLEAN_TRUE(CLC_DL_is_empty(l));
+                TEST_INT_EQ(0, CLC_DL_len(l));
+                TEST_INT_EQ(9, CLC_DL_spare(l));
+            }
+        }
+
+        clc_dlist_free_storage(&l);
+    }
+
+    {
+        custom_t const values[] =
+        {
+            { 1, 1, 1, },
+            { 2, 2, 2, },
+            { 3, 3, 3, },
+            { 4, 4, 4, },
+            { 5, 5, 5, },
+            { 6, 6, 6, },
+            { 7, 7, 7, },
+            { 8, 8, 8, },
+            { 9, 9, 9, },
+        };
+
+        CLC_DL_define_empty(custom_t, l);
+
+        size_t num_succeeded = 0;
+
+        for (size_t i = 0; STLSOFT_NUM_ELEMENTS(values) != i; ++i)
+        {
+            int const r = CLC_DL_push_front_by_ref(l, custom_t, &values[i]);
+
+            TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+            if (0 == r)
+            {
+                ++num_succeeded;
+
+                TEST_BOOLEAN_FALSE(CLC_DL_is_empty(l));
+                TEST_INT_EQ(num_succeeded, CLC_DL_len(l));
+                TEST_INT_EQ(0, CLC_DL_spare(l));
+            }
+        }
+
+        if (STLSOFT_NUM_ELEMENTS(values) == num_succeeded)
+        {
+            TEST_INT_EQ(9, COLLECT_C_DLIST_cfront_t(l, custom_t)->x);
+            TEST_INT_EQ(9, COLLECT_C_DLIST_cfront_t(l, custom_t)->y);
+            TEST_INT_EQ(9, COLLECT_C_DLIST_cfront_t(l, custom_t)->z);
+            TEST_INT_EQ(1, COLLECT_C_DLIST_cback_t(l, custom_t)->x);
+            TEST_INT_EQ(1, COLLECT_C_DLIST_cback_t(l, custom_t)->y);
+            TEST_INT_EQ(1, COLLECT_C_DLIST_cback_t(l, custom_t)->z);
 
             TEST_INT_EQ(45, accumulate_l2_forward(&l, 0));
             TEST_INT_EQ(45, accumulate_l2_backward(&l, 0));

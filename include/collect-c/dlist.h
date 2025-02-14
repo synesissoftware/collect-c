@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 11th February 2025
+ * Updated: 14th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -207,8 +207,12 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
 
 #define COLLECT_C_DLIST_insert_before(...)                  COLLECT_C_UTIL_GET_MACRO_3_or_4_(__VA_ARGS__, COLLECT_C_DLIST_insert_before_4_, COLLECT_C_DLIST_insert_before_3_, NULL)(__VA_ARGS__)
 
+#define COLLECT_DLIST_push_back_by_ref(l_name, t_el, new_el)    \
+                                                            (COLLECT_C_DLIST_assert_el_size_(l_name, t_el),  collect_c_dlist_push_back_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), (new_el)))
 #define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)    \
                                                             (COLLECT_C_DLIST_assert_el_size_(l_name, t_el),  collect_c_dlist_push_back_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), &((t_el){(new_el)})))
+#define COLLECT_DLIST_push_front_by_ref(l_name, t_el, new_el)   \
+                                                            (COLLECT_C_DLIST_assert_el_size_(l_name, t_el),  collect_c_dlist_push_front_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), (new_el)))
 #define COLLECT_DLIST_push_front_by_val(l_name, t_el, new_el)   \
                                                             (COLLECT_C_DLIST_assert_el_size_(l_name, t_el), collect_c_dlist_push_front_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), &((t_el){(new_el)})))
 
