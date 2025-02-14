@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 10th February 2025
+ * Updated: 15th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -17,10 +17,7 @@
 
 #include <errno.h>
 #include <assert.h>
-#include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -48,10 +45,13 @@ clc_c_dl_make_node_(
     size_t const    cb  =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(el_size);
     node_t* const   nd  =   malloc(cb);
 
-    nd->prev    =   prev;
-    nd->next    =   next;
+    if (NULL != nd)
+    {
+        nd->prev    =   prev;
+        nd->next    =   next;
 
-    memcpy(&nd->data->data[0], ptr_new_el, el_size);
+        memcpy(&nd->data->data[0], ptr_new_el, el_size);
+    }
 
     return nd;
 }
