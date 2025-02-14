@@ -4,7 +4,7 @@
  * Purpose: Common elements.
  *
  * Created: 5th February 2025
- * Updated: 11th February 2025
+ * Updated: 15th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -14,6 +14,7 @@
  */
 
 #include <collect-c/common/macros.h>
+#include <collect-c/common/mem_api.h>
 #ifndef __cplusplus
 # include <collect-c/common/version.h>
 #endif
