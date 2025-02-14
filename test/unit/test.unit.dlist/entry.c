@@ -39,6 +39,7 @@ static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase(void);
 static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase_NO_SPARES(void);
 static void TEST_push_front_1_ELEMENT_THEN_insert_after_1_ELEMENT(void);
 static void TEST_push_front_1_ELEMENT_THEN_insert_before_1_ELEMENT(void);
+static void TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -67,6 +68,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase_NO_SPARES);
         XTESTS_RUN_CASE(TEST_push_front_1_ELEMENT_THEN_insert_after_1_ELEMENT);
         XTESTS_RUN_CASE(TEST_push_front_1_ELEMENT_THEN_insert_before_1_ELEMENT);
+        XTESTS_RUN_CASE(TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare);
 
         XTESTS_PRINT_RESULTS();
 
@@ -974,6 +976,48 @@ static void TEST_push_front_1_ELEMENT_THEN_insert_before_1_ELEMENT(void)
             }
 
             clc_dlist_free_storage(&l);
+        }
+    }
+}
+
+static void TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare(void)
+{
+    {
+        CLC_DL_define_empty(int, l);
+
+        {
+            { for (int i = 0; 10000 != i; ++i)
+            {
+                int const r = CLC_DL_push_back_by_val(l, int, i);
+
+                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+                if (0 != r)
+                {
+                    break;
+                }
+                else
+                {
+
+                }
+            }}
+
+            TEST_INT_EQ(10000, CLC_DL_len(l));
+            TEST_INT_EQ(0, CLC_DL_spare(l));
+        }
+
+        {
+            CLC_DL_clear(l);
+
+            TEST_INT_EQ(0, CLC_DL_len(l));
+            TEST_INT_EQ(64, CLC_DL_spare(l));
+        }
+
+        {
+            clc_dlist_free_storage(&l);
+
+            TEST_INT_EQ(0, CLC_DL_len(l));
+            TEST_INT_EQ(0, CLC_DL_spare(l));
         }
     }
 }

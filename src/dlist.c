@@ -24,6 +24,13 @@
 
 
 /* /////////////////////////////////////////////////////////////////////////
+ * constants
+ */
+
+#define COLLECT_C_DLIST_INTERNAL_MAX_SPARES_                64
+
+
+/* /////////////////////////////////////////////////////////////////////////
  * local types
  */
 
@@ -94,6 +101,8 @@ clc_dlist_free_storage(
             n = n->next;
 
             free(n2);
+
+            --l->num_spares;
         }
 
         l->spares = NULL;
@@ -133,17 +142,19 @@ collect_c_dlist_clear(
 
             n = n->next;
 
-#if 1
+            if (0 == (COLLECT_C_DLIST_F_NO_SPARES & l->flags) &&
+                l->num_spares < COLLECT_C_DLIST_INTERNAL_MAX_SPARES_)
+            {
+                n2->next = n2->prev = l->spares;
 
-            n2->next = n2->prev = l->spares;
+                l->spares = n2;
 
-            l->spares = n2;
-
-            ++l->num_spares;
-#else
-
-            free(n2);
-#endif
+                ++l->num_spares;
+            }
+            else
+            {
+                free(n2);
+            }
 
             ++*num_dropped;
         }
@@ -210,17 +221,18 @@ collect_c_dlist_erase_node(
 
             --l->size;
 
-            if (0 != (COLLECT_C_DLIST_F_NO_SPARES & l->flags))
-            {
-                free(node);
-            }
-            else
+            if (0 == (COLLECT_C_DLIST_F_NO_SPARES & l->flags) &&
+                l->num_spares < COLLECT_C_DLIST_INTERNAL_MAX_SPARES_)
             {
                 node->next = node->prev = l->spares;
 
                 l->spares = node;
 
                 ++l->num_spares;
+            }
+            else
+            {
+                free(node);
             }
         }
 
