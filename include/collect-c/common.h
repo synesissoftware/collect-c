@@ -4,7 +4,7 @@
  * Purpose: Common elements.
  *
  * Created: 5th February 2025
- * Updated: 11th February 2025
+ * Updated: 14th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -22,6 +22,22 @@
 /* /////////////////////////////////////////////////////////////////////////
  * compatibility
  */
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+typedef union
+{
+    char            data[1];
+    int             _i;
+    long            _l;
+    long long       _ll;
+    double          _d;
+    long double     _ld;
+    void*           _pv;
+} collect_c_common_node_data_t;
 
 
 /* /////////////////////////////////////////////////////////////////////////

@@ -25,9 +25,9 @@
  */
 
 #define COLLECT_C_DLIST_VER_MAJOR       0
-#define COLLECT_C_DLIST_VER_MINOR       1
+#define COLLECT_C_DLIST_VER_MINOR       2
 #define COLLECT_C_DLIST_VER_PATCH       0
-#define COLLECT_C_DLIST_VER_ALPHABETA   41
+#define COLLECT_C_DLIST_VER_ALPHABETA   42
 
 #define COLLECT_C_DLIST_VER \
     (0\
@@ -61,33 +61,21 @@
  * API types
  */
 
-typedef union
-{
-    char            data[1];
-    int             _i;
-    long            _l;
-    long long       _ll;
-    double          _d;
-    long double     _ld;
-    void*           _pv;
-} collect_c_dlist_node_data_t;
-
 struct collect_c_dlist_node_t;
 #ifndef __cplusplus
-typedef struct collect_c_dlist_node_t   collect_c_dlist_node_t;
+typedef struct collect_c_dlist_node_t                       collect_c_dlist_node_t;
 #endif
-
 struct collect_c_dlist_node_t
 {
-    collect_c_dlist_node_t*     prev;
-    collect_c_dlist_node_t*     next;
-    collect_c_dlist_node_data_t data[1];
+    collect_c_dlist_node_t*         prev;
+    collect_c_dlist_node_t*         next;
+    collect_c_common_node_data_t    data[1];
 };
 
 
 struct collect_c_dlist_block_t;
 #ifndef __cplusplus
-typedef struct collect_c_dlist_block_t  collect_c_dlist_block_t;
+typedef struct collect_c_dlist_block_t                      collect_c_dlist_block_t;
 #endif
 struct collect_c_dlist_block_t
 {
@@ -123,7 +111,7 @@ struct collect_c_dlist_t
     collect_c_dlist_pfn_free    pfn_element_free;   /*! Custom function to be invoked when element erased/replaced. */
 };
 #ifndef __cplusplus
-typedef struct collect_c_dlist_t        collect_c_dlist_t;
+typedef struct collect_c_dlist_t                            collect_c_dlist_t;
 #endif
 
 /** Callback function that performs comparison between elements for the
