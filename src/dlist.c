@@ -36,14 +36,15 @@ typedef collect_c_dlist_node_t                              node_t;
 static
 node_t*
 clc_c_dl_make_node_(
-    node_t*     prev
-,   node_t*     next
-,   size_t      el_size
-,   void const* ptr_new_el
+    collect_c_mem_api_t*    mem_api
+,   node_t*                 prev
+,   node_t*                 next
+,   size_t                  el_size
+,   void const*             ptr_new_el
 )
 {
     size_t const    cb  =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(el_size);
-    node_t* const   nd  =   malloc(cb);
+    node_t* const   nd  =   (*mem_api->pfn_alloc)(mem_api->param, cb);
 
     if (NULL != nd)
     {
@@ -75,13 +76,16 @@ clc_dlist_free_storage(
     assert(NULL != l);
 
     {
+        collect_c_mem_api_t* const  mem_api =   &l->mem_api;
+        size_t const                cb      =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(l->el_size);
+
         for (collect_c_dlist_node_t* n = l->head; NULL != n; )
         {
             collect_c_dlist_node_t* const n2 = n;
 
             n = n->next;
 
-            free(n2);
+            (mem_api->pfn_free)(mem_api->param, n2, cb);
         }
 
         l->head = l->tail = NULL;
@@ -93,7 +97,7 @@ clc_dlist_free_storage(
 
             n = n->next;
 
-            free(n2);
+            (mem_api->pfn_free)(mem_api->param, n2, cb);
         }
 
         l->spares = NULL;
@@ -142,7 +146,7 @@ collect_c_dlist_clear(
             ++l->num_spares;
 #else
 
-            free(n2);
+            (mem_api->pfn_free)(mem_api->param, n2, cb);
 #endif
 
             ++*num_dropped;
@@ -212,7 +216,9 @@ collect_c_dlist_erase_node(
 
             if (0 != (COLLECT_C_DLIST_F_NO_SPARES & l->flags))
             {
-                free(node);
+                size_t const cb = COLLECT_C_DLIST_INTERNAL_sizeof_node_(l->el_size);
+
+                (l->mem_api.pfn_free)(l->mem_api.param, node, cb);
             }
             else
             {
@@ -344,7 +350,7 @@ collect_c_dlist_insert_after(
             new_node = &dummy;
         }
 
-        *new_node = clc_c_dl_make_node_(reference_node, reference_node->next, l->el_size, ptr_new_el);
+        *new_node = clc_c_dl_make_node_(&l->mem_api, reference_node, reference_node->next, l->el_size, ptr_new_el);
 
         if (NULL == *new_node)
         {
@@ -391,7 +397,7 @@ collect_c_dlist_insert_before(
             new_node = &dummy;
         }
 
-        *new_node = clc_c_dl_make_node_(reference_node->prev, reference_node, l->el_size, ptr_new_el);
+        *new_node = clc_c_dl_make_node_(&l->mem_api, reference_node->prev, reference_node, l->el_size, ptr_new_el);
 
         if (NULL == *new_node)
         {
@@ -431,7 +437,7 @@ collect_c_dlist_push_back_by_ref(
     {
         if (NULL == l->head)
         {
-            collect_c_dlist_node_t* const nd = clc_c_dl_make_node_(NULL, NULL, l->el_size, ptr_new_el);
+            collect_c_dlist_node_t* const nd = clc_c_dl_make_node_(&l->mem_api, NULL, NULL, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
@@ -448,7 +454,7 @@ collect_c_dlist_push_back_by_ref(
         {
             collect_c_dlist_node_t* const   prev    =   l->tail;
             collect_c_dlist_node_t* const   next    =   NULL;
-            collect_c_dlist_node_t* const   nd      =   clc_c_dl_make_node_(prev, next, l->el_size, ptr_new_el);
+            collect_c_dlist_node_t* const   nd      =   clc_c_dl_make_node_(&l->mem_api, prev, next, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
@@ -479,7 +485,7 @@ collect_c_dlist_push_front_by_ref(
     {
         if (NULL == l->head)
         {
-            collect_c_dlist_node_t* const nd = clc_c_dl_make_node_(NULL, NULL, l->el_size, ptr_new_el);
+            collect_c_dlist_node_t* const nd = clc_c_dl_make_node_(&l->mem_api, NULL, NULL, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
@@ -496,7 +502,7 @@ collect_c_dlist_push_front_by_ref(
         {
             collect_c_dlist_node_t* const   prev    =   NULL;
             collect_c_dlist_node_t* const   next    =   l->head;
-            collect_c_dlist_node_t* const   nd      =   clc_c_dl_make_node_(prev, next, l->el_size, ptr_new_el);
+            collect_c_dlist_node_t* const   nd      =   clc_c_dl_make_node_(&l->mem_api, prev, next, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
