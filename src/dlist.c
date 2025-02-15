@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 14th February 2025
+ * Updated: 15th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -215,7 +215,7 @@ collect_c_dlist_erase_node(
 
         if (NULL != l->pfn_element_free)
         {
-            (*l->pfn_element_free)(l->el_size, 0, &node->data->data[0], l->param_element_free);
+            (*l->pfn_element_free)(l->el_size, -1, &node->data->data[0], l->param_element_free);
         }
 
         {

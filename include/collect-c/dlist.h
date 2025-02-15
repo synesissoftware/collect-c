@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 14th February 2025
+ * Updated: 15th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -90,10 +90,10 @@ struct collect_c_dlist_block_t
  * each element upon its erasure or replacement by any of the API functions.
  */
 typedef void (*collect_c_dlist_pfn_free)(
-    size_t  el_size
-,   size_t  el_index    /* always 0 */
-,   void*   el_ptr
-,   void*   param_element_free
+    size_t      el_size
+,   intptr_t    el_index    /* always -1 */
+,   void*       el_ptr
+,   void*       param_element_free
 );
 
 struct collect_c_dlist_t
