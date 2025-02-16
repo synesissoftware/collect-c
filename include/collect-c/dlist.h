@@ -98,6 +98,7 @@ typedef void (*collect_c_dlist_pfn_free)(
 
 struct collect_c_dlist_t
 {
+    collect_c_mem_api_t         mem_api;
     size_t                      el_size;            /*! The element size. */
     size_t                      num_spares;         /*! */
     size_t                      size;               /*! */
@@ -435,6 +436,13 @@ collect_c_dlist_push_front_by_ref(
 #define COLLECT_C_DLIST_EMPTY_INITIALIZER_(l_el_type, l_flags, l_storage, elf_fn, elf_param) \
                                                                             \
     {                                                                       \
+        .mem_api =                                                          \
+        {                                                                   \
+            .pfn_alloc = collect_c_mem_std_alloc,                           \
+            .pfn_realloc = collect_c_mem_std_realloc,                       \
+            .pfn_free = collect_c_mem_std_free,                             \
+            .param = NULL,                                                  \
+        },                                                                  \
         .el_size = sizeof(l_el_type),                                       \
         .num_spares = 0,                                                    \
         .size = 0,                                                          \

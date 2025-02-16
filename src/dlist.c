@@ -39,16 +39,17 @@ typedef collect_c_dlist_node_t                              node_t;
  * helper functions and macros
  */
 
-#define COLLECT_C_DLIST_INTERNAL_sizeof_node_(el_size)      (offsetof(collect_c_dlist_node_t, data) + el_size)
+#define COLLECT_C_DLIST_INTERNAL_sizeof_node_(el_size)      (offsetof(node_t, data) + el_size)
 
 static
 node_t*
 clc_c_dl_alloc_node_(
-    size_t      el_size
+    collect_c_mem_api_t*    mem_api
+,   size_t                  el_size
 )
 {
     size_t const    cb  =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(el_size);
-    node_t* const   nd  =   malloc(cb);
+    node_t* const   nd  =   (*mem_api->pfn_alloc)(mem_api->param, cb);
 
     return nd;
 }
@@ -75,7 +76,7 @@ clc_c_dl_obtain_node_(
     }
     else
     {
-        nd = clc_c_dl_alloc_node_(el_size);
+        nd = clc_c_dl_alloc_node_(&l->mem_api, el_size);
 
         if (NULL == nd)
         {
@@ -110,21 +111,24 @@ clc_dlist_free_storage(
     assert(NULL != l);
 
     {
-        for (collect_c_dlist_node_t* n = l->head; NULL != n; )
+        collect_c_mem_api_t* const  mem_api =   &l->mem_api;
+        size_t const                cb      =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(l->el_size);
+
+        for (node_t* n = l->head; NULL != n; )
         {
-            collect_c_dlist_node_t* const n2 = n;
+            node_t* const n2 = n;
 
             n = n->next;
 
-            free(n2);
+            (mem_api->pfn_free)(mem_api->param, n2, cb);
         }
 
         l->head = l->tail = NULL;
         l->size = 0;
 
-        for (collect_c_dlist_node_t* n = l->spares; NULL != n; )
+        for (node_t* n = l->spares; NULL != n; )
         {
-            collect_c_dlist_node_t* const n2 = n;
+            node_t* const n2 = n;
 
             n = n->next;
 
@@ -164,9 +168,9 @@ collect_c_dlist_clear(
 
         *num_dropped = 0;
 
-        for (collect_c_dlist_node_t* n = l->head; NULL != n; )
+        for (node_t* n = l->head; NULL != n; )
         {
-            collect_c_dlist_node_t* const n2 = n;
+            node_t* const n2 = n;
 
             n = n->next;
 
@@ -295,7 +299,7 @@ collect_c_dlist_find_node(
 
         *num_searched = 0;
 
-        for (collect_c_dlist_node_t* n = l->head; NULL != n; n = n->next)
+        for (node_t* n = l->head; NULL != n; n = n->next)
         {
             int const r = (*pfn)(l, p_lhs, &n->data->data[0]);
 
@@ -343,7 +347,7 @@ collect_c_dlist_rfind_node(
 
         *num_searched = 0;
 
-        for (collect_c_dlist_node_t* n = l->tail; NULL != n; n = n->prev)
+        for (node_t* n = l->tail; NULL != n; n = n->prev)
         {
             int const r = (*pfn)(l, p_lhs, &n->data->data[0]);
 
@@ -377,7 +381,7 @@ collect_c_dlist_insert_after(
     assert(NULL != ptr_new_el);
 
     {
-        collect_c_dlist_node_t* dummy;
+        node_t* dummy;
 
         if (NULL == new_node)
         {
@@ -424,7 +428,7 @@ collect_c_dlist_insert_before(
     assert(NULL != ptr_new_el);
 
     {
-        collect_c_dlist_node_t* dummy;
+        node_t* dummy;
 
         if (NULL == new_node)
         {
@@ -471,7 +475,7 @@ collect_c_dlist_push_back_by_ref(
     {
         if (NULL == l->head)
         {
-            collect_c_dlist_node_t* const nd = clc_c_dl_obtain_node_(l, NULL, NULL, l->el_size, ptr_new_el);
+            node_t* const nd = clc_c_dl_obtain_node_(l, NULL, NULL, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
@@ -486,9 +490,9 @@ collect_c_dlist_push_back_by_ref(
         }
         else
         {
-            collect_c_dlist_node_t* const   prev    =   l->tail;
-            collect_c_dlist_node_t* const   next    =   NULL;
-            collect_c_dlist_node_t* const   nd      =   clc_c_dl_obtain_node_(l, prev, next, l->el_size, ptr_new_el);
+            node_t* const   prev    =   l->tail;
+            node_t* const   next    =   NULL;
+            node_t* const   nd      =   clc_c_dl_obtain_node_(l, prev, next, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
@@ -519,7 +523,7 @@ collect_c_dlist_push_front_by_ref(
     {
         if (NULL == l->head)
         {
-            collect_c_dlist_node_t* const nd = clc_c_dl_obtain_node_(l, NULL, NULL, l->el_size, ptr_new_el);
+            node_t* const nd = clc_c_dl_obtain_node_(l, NULL, NULL, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
@@ -534,9 +538,9 @@ collect_c_dlist_push_front_by_ref(
         }
         else
         {
-            collect_c_dlist_node_t* const   prev    =   NULL;
-            collect_c_dlist_node_t* const   next    =   l->head;
-            collect_c_dlist_node_t* const   nd      =   clc_c_dl_obtain_node_(l, prev, next, l->el_size, ptr_new_el);
+            node_t* const   prev    =   NULL;
+            node_t* const   next    =   l->head;
+            node_t* const   nd      =   clc_c_dl_obtain_node_(l, prev, next, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
