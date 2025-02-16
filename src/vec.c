@@ -4,7 +4,7 @@
  * Purpose: Vector container.
  *
  * Created: 5th February 2025
- * Updated: 10th February 2025
+ * Updated: 14th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -412,8 +412,6 @@ collect_c_v_push_front_by_ref(
             return 0;
         }
     }
-
-    return -1;
 }
 
 
