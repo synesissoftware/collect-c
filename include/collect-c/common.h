@@ -26,6 +26,22 @@
 
 
 /* /////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+typedef union
+{
+    char            data[1];
+    int             _i;
+    long            _l;
+    long long       _ll;
+    double          _d;
+    long double     _ld;
+    void*           _pv;
+} collect_c_common_node_data_t;
+
+
+/* /////////////////////////////////////////////////////////////////////////
  * inclusion control
  */
 
