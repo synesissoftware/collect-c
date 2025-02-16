@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 15th February 2025
+ * Updated: 16th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <stddef.h>
+#include <string.h>
 
 
 /* /////////////////////////////////////////////////////////////////////////
