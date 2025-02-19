@@ -145,6 +145,8 @@ int walk_int_int(
     assert(sizeof(int) == key_size);
     assert(sizeof(int) == val_size);
 
+    ((void)&key_size);
+    ((void)&val_size);
     ((void)&el_index);
     ((void)&param_walk);
 
