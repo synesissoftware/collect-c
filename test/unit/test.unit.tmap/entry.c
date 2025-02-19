@@ -35,10 +35,11 @@ static void TEST_insert_1000_ELEMENTS(void);
  * main()
  */
 
+int verbosity = 2;
+
 int main(int argc, char* argv[])
 {
     int retCode = EXIT_SUCCESS;
-    int verbosity = 2;
 
     XTESTS_COMMANDLINE_PARSE_HELP_OR_VERBOSITY(argc, argv, &verbosity);
 
@@ -145,14 +146,19 @@ int walk_int_int(
     assert(sizeof(int) == key_size);
     assert(sizeof(int) == val_size);
 
+    ((void)&key_size);
+    ((void)&val_size);
     ((void)&el_index);
     ((void)&param_walk);
 
-    fprintf(stderr, "[%zu] %d => %d\n"
-    ,   depth
-    ,   *(int const*)p_el_key
-    ,   *(int const*)p_el_val
-    );
+    if (verbosity >= 4)
+    {
+        fprintf(stdout, "[%zu] %d => %d\n"
+        ,   depth
+        ,   *(int const*)p_el_key
+        ,   *(int const*)p_el_val
+        );
+    }
 
     return 1;
 }
@@ -442,6 +448,32 @@ static void TEST_insert_1000_ELEMENTS(void)
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
+            (verbosity >= 4) && fprintf(stdout, "\n");
+
+            TEST_INT_EQ(0, r);
+        }
+
+        {
+            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+
+            (verbosity >= 4) && fprintf(stdout, "\n");
+
+            TEST_INT_EQ(0, r);
+        }
+
+        {
+            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
+
+            (verbosity >= 4) && fprintf(stdout, "\n");
+
+            TEST_INT_EQ(0, r);
+        }
+
+        {
+            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+
+            (verbosity >= 4) && fprintf(stdout, "\n");
+
             TEST_INT_EQ(0, r);
         }
 
@@ -490,11 +522,15 @@ static void TEST_insert_1000_ELEMENTS(void)
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
+            (verbosity >= 4) && fprintf(stdout, "\n");
+
             TEST_INT_EQ(0, r);
         }
 
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+
+            (verbosity >= 4) && fprintf(stdout, "\n");
 
             TEST_INT_EQ(0, r);
         }
@@ -502,11 +538,15 @@ static void TEST_insert_1000_ELEMENTS(void)
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
+            (verbosity >= 4) && fprintf(stdout, "\n");
+
             TEST_INT_EQ(0, r);
         }
 
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+
+            (verbosity >= 4) && fprintf(stdout, "\n");
 
             TEST_INT_EQ(0, r);
         }
