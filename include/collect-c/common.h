@@ -37,7 +37,10 @@ typedef union
     long            _l;
     long long       _ll;
     double          _d;
+#if 0
+
     long double     _ld;
+#endif
     void*           _pv;
 } collect_c_common_node_data_t;
 

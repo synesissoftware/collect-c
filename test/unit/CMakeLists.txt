@@ -2,5 +2,6 @@
 add_subdirectory(test.unit.cq)
 add_subdirectory(test.unit.dlist)
 add_subdirectory(test.unit.stock_cmp_fns)
+add_subdirectory(test.unit.tmap)
 add_subdirectory(test.unit.vec)
 add_subdirectory(test.unit.version)
