@@ -150,7 +150,7 @@ int walk_int_int(
     ((void)&el_index);
     ((void)&param_walk);
 
-    fprintf(stderr, "[%zu] %d => %d\n"
+    fprintf(stdout, "[%zu] %d => %d\n"
     ,   depth
     ,   *(int const*)p_el_key
     ,   *(int const*)p_el_val
@@ -444,6 +444,32 @@ static void TEST_insert_1000_ELEMENTS(void)
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
+            fprintf(stdout, "\n");
+
+            TEST_INT_EQ(0, r);
+        }
+
+        {
+            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+
+            fprintf(stdout, "\n");
+
+            TEST_INT_EQ(0, r);
+        }
+
+        {
+            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
+
+            fprintf(stdout, "\n");
+
+            TEST_INT_EQ(0, r);
+        }
+
+        {
+            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+
+            fprintf(stdout, "\n");
+
             TEST_INT_EQ(0, r);
         }
 
@@ -492,11 +518,15 @@ static void TEST_insert_1000_ELEMENTS(void)
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
+            fprintf(stdout, "\n");
+
             TEST_INT_EQ(0, r);
         }
 
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+
+            fprintf(stdout, "\n");
 
             TEST_INT_EQ(0, r);
         }
@@ -504,11 +534,15 @@ static void TEST_insert_1000_ELEMENTS(void)
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
+            fprintf(stdout, "\n");
+
             TEST_INT_EQ(0, r);
         }
 
         {
             int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+
+            fprintf(stdout, "\n");
 
             TEST_INT_EQ(0, r);
         }
