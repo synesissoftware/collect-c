@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 19th February 2025
+ * Updated: 19th March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -26,7 +26,7 @@
 
 #define COLLECT_C_TMAP_VER_MAJOR        0
 #define COLLECT_C_TMAP_VER_MINOR        0
-#define COLLECT_C_TMAP_VER_PATCH        0
+#define COLLECT_C_TMAP_VER_PATCH        1
 #define COLLECT_C_TMAP_VER_ALPHABETA    1
 
 #define COLLECT_C_TMAP_VER \

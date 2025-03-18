@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 19th February 2025
+ * Updated: 19th March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -393,17 +393,17 @@ clc_treemap_free_storage(
     collect_c_tmap_t*   m
 )
 {
-    if (NULL != m->pfn_element_free)
-    {
-        clc_c_tm_destroy_child_nodes_6_(&m->mem_api, m->root, m->pfn_element_free, m->param_element_free, m->key_size, m->val_size);
-    }
-    else
-    {
-        clc_c_tm_destroy_child_nodes_4_(&m->mem_api, m->root, m->key_size, m->val_size);
-    }
-
     if (NULL != m->root)
     {
+        if (NULL != m->pfn_element_free)
+        {
+            clc_c_tm_destroy_child_nodes_6_(&m->mem_api, m->root, m->pfn_element_free, m->param_element_free, m->key_size, m->val_size);
+        }
+        else
+        {
+            clc_c_tm_destroy_child_nodes_4_(&m->mem_api, m->root, m->key_size, m->val_size);
+        }
+
         if (NULL != m->pfn_element_free)
         {
             void* const p_key   =   CLC_TMAP_node_key_ptr_(m->root);
