@@ -108,6 +108,7 @@
 		"numeric": "cpp",
 		"optional": "cpp",
 		"ostream": "cpp",
+		"path_functions.h": "c",
 		"print": "cpp",
 		"queue": "cpp",
 		"ratio": "cpp",
