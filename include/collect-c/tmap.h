@@ -64,6 +64,7 @@
 
 #ifdef __cplusplus
 
+struct collect_c_tmap_t;
 inline collect_c_tmap_t      * COLLECT_C_TMAP_get_l_ptr_(collect_c_tmap_t      & l) { return &l; }
 inline collect_c_tmap_t const* COLLECT_C_TMAP_get_l_ptr_(collect_c_tmap_t const& l) { return &l; }
 inline collect_c_tmap_t      * COLLECT_C_TMAP_get_l_ptr_(collect_c_tmap_t      * p) { return  p; }

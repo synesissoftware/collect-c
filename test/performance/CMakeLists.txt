@@ -2,4 +2,5 @@
 add_subdirectory(test.performance.cq)
 add_subdirectory(test.performance.dlist)
 add_subdirectory(test.performance.std_list)
+add_subdirectory(test.performance.tmap)
 
