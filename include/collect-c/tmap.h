@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 19th March 2025
+ * Updated: 21st March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -26,7 +26,7 @@
 
 #define COLLECT_C_TMAP_VER_MAJOR        0
 #define COLLECT_C_TMAP_VER_MINOR        0
-#define COLLECT_C_TMAP_VER_PATCH        1
+#define COLLECT_C_TMAP_VER_PATCH        2
 #define COLLECT_C_TMAP_VER_ALPHABETA    1
 
 #define COLLECT_C_TMAP_VER \
@@ -64,6 +64,7 @@
 
 #ifdef __cplusplus
 
+struct collect_c_tmap_t;
 inline collect_c_tmap_t      * COLLECT_C_TMAP_get_l_ptr_(collect_c_tmap_t      & l) { return &l; }
 inline collect_c_tmap_t const* COLLECT_C_TMAP_get_l_ptr_(collect_c_tmap_t const& l) { return &l; }
 inline collect_c_tmap_t      * COLLECT_C_TMAP_get_l_ptr_(collect_c_tmap_t      * p) { return  p; }
