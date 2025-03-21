@@ -26,7 +26,7 @@
 
 #define COLLECT_C_TMAP_VER_MAJOR        0
 #define COLLECT_C_TMAP_VER_MINOR        0
-#define COLLECT_C_TMAP_VER_PATCH        1
+#define COLLECT_C_TMAP_VER_PATCH        2
 #define COLLECT_C_TMAP_VER_ALPHABETA    1
 
 #define COLLECT_C_TMAP_VER \
