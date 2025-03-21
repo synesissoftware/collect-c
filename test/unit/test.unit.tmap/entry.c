@@ -240,9 +240,9 @@ static void TEST_insert_1_ELEMENT(void)
 
                 TEST_PTR_EQ(NULL, node);
             }
-
-            clc_treemap_free_storage(&m);
         }
+
+        clc_treemap_free_storage(&m);
     }
 }
 
@@ -414,9 +414,9 @@ static void TEST_insert_2_ELEMENTS(void)
                     }
                 }
             }
-
-            clc_treemap_free_storage(&m);
         }
+
+        clc_treemap_free_storage(&m);
     }
 }
 
