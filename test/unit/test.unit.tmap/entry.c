@@ -4,7 +4,7 @@
  * Purpose: Unit-test for Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 19th February 2025
+ * Updated: 22nd February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -446,7 +446,7 @@ static void TEST_insert_1000_ELEMENTS(void)
         }
 
         {
-            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
+            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
             (verbosity >= 4) && fprintf(stdout, "\n");
 
@@ -454,7 +454,7 @@ static void TEST_insert_1000_ELEMENTS(void)
         }
 
         {
-            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
             (verbosity >= 4) && fprintf(stdout, "\n");
 
@@ -462,7 +462,7 @@ static void TEST_insert_1000_ELEMENTS(void)
         }
 
         {
-            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
+            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
             (verbosity >= 4) && fprintf(stdout, "\n");
 
@@ -470,7 +470,7 @@ static void TEST_insert_1000_ELEMENTS(void)
         }
 
         {
-            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
             (verbosity >= 4) && fprintf(stdout, "\n");
 
@@ -520,7 +520,7 @@ static void TEST_insert_1000_ELEMENTS(void)
         }
 
         {
-            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
+            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
             (verbosity >= 4) && fprintf(stdout, "\n");
 
@@ -528,7 +528,7 @@ static void TEST_insert_1000_ELEMENTS(void)
         }
 
         {
-            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
             (verbosity >= 4) && fprintf(stdout, "\n");
 
@@ -536,7 +536,7 @@ static void TEST_insert_1000_ELEMENTS(void)
         }
 
         {
-            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
+            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
             (verbosity >= 4) && fprintf(stdout, "\n");
 
@@ -544,7 +544,7 @@ static void TEST_insert_1000_ELEMENTS(void)
         }
 
         {
-            int const r = collect_c_tmap_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
             (verbosity >= 4) && fprintf(stdout, "\n");
 

@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 19th March 2025
+ * Updated: 22nd March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -253,11 +253,11 @@ clc_c_tm_find_(
 
 bool
 node_walk_backward_(
-    collect_c_tmap_t*           m
-,   node_t const*               node
-,   collect_c_tmap_pfn_walk     pfn_walk
-,   void*                       param_walk
-,   size_t                      depth
+    collect_c_tmap_t*               m
+,   node_t const*                   node
+,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   size_t                          depth
 )
 {
     assert(NULL != m);
@@ -295,11 +295,11 @@ node_walk_backward_(
 
 bool
 node_walk_downward_(
-    collect_c_tmap_t*           m
-,   node_t const*               node
-,   collect_c_tmap_pfn_walk     pfn_walk
-,   void*                       param_walk
-,   size_t                      depth
+    collect_c_tmap_t*               m
+,   node_t const*                   node
+,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   size_t                          depth
 )
 {
     assert(NULL != m);
@@ -337,11 +337,11 @@ node_walk_downward_(
 
 bool
 node_walk_forward_(
-    collect_c_tmap_t*           m
-,   node_t const*               node
-,   collect_c_tmap_pfn_walk     pfn_walk
-,   void*                       param_walk
-,   size_t                      depth
+    collect_c_tmap_t*               m
+,   node_t const*                   node
+,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   size_t                          depth
 )
 {
     assert(NULL != m);
@@ -533,11 +533,11 @@ collect_c_tmap_insert(
 }
 
 int
-collect_c_tmap_walk(
-    collect_c_tmap_t*           m
-,   collect_c_tmap_pfn_walk     pfn_walk
-,   void*                       param_walk
-,   collect_c_tmap_walkdir_t    direction
+collect_c_tmap_entry_walk(
+    collect_c_tmap_t*               m
+,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   collect_c_tmap_walkdir_t        direction
 )
 {
     assert(NULL != m);
