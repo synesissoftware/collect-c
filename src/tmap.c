@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 19th March 2025
+ * Updated: 22nd March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -21,8 +21,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-
-    #include <stdio.h>
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -44,7 +42,6 @@ typedef collect_c_tmap_node_t                               node_t;
  */
 
 #define CLC_TMAP_node_key_ptr_(n)                           (&(n)->data->data[0])
-// #define CLC_TMAP_node_val_ptr_(n)                           ((n)->value)
 #define CLC_TMAP_node_val_ptr_(n, key_size)                 ((void*)(CLC_TMAP_node_key_ptr_(n) + (CLC_TMAP_INTERNAL_NUM_nd_FOR_key_(key_size) * sizeof(collect_c_common_node_data_t))))
 
 #define CLC_TMAP_INTERNAL_NUM_nd_FOR_key_(key_size)         (((key_size) + (sizeof(sizeof(collect_c_common_node_data_t)) - 1)) / sizeof(collect_c_common_node_data_t))
@@ -63,7 +60,24 @@ clc_c_tm_alloc_node_(
     size_t const    cb  =   CLC_TMAP_INTERNAL_sizeof_node_(key_size, val_size);
     node_t* const   nd  =   (*mem_api->pfn_alloc)(mem_api->param, cb);
 
-    // _Static_assert(8 == sizeof(collect_c_common_node_data_t), "VIOLATION: node data unexpected size");
+    /*
+    _Static_assert(8 == sizeof(collect_c_common_node_data_t), "VIOLATION: node data unexpected size");
+    */
+
+    if (NULL != nd)
+    {
+        /* NOTE: the following indirection and const-casting allows the
+         * `value` field to be `const`+`const`, which: 1. precludes errant
+         * modification by client code; and 2. prevents frame variables of
+         * the node type. Both of these are GOOD THINGS, so worth the
+         * dodginess here.
+         */
+
+        size_t const    v_off   =   cb - val_size;
+        void** const    ppvalue =   (void**)&nd->value;
+
+        *ppvalue = ((char*)nd) + v_off;
+    }
 
     return nd;
 }
@@ -253,11 +267,11 @@ clc_c_tm_find_(
 
 bool
 node_walk_backward_(
-    collect_c_tmap_t*           m
-,   node_t const*               node
-,   collect_c_tmap_pfn_walk     pfn_walk
-,   void*                       param_walk
-,   size_t                      depth
+    collect_c_tmap_t*               m
+,   node_t const*                   node
+,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   size_t                          depth
 )
 {
     assert(NULL != m);
@@ -295,11 +309,11 @@ node_walk_backward_(
 
 bool
 node_walk_downward_(
-    collect_c_tmap_t*           m
-,   node_t const*               node
-,   collect_c_tmap_pfn_walk     pfn_walk
-,   void*                       param_walk
-,   size_t                      depth
+    collect_c_tmap_t*               m
+,   node_t const*                   node
+,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   size_t                          depth
 )
 {
     assert(NULL != m);
@@ -337,11 +351,11 @@ node_walk_downward_(
 
 bool
 node_walk_forward_(
-    collect_c_tmap_t*           m
-,   node_t const*               node
-,   collect_c_tmap_pfn_walk     pfn_walk
-,   void*                       param_walk
-,   size_t                      depth
+    collect_c_tmap_t*               m
+,   node_t const*                   node
+,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   size_t                          depth
 )
 {
     assert(NULL != m);
@@ -533,11 +547,11 @@ collect_c_tmap_insert(
 }
 
 int
-collect_c_tmap_walk(
-    collect_c_tmap_t*           m
-,   collect_c_tmap_pfn_walk     pfn_walk
-,   void*                       param_walk
-,   collect_c_tmap_walkdir_t    direction
+collect_c_tmap_entry_walk(
+    collect_c_tmap_t*               m
+,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   collect_c_tmap_walkdir_t        direction
 )
 {
     assert(NULL != m);

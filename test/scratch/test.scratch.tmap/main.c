@@ -192,7 +192,7 @@ int main(int argc, char* argv[])
 
     size_t max_depth = 0;
 
-    collect_c_tmap_walk(
+    collect_c_tmap_entry_walk(
         &m
     ,   element_walk_function
     ,   &max_depth

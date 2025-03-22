@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 19th March 2025
+ * Updated: 22nd March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -26,7 +26,7 @@
 
 #define COLLECT_C_TMAP_VER_MAJOR        0
 #define COLLECT_C_TMAP_VER_MINOR        0
-#define COLLECT_C_TMAP_VER_PATCH        1
+#define COLLECT_C_TMAP_VER_PATCH        3
 #define COLLECT_C_TMAP_VER_ALPHABETA    1
 
 #define COLLECT_C_TMAP_VER \
@@ -92,7 +92,7 @@ struct collect_c_tmap_node_t
 {
     collect_c_tmap_node_t*          left;
     collect_c_tmap_node_t*          right;
-    void*                           value;
+    void const* const               value;
     collect_c_common_node_data_t    data[1];
 };
 
@@ -100,7 +100,7 @@ struct collect_c_tmap_node_t
  *
  * @param pe_lhs Pointer to the left-hand side key;
  * @param pe_rhs Pointer to the right-hand side key;
- * @param key_size Sizze of the key type;
+ * @param key_size Size of the key type;
  */
 typedef int (*collect_c_tmap_pfn_cmp)(
     void const*     pe_lhs
@@ -128,10 +128,10 @@ typedef void (*collect_c_tmap_pfn_free)(
 ,   void*       param_element_free
 );
 
-/** T.B.C.
+/** Prototype for callback function for entries.
  *
  */
-typedef int (*collect_c_tmap_pfn_walk)(
+typedef int (*collect_c_tmap_pfn_entry_walk)(
     size_t      key_size
 ,   size_t      val_size
 ,   intptr_t    el_index    /* always -1 */
@@ -268,11 +268,11 @@ collect_c_tmap_insert(
 );
 
 int
-collect_c_tmap_walk(
-    collect_c_tmap_t*           m
-,   collect_c_tmap_pfn_walk     pfn_walk
-,   void*                       param_walk
-,   collect_c_tmap_walkdir_t    direction
+collect_c_tmap_entry_walk(
+    collect_c_tmap_t*               m
+,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   collect_c_tmap_walkdir_t        direction
 );
 
 
