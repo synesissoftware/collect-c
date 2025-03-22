@@ -210,8 +210,32 @@ typedef struct collect_c_tmap_t                             collect_c_tmap_t;
 
 /* modifiers */
 
+/** @def COLLECT_C_TMAP_insert_by_val(m_name, t_key, v_key, t_val, v_val, p_was_replaced)
+ *
+ * Attempts to insert/update an entry (key + value) into the map, where both key
+ * and map are presented by-value.
+ *
+ * @param m_name The map - by-value or by-reference (pointer) - into which
+ *  the new entry is to be inserted (or updated);
+ * @param t_key The type of the key;
+ * @param v_key The entry key, presented by-value;
+ * @param t_val The type of the value;
+ * @param v_val The entry value, presented by-value;
+ * @param p_was_replaced Pointer to a variable that will receive an integer representing whether ;
+ *
+ * @return Indicates whether operation succeeded.
+ * @retval 0 Operation succeed;
+ * @retval ENOMEM Sufficient memory not available;
+ */
 #define COLLECT_C_TMAP_insert_by_val(m_name, t_key, v_key, t_val, v_val, p_was_replaced)    \
-                                                            collect_c_tmap_insert(COLLECT_C_TMAP_get_l_ptr_(m_name), &((t_key){(v_key)}), &((t_val){(v_val)}), NULL, p_was_replaced)
+                                                                                            \
+    collect_c_tmap_insert(                                                                  \
+        COLLECT_C_TMAP_get_l_ptr_(m_name)                                                   \
+    ,   &((t_key){(v_key)})                                                                 \
+    ,   &((t_val){(v_val)})                                                                 \
+    ,   NULL                                                                                \
+    ,   p_was_replaced                                                                      \
+    )
 
 
 /* attributes */
