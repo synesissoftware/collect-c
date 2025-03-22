@@ -174,7 +174,7 @@ int cmp_VeryLargeKey_t(
     }
 }
 
-int walk_int_int(
+int entry_walk_int_int(
     size_t      key_size
 ,   size_t      val_size
 ,   intptr_t    el_index    /* always -1 */
@@ -194,10 +194,42 @@ int walk_int_int(
 
     if (verbosity >= 4)
     {
-        fprintf(stdout, "[%zu] %d => %d\n"
+        fprintf(stdout, "\t[%zu] %d => %d\n"
         ,   depth
         ,   *(int const*)p_el_key
         ,   *(int const*)p_el_val
+        );
+    }
+
+    return 1;
+}
+
+int node_walk_int_int(
+    size_t                          key_size
+,   size_t                          val_size
+,   intptr_t                        el_index    /* always -1 */
+,   size_t                          depth
+,   collect_c_tmap_node_t const*    node
+,   void*                           param_walk
+)
+{
+    assert(sizeof(int) == key_size);
+    assert(sizeof(int) == val_size);
+
+    ((void)&key_size);
+    ((void)&val_size);
+    ((void)&el_index);
+    ((void)&param_walk);
+
+    if (verbosity >= 4)
+    {
+        void const* const   p_key   =   &node->data[0].data[0];
+        void const* const   p_val   =   node->value;
+
+        fprintf(stdout, "\t[%zu] %d => %d\n"
+        ,   depth
+        ,   *(int const*)p_key
+        ,   *(int const*)p_val
         );
     }
 
@@ -762,36 +794,84 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             }
         }
 
+        /* collect_c_tmap_entry_walk */
         {
-            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
+            if (verbosity >= 4)
+            {
+                fprintf(stdout, "%s() - walking entries:\n", __FUNCTION__);
+            }
 
-            (verbosity >= 4) && fprintf(stdout, "\n");
+            {
+                int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-            TEST_INT_EQ(0, r);
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
+
+            {
+                int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
+
+            {
+                int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
+
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
+
+            {
+                int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
         }
 
+        /* node_walk_int_int */
         {
-            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+            if (verbosity >= 4)
+            {
+                fprintf(stdout, "%s() - walking nodes:\n", __FUNCTION__);
+            }
 
-            (verbosity >= 4) && fprintf(stdout, "\n");
+            {
+                int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-            TEST_INT_EQ(0, r);
-        }
+                (verbosity >= 4) && fprintf(stdout, "\n");
 
-        {
-            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
+                TEST_INT_EQ(0, r);
+            }
 
-            (verbosity >= 4) && fprintf(stdout, "\n");
+            {
+                int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-            TEST_INT_EQ(0, r);
-        }
+                (verbosity >= 4) && fprintf(stdout, "\n");
 
-        {
-            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+                TEST_INT_EQ(0, r);
+            }
 
-            (verbosity >= 4) && fprintf(stdout, "\n");
+            {
+                int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-            TEST_INT_EQ(0, r);
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
+
+            {
+                int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
         }
 
         clc_treemap_free_storage(&m);
@@ -836,36 +916,84 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             }
         }
 
+        /* collect_c_tmap_entry_walk */
         {
-            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
+            if (verbosity >= 4)
+            {
+                fprintf(stdout, "%s() - walking entries:\n", __FUNCTION__);
+            }
 
-            (verbosity >= 4) && fprintf(stdout, "\n");
+            {
+                int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-            TEST_INT_EQ(0, r);
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
+
+            {
+                int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
+
+            {
+                int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
+
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
+
+            {
+                int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
         }
 
+        /* node_walk_int_int */
         {
-            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
+            if (verbosity >= 4)
+            {
+                fprintf(stdout, "%s() - walking nodes:\n", __FUNCTION__);
+            }
 
-            (verbosity >= 4) && fprintf(stdout, "\n");
+            {
+                int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-            TEST_INT_EQ(0, r);
-        }
+                (verbosity >= 4) && fprintf(stdout, "\n");
 
-        {
-            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_FORWARD);
+                TEST_INT_EQ(0, r);
+            }
 
-            (verbosity >= 4) && fprintf(stdout, "\n");
+            {
+                int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-            TEST_INT_EQ(0, r);
-        }
+                (verbosity >= 4) && fprintf(stdout, "\n");
 
-        {
-            int const r = collect_c_tmap_entry_walk(&m, walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+                TEST_INT_EQ(0, r);
+            }
 
-            (verbosity >= 4) && fprintf(stdout, "\n");
+            {
+                int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-            TEST_INT_EQ(0, r);
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
+
+            {
+                int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
+
+                (verbosity >= 4) && fprintf(stdout, "\n");
+
+                TEST_INT_EQ(0, r);
+            }
         }
 
         clc_treemap_free_storage(&m);
