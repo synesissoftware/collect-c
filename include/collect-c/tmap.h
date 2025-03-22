@@ -26,8 +26,8 @@
 
 #define COLLECT_C_TMAP_VER_MAJOR        0
 #define COLLECT_C_TMAP_VER_MINOR        0
-#define COLLECT_C_TMAP_VER_PATCH        2
-#define COLLECT_C_TMAP_VER_ALPHABETA    2
+#define COLLECT_C_TMAP_VER_PATCH        3
+#define COLLECT_C_TMAP_VER_ALPHABETA    1
 
 #define COLLECT_C_TMAP_VER \
     (0\
@@ -92,7 +92,7 @@ struct collect_c_tmap_node_t
 {
     collect_c_tmap_node_t*          left;
     collect_c_tmap_node_t*          right;
-    void*                           value;
+    void const* const               value;
     collect_c_common_node_data_t    data[1];
 };
 
@@ -100,7 +100,7 @@ struct collect_c_tmap_node_t
  *
  * @param pe_lhs Pointer to the left-hand side key;
  * @param pe_rhs Pointer to the right-hand side key;
- * @param key_size Sizze of the key type;
+ * @param key_size Size of the key type;
  */
 typedef int (*collect_c_tmap_pfn_cmp)(
     void const*     pe_lhs
