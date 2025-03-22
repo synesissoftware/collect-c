@@ -75,8 +75,9 @@ typedef struct custom_t custom_t;
 
 struct VeryLargeKey_t
 {
+    char        padding0[500];
     int         key;
-    char        padding[1000];
+    char        padding1[500];
 };
 typedef struct VeryLargeKey_t VeryLargeKey_t;
 
@@ -291,6 +292,7 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
     {
         CLC_TM_define_empty(int, int, m);
 
+        /* insert 101:-101 for something to find */
         int         was_replaced;
         int const   r = CLC_TM_insert_by_val(m, int, 101, int, -101, &was_replaced);
 
@@ -303,6 +305,7 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
             TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
             TEST_INT_EQ(1, CLC_TM_len(m));
 
+            /* verify can find 101 */
             {
                 int const                       key     =   101;
                 collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
@@ -314,6 +317,7 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                 TEST_INT_EQ(-101, *(int const*)node->value);
             }
 
+            /* insert 202:-202 for something to find */
             {
                 int const r2 = CLC_TM_insert_by_val(m, int, 202, int, -202, &was_replaced);
 
@@ -325,43 +329,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
 
                     TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
                     TEST_INT_EQ(2, CLC_TM_len(m));
-                }
 
-                {
-                    int const                       key     =   101;
-                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                    TEST_PTR_NE(NULL, node);
-                    TEST_PTR_EQ(NULL, node->left);
-                    TEST_PTR_NE(NULL, node->right);
-
-                    TEST_INT_EQ(-101, *(int const*)node->value);
-                }
-
-                {
-                    int const                       key     =   202;
-                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                    TEST_PTR_NE(NULL, node);
-                    TEST_PTR_EQ(NULL, node->left);
-                    TEST_PTR_EQ(NULL, node->right);
-
-                    TEST_INT_EQ(-202, *(int const*)node->value);
-                }
-
-                {
-                    int const r3 = CLC_TM_insert_by_val(m, int, 201, int, -201, &was_replaced);
-
-                    TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r3);
-
-                    if (0 == r3)
-                    {
-                        TEST_INT_EQ(0, was_replaced);
-
-                        TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
-                        TEST_INT_EQ(3, CLC_TM_len(m));
-                    }
-
+                    /* verify can find 101 */
                     {
                         int const                       key     =   101;
                         collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
@@ -373,83 +342,161 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                         TEST_INT_EQ(-101, *(int const*)node->value);
                     }
 
+                    /* verify can find 202 */
                     {
-                        int const                       key     =   201;
+                        int const                       key     =   202;
                         collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                         TEST_PTR_NE(NULL, node);
                         TEST_PTR_EQ(NULL, node->left);
                         TEST_PTR_EQ(NULL, node->right);
 
-                        TEST_INT_EQ(-201, *(int const*)node->value);
-                    }
-
-                    {
-                        int const                       key     =   202;
-                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                        TEST_PTR_NE(NULL, node);
-                        TEST_PTR_NE(NULL, node->left);
-                        TEST_PTR_EQ(NULL, node->right);
-
                         TEST_INT_EQ(-202, *(int const*)node->value);
                     }
 
+                    /* verify cannot find 201 */
                     {
-                        int const r4 = CLC_TM_insert_by_val(m, int, 303, int, -303, &was_replaced);
+                        int const                       key     =   201;
+                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r4);
+                        TEST_PTR_EQ(NULL, node);
+                    }
 
-                        if (0 == r4)
+                    /* verify cannot find 303 */
+                    {
+                        int const                       key     =   303;
+                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                        TEST_PTR_EQ(NULL, node);
+                    }
+
+                    /* insert 201:-201 for something to find */
+                    {
+                        int const r3 = CLC_TM_insert_by_val(m, int, 201, int, -201, &was_replaced);
+
+                        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r3);
+
+                        if (0 == r3)
                         {
                             TEST_INT_EQ(0, was_replaced);
 
                             TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
-                            TEST_INT_EQ(4, CLC_TM_len(m));
-                        }
+                            TEST_INT_EQ(3, CLC_TM_len(m));
 
-                        {
-                            int const                       key     =   101;
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            /* verify can find 101 */
+                            {
+                                int const                       key     =   101;
+                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            TEST_PTR_NE(NULL, node);
-                            TEST_PTR_EQ(NULL, node->left);
-                            TEST_PTR_NE(NULL, node->right);
+                                TEST_PTR_NE(NULL, node);
+                                TEST_PTR_EQ(NULL, node->left);
+                                TEST_PTR_NE(NULL, node->right);
 
-                            TEST_INT_EQ(-101, *(int const*)node->value);
-                        }
+                                TEST_INT_EQ(-101, *(int const*)node->value);
+                            }
 
-                        {
-                            int const                       key     =   201;
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            /* verify can find 201 */
+                            {
+                                int const                       key     =   201;
+                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            TEST_PTR_NE(NULL, node);
-                            TEST_PTR_EQ(NULL, node->left);
-                            TEST_PTR_EQ(NULL, node->right);
+                                TEST_PTR_NE(NULL, node);
+                                TEST_PTR_EQ(NULL, node->left);
+                                TEST_PTR_EQ(NULL, node->right);
 
-                            TEST_INT_EQ(-201, *(int const*)node->value);
-                        }
+                                TEST_INT_EQ(-201, *(int const*)node->value);
+                            }
 
-                        {
-                            int const                       key     =   202;
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            /* verify can find 202 */
+                            {
+                                int const                       key     =   202;
+                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            TEST_PTR_NE(NULL, node);
-                            TEST_PTR_NE(NULL, node->left);
-                            TEST_PTR_NE(NULL, node->right);
+                                TEST_PTR_NE(NULL, node);
+                                TEST_PTR_NE(NULL, node->left);
+                                TEST_PTR_EQ(NULL, node->right);
 
-                            TEST_INT_EQ(-202, *(int const*)node->value);
-                        }
+                                TEST_INT_EQ(-202, *(int const*)node->value);
+                            }
 
-                        {
-                            int const                       key     =   303;
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            /* verify cannot find 303 */
+                            {
+                                int const                       key     =   303;
+                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            TEST_PTR_NE(NULL, node);
-                            TEST_PTR_EQ(NULL, node->left);
-                            TEST_PTR_EQ(NULL, node->right);
+                                TEST_PTR_EQ(NULL, node);
+                            }
 
-                            TEST_INT_EQ(-303, *(int const*)node->value);
+                            /* insert 303:-303 for something to find */
+                            {
+                                int const r4 = CLC_TM_insert_by_val(m, int, 303, int, -303, &was_replaced);
+
+                                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r4);
+
+                                if (0 == r4)
+                                {
+                                    TEST_INT_EQ(0, was_replaced);
+
+                                    TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
+                                    TEST_INT_EQ(4, CLC_TM_len(m));
+
+                                    /* verify can find 101 */
+                                    {
+                                        int const                       key     =   101;
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_NE(NULL, node);
+                                        TEST_PTR_EQ(NULL, node->left);
+                                        TEST_PTR_NE(NULL, node->right);
+
+                                        TEST_INT_EQ(-101, *(int const*)node->value);
+                                    }
+
+                                    /* verify can find 201 */
+                                    {
+                                        int const                       key     =   201;
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_NE(NULL, node);
+                                        TEST_PTR_EQ(NULL, node->left);
+                                        TEST_PTR_EQ(NULL, node->right);
+
+                                        TEST_INT_EQ(-201, *(int const*)node->value);
+                                    }
+
+                                    /* verify can find 202 */
+                                    {
+                                        int const                       key     =   202;
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_NE(NULL, node);
+                                        TEST_PTR_NE(NULL, node->left);
+                                        TEST_PTR_NE(NULL, node->right);
+
+                                        TEST_INT_EQ(-202, *(int const*)node->value);
+                                    }
+
+                                    /* verify can find 303 */
+                                    {
+                                        int const                       key     =   303;
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_NE(NULL, node);
+                                        TEST_PTR_EQ(NULL, node->left);
+                                        TEST_PTR_EQ(NULL, node->right);
+
+                                        TEST_INT_EQ(-303, *(int const*)node->value);
+                                    }
+
+                                    /* verify cannot find 404 */
+                                    {
+                                        int const                       key     =   404;
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_EQ(NULL, node);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -465,8 +512,12 @@ static void TEST_insert_2_ELEMENTS_WITH_VeryLargeKey_TO_int(void)
     {
         CLC_TM_define_empty_with_cmp(VeryLargeKey_t, int, cmp_VeryLargeKey_t, m);
 
-        int         was_replaced;
-        int const   r = CLC_TM_insert_by_val(m, int, 101, int, -101, &was_replaced);
+
+        /* insert 101:-101 for something to find */
+        int                     was_replaced;
+        VeryLargeKey_t const    key =   { .key = 101, };
+        int const               val =   -101;
+        int const               r   =   collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
 
         TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
 
@@ -477,6 +528,7 @@ static void TEST_insert_2_ELEMENTS_WITH_VeryLargeKey_TO_int(void)
             TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
             TEST_INT_EQ(1, CLC_TM_len(m));
 
+            /* verify can find 101 */
             {
                 VeryLargeKey_t const            key     =   { .key = 101, };
                 collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
@@ -488,8 +540,11 @@ static void TEST_insert_2_ELEMENTS_WITH_VeryLargeKey_TO_int(void)
                 TEST_INT_EQ(-101, *(int const*)node->value);
             }
 
+            /* insert 202:-202 for something to find */
             {
-                int const r2 = CLC_TM_insert_by_val(m, int, 202, int, -202, &was_replaced);
+                VeryLargeKey_t const    key =   { .key = 202, };
+                int const               val =   -202;
+                int const               r2  =   collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
 
                 TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r2);
 
@@ -499,43 +554,9 @@ static void TEST_insert_2_ELEMENTS_WITH_VeryLargeKey_TO_int(void)
 
                     TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
                     TEST_INT_EQ(2, CLC_TM_len(m));
-                }
 
-                {
-                    VeryLargeKey_t const            key     =   { .key = 101, };
-                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                    TEST_PTR_NE(NULL, node);
-                    TEST_PTR_EQ(NULL, node->left);
-                    TEST_PTR_NE(NULL, node->right);
-
-                    TEST_INT_EQ(-101, *(int const*)node->value);
-                }
-
-                {
-                    VeryLargeKey_t const            key     =   { .key = 202, };
-                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                    TEST_PTR_NE(NULL, node);
-                    TEST_PTR_EQ(NULL, node->left);
-                    TEST_PTR_EQ(NULL, node->right);
-
-                    TEST_INT_EQ(-202, *(int const*)node->value);
-                }
-
-                {
-                    int const r3 = CLC_TM_insert_by_val(m, int, 201, int, -201, &was_replaced);
-
-                    TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r3);
-
-                    if (0 == r3)
-                    {
-                        TEST_INT_EQ(0, was_replaced);
-
-                        TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
-                        TEST_INT_EQ(3, CLC_TM_len(m));
-                    }
-
+                    /* verify can find 101 */
                     {
                         VeryLargeKey_t const            key     =   { .key = 101, };
                         collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
@@ -547,83 +568,165 @@ static void TEST_insert_2_ELEMENTS_WITH_VeryLargeKey_TO_int(void)
                         TEST_INT_EQ(-101, *(int const*)node->value);
                     }
 
+                    /* verify can find 202 */
                     {
-                        VeryLargeKey_t const            key     =   { .key = 201, };
+                        VeryLargeKey_t const            key     =   { .key = 202, };
                         collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                         TEST_PTR_NE(NULL, node);
                         TEST_PTR_EQ(NULL, node->left);
                         TEST_PTR_EQ(NULL, node->right);
 
-                        TEST_INT_EQ(-201, *(int const*)node->value);
-                    }
-
-                    {
-                        VeryLargeKey_t const            key     =   { .key = 202, };
-                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                        TEST_PTR_NE(NULL, node);
-                        TEST_PTR_NE(NULL, node->left);
-                        TEST_PTR_EQ(NULL, node->right);
-
                         TEST_INT_EQ(-202, *(int const*)node->value);
                     }
 
+                    /* verify cannot find 201 */
                     {
-                        int const r4 = CLC_TM_insert_by_val(m, int, 303, int, -303, &was_replaced);
+                        VeryLargeKey_t const            key     =   { .key = 201, };
+                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r4);
+                        TEST_PTR_EQ(NULL, node);
+                    }
 
-                        if (0 == r4)
+                    /* verify cannot find 303 */
+                    {
+                        VeryLargeKey_t const            key     =   { .key = 303, };
+                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                        TEST_PTR_EQ(NULL, node);
+                    }
+
+                    /* insert 201:-201 for something to find */
+                    {
+                        VeryLargeKey_t const    key =   { .key = 201, };
+                        int const               val =   -201;
+                        int const               r3  =   collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
+
+                        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r3);
+
+                        if (0 == r3)
                         {
                             TEST_INT_EQ(0, was_replaced);
 
                             TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
-                            TEST_INT_EQ(4, CLC_TM_len(m));
-                        }
+                            TEST_INT_EQ(3, CLC_TM_len(m));
 
-                        {
-                            VeryLargeKey_t const            key     =   { .key = 101, };
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            /* verify can find 101 */
+                            {
+                                VeryLargeKey_t const            key     =   { .key = 101, };
+                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            TEST_PTR_NE(NULL, node);
-                            TEST_PTR_EQ(NULL, node->left);
-                            TEST_PTR_NE(NULL, node->right);
+                                TEST_PTR_NE(NULL, node);
+                                TEST_PTR_EQ(NULL, node->left);
+                                TEST_PTR_NE(NULL, node->right);
 
-                            TEST_INT_EQ(-101, *(int const*)node->value);
-                        }
+                                TEST_INT_EQ(-101, *(int const*)node->value);
+                            }
 
-                        {
-                            int const                       key     =   201;
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            /* verify can find 201 */
+                            {
+                                VeryLargeKey_t const            key     =   { .key = 201, };
+                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            TEST_PTR_NE(NULL, node);
-                            TEST_PTR_EQ(NULL, node->left);
-                            TEST_PTR_EQ(NULL, node->right);
+                                TEST_PTR_NE(NULL, node);
+                                TEST_PTR_EQ(NULL, node->left);
+                                TEST_PTR_EQ(NULL, node->right);
 
-                            TEST_INT_EQ(-201, *(int const*)node->value);
-                        }
+                                TEST_INT_EQ(-201, *(int const*)node->value);
+                            }
 
-                        {
-                            VeryLargeKey_t const            key     =   { .key = 202, };
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            /* verify can find 202 */
+                            {
+                                VeryLargeKey_t const            key     =   { .key = 202, };
+                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            TEST_PTR_NE(NULL, node);
-                            TEST_PTR_NE(NULL, node->left);
-                            TEST_PTR_NE(NULL, node->right);
+                                TEST_PTR_NE(NULL, node);
+                                TEST_PTR_NE(NULL, node->left);
+                                TEST_PTR_EQ(NULL, node->right);
 
-                            TEST_INT_EQ(-202, *(int const*)node->value);
-                        }
+                                TEST_INT_EQ(-202, *(int const*)node->value);
+                            }
 
-                        {
-                            VeryLargeKey_t const            key     =   { .key = 303, };
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            /* verify cannot find 303 */
+                            {
+                                VeryLargeKey_t const            key     =   { .key = 303, };
+                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            TEST_PTR_NE(NULL, node);
-                            TEST_PTR_EQ(NULL, node->left);
-                            TEST_PTR_EQ(NULL, node->right);
+                                TEST_PTR_EQ(NULL, node);
+                            }
 
-                            TEST_INT_EQ(-303, *(int const*)node->value);
+                            /* insert 303:-303 for something to find */
+                            {
+                                VeryLargeKey_t const            key =   { .key = 303, };
+                                int const                       val =   -303;
+                                int const                       r4  =   collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
+
+                                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r4);
+
+                                if (0 == r4)
+                                {
+                                    TEST_INT_EQ(0, was_replaced);
+
+                                    TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
+                                    TEST_INT_EQ(4, CLC_TM_len(m));
+
+                                    /* verify can find 101 */
+                                    {
+                                        VeryLargeKey_t const            key     =   { .key = 101, };
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_NE(NULL, node);
+                                        TEST_PTR_EQ(NULL, node->left);
+                                        TEST_PTR_NE(NULL, node->right);
+
+                                        TEST_INT_EQ(-101, *(int const*)node->value);
+                                    }
+
+                                    /* verify can find 201 */
+                                    {
+                                        VeryLargeKey_t const            key     =   { .key = 201, };
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_NE(NULL, node);
+                                        TEST_PTR_EQ(NULL, node->left);
+                                        TEST_PTR_EQ(NULL, node->right);
+
+                                        TEST_INT_EQ(-201, *(int const*)node->value);
+                                    }
+
+                                    /* verify can find 202 */
+                                    {
+                                        VeryLargeKey_t const            key     =   { .key = 202, };
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_NE(NULL, node);
+                                        TEST_PTR_NE(NULL, node->left);
+                                        TEST_PTR_NE(NULL, node->right);
+
+                                        TEST_INT_EQ(-202, *(int const*)node->value);
+                                    }
+
+                                    /* verify can find 303 */
+                                    {
+                                        VeryLargeKey_t const            key     =   { .key = 303, };
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_NE(NULL, node);
+                                        TEST_PTR_EQ(NULL, node->left);
+                                        TEST_PTR_EQ(NULL, node->right);
+
+                                        TEST_INT_EQ(-303, *(int const*)node->value);
+                                    }
+
+                                    /* verify cannot find 404 */
+                                    {
+                                        VeryLargeKey_t const            key     =   { .key = 404, };
+                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                                        TEST_PTR_EQ(NULL, node);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
