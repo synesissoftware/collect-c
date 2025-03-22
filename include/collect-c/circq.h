@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 11th February 2025
+ * Updated: 23rd March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -25,9 +25,9 @@
  */
 
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
-#define COLLECT_C_CIRCQ_VER_MINOR       2
+#define COLLECT_C_CIRCQ_VER_MINOR       3
 #define COLLECT_C_CIRCQ_VER_PATCH       0
-#define COLLECT_C_CIRCQ_VER_ALPHABETA   41
+#define COLLECT_C_CIRCQ_VER_ALPHABETA   42
 
 #define COLLECT_C_CIRCQ_VER \
     (0\
@@ -76,6 +76,7 @@ typedef void (*collect_c_circq_pfn_free)(
 
 struct collect_c_cq_t
 {
+    collect_c_mem_api_t         mem_api;
     size_t                      el_size;            /*! The element size. */
     size_t                      capacity;           /*! The capacity. */
     size_t                      b;                  /*! The pseudo-index of el[0]. */
@@ -87,7 +88,7 @@ struct collect_c_cq_t
     collect_c_circq_pfn_free    pfn_element_free;   /*! Custom function to be invoked when element erased/replaced. */
 };
 #ifndef __cplusplus
-typedef struct collect_c_cq_t   collect_c_cq_t;
+typedef struct collect_c_cq_t                               collect_c_cq_t;
 #endif
 
 
@@ -376,17 +377,24 @@ collect_c_cq_pop_from_front_n(
  */
 
 #define COLLECT_C_CIRCQ_EMPTY_INITIALIZER_(cq_el_type, cq_cap, cq_flags, cq_storage, elf_fn, elf_param) \
-                                                                            \
-    {                                                                       \
-        .el_size = sizeof(cq_el_type),                                      \
-        .capacity = (cq_cap),                                               \
-        .b = 0,                                                             \
-        .e = 0,                                                             \
-        .flags = (cq_flags),                                                \
-        .reserved0 = 0,                                                     \
-        .storage = (cq_storage),                                            \
-        .param_element_free = (elf_param),                                  \
-        .pfn_element_free = (elf_fn),                                       \
+                                                            \
+    {                                                       \
+        .mem_api =                                          \
+        {                                                   \
+            .pfn_alloc = collect_c_mem_std_alloc,           \
+            .pfn_realloc = collect_c_mem_std_realloc,       \
+            .pfn_free = collect_c_mem_std_free,             \
+            .param = NULL,                                  \
+        },                                                  \
+        .el_size = sizeof(cq_el_type),                      \
+        .capacity = (cq_cap),                               \
+        .b = 0,                                             \
+        .e = 0,                                             \
+        .flags = (cq_flags),                                \
+        .reserved0 = 0,                                     \
+        .storage = (cq_storage),                            \
+        .param_element_free = (elf_param),                  \
+        .pfn_element_free = (elf_fn),                       \
     }
 
 
