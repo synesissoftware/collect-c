@@ -217,8 +217,8 @@ static void TEST_insert_1_ELEMENT_WITH_int_TO_int(void)
             TEST_INT_EQ(1, CLC_TM_len(m));
 
             {
-                int const                       value   =   101;
-                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                int const                       key     =   101;
+                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                 TEST_PTR_NE(NULL, node);
                 TEST_PTR_EQ(NULL, node->left);
@@ -228,15 +228,15 @@ static void TEST_insert_1_ELEMENT_WITH_int_TO_int(void)
             }
 
             {
-                int const                       value   =   100;
-                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                int const                       key     =   100;
+                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                 TEST_PTR_EQ(NULL, node);
             }
 
             {
-                int const                       value   =   102;
-                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                int const                       key     =   102;
+                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                 TEST_PTR_EQ(NULL, node);
             }
@@ -264,8 +264,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
             TEST_INT_EQ(1, CLC_TM_len(m));
 
             {
-                int const                       value   =   101;
-                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                int const                       key     =   101;
+                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                 TEST_PTR_NE(NULL, node);
                 TEST_PTR_EQ(NULL, node->left);
@@ -288,8 +288,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                 }
 
                 {
-                    int const                       value   =   101;
-                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                    int const                       key     =   101;
+                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                     TEST_PTR_NE(NULL, node);
                     TEST_PTR_EQ(NULL, node->left);
@@ -299,8 +299,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                 }
 
                 {
-                    int const                       value   =   202;
-                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                    int const                       key     =   202;
+                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                     TEST_PTR_NE(NULL, node);
                     TEST_PTR_EQ(NULL, node->left);
@@ -323,8 +323,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                     }
 
                     {
-                        int const                       value   =   101;
-                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                        int const                       key     =   101;
+                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                         TEST_PTR_NE(NULL, node);
                         TEST_PTR_EQ(NULL, node->left);
@@ -334,8 +334,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                     }
 
                     {
-                        int const                       value   =   201;
-                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                        int const                       key     =   201;
+                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                         TEST_PTR_NE(NULL, node);
                         TEST_PTR_EQ(NULL, node->left);
@@ -345,8 +345,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                     }
 
                     {
-                        int const                       value   =   202;
-                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                        int const                       key     =   202;
+                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                         TEST_PTR_NE(NULL, node);
                         TEST_PTR_NE(NULL, node->left);
@@ -369,8 +369,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                         }
 
                         {
-                            int const                       value   =   101;
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                            int const                       key     =   101;
+                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                             TEST_PTR_NE(NULL, node);
                             TEST_PTR_EQ(NULL, node->left);
@@ -380,8 +380,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                         }
 
                         {
-                            int const                       value   =   201;
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                            int const                       key     =   201;
+                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                             TEST_PTR_NE(NULL, node);
                             TEST_PTR_EQ(NULL, node->left);
@@ -391,8 +391,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                         }
 
                         {
-                            int const                       value   =   202;
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                            int const                       key     =   202;
+                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                             TEST_PTR_NE(NULL, node);
                             TEST_PTR_NE(NULL, node->left);
@@ -402,8 +402,8 @@ static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
                         }
 
                         {
-                            int const                       value   =   303;
-                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &value);
+                            int const                       key     =   303;
+                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                             TEST_PTR_NE(NULL, node);
                             TEST_PTR_EQ(NULL, node->left);
