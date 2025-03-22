@@ -4,7 +4,7 @@
  * Purpose: Unit-test for doubly-linked list.
  *
  * Created: 7th February 2025
- * Updated: 14th February 2025
+ * Updated: 22nd March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -40,6 +40,7 @@ static void TEST_push_back_9_ELEMENTS_THEN_find_THEN_erase_NO_SPARES(void);
 static void TEST_push_front_1_ELEMENT_THEN_insert_after_1_ELEMENT(void);
 static void TEST_push_front_1_ELEMENT_THEN_insert_before_1_ELEMENT(void);
 static void TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare_THEN_ALLOCATE_64_MORE(void);
+static void TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare_THEN_ALLOCATE_64_MORE_WITH_CUSTOM_mem_api(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -69,6 +70,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_push_front_1_ELEMENT_THEN_insert_after_1_ELEMENT);
         XTESTS_RUN_CASE(TEST_push_front_1_ELEMENT_THEN_insert_before_1_ELEMENT);
         XTESTS_RUN_CASE(TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare_THEN_ALLOCATE_64_MORE);
+        XTESTS_RUN_CASE(TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare_THEN_ALLOCATE_64_MORE_WITH_CUSTOM_mem_api);
 
         XTESTS_PRINT_RESULTS();
 
@@ -152,6 +154,83 @@ int compare_matching_int(
     return 0;
 }
 
+
+void*
+custom_alloc(
+    void*   param
+,   size_t  cb_new
+)
+{
+    ((void)&param);
+
+    {
+        char* actual = malloc(8 + cb_new);
+
+        if (NULL != actual)
+        {
+            actual += 8;
+        }
+
+        return actual;
+    }
+}
+
+void*
+custom_realloc(
+    void*   param
+,   void*   pv_curr
+,   size_t  cb_curr
+,   size_t  cb_new
+)
+{
+    ((void)&param);
+    ((void)&cb_curr);
+
+    {
+        if (NULL == pv_curr)
+        {
+            return custom_alloc(param, cb_new);
+        }
+        else
+        {
+            char* p = pv_curr;
+            char* p2;
+
+            p -= 8;
+
+            p2 = realloc(p, cb_new + 8);
+
+            if (NULL != p2)
+            {
+                p2 += 8;
+            }
+
+            return p2;
+        }
+    }
+}
+
+void
+custom_free(
+    void*   param
+,   void*   pv_curr
+,   size_t  cb_curr
+)
+{
+    ((void)&param);
+    ((void)&cb_curr);
+
+    {
+        if (NULL != pv_curr)
+        {
+            char* p = pv_curr;
+
+            p -= 8;
+
+            free(p);
+        }
+    }
+}
 
 
 static void TEST_define_empty(void)
@@ -984,6 +1063,79 @@ static void TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare_THEN_ALLOC
 {
     {
         CLC_DL_define_empty(int, l);
+
+        {
+            { for (int i = 0; 10000 != i; ++i)
+            {
+                int const r = CLC_DL_push_back_by_val(l, int, i);
+
+                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+                if (0 != r)
+                {
+                    break;
+                }
+                else
+                {
+
+                }
+            }}
+
+            TEST_INT_EQ(10000, CLC_DL_len(l));
+            TEST_INT_EQ(0, CLC_DL_spare(l));
+
+            TEST_INT_EQ(0, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(9999, *COLLECT_C_DLIST_cback_t(l, int));
+        }
+
+        {
+            CLC_DL_clear(l);
+
+            TEST_INT_EQ(0, CLC_DL_len(l));
+            TEST_INT_EQ(64, CLC_DL_spare(l));
+        }
+
+        {
+            { for (int i = 0; 64 != i; ++i)
+            {
+                int const r = CLC_DL_push_back_by_val(l, int, -i);
+
+                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+                if (0 != r)
+                {
+                    break;
+                }
+                else
+                {
+
+                }
+            }}
+
+            TEST_INT_EQ(64, CLC_DL_len(l));
+            TEST_INT_EQ(0, CLC_DL_spare(l));
+
+            TEST_INT_EQ(0, *COLLECT_C_DLIST_cfront_t(l, int));
+            TEST_INT_EQ(-63, *COLLECT_C_DLIST_cback_t(l, int));
+        }
+
+        {
+            clc_dlist_free_storage(&l);
+
+            TEST_INT_EQ(0, CLC_DL_len(l));
+            TEST_INT_EQ(0, CLC_DL_spare(l));
+        }
+    }
+}
+
+static void TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare_THEN_ALLOCATE_64_MORE_WITH_CUSTOM_mem_api(void)
+{
+    {
+        CLC_DL_define_empty(int, l);
+
+        l.mem_api.pfn_alloc = custom_alloc;
+        l.mem_api.pfn_realloc = custom_realloc;
+        l.mem_api.pfn_free = custom_free;
 
         {
             { for (int i = 0; 10000 != i; ++i)
