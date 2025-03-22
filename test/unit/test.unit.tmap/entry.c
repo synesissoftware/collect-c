@@ -26,9 +26,9 @@
  */
 
 static void TEST_define_empty(void);
-static void TEST_insert_1_ELEMENT(void);
-static void TEST_insert_2_ELEMENTS(void);
-static void TEST_insert_1000_ELEMENTS(void);
+static void TEST_insert_1_ELEMENT_WITH_int_TO_int(void);
+static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void);
+static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -46,9 +46,9 @@ int main(int argc, char* argv[])
     if (XTESTS_START_RUNNER("test.unit.tmap", verbosity))
     {
         XTESTS_RUN_CASE(TEST_define_empty);
-        XTESTS_RUN_CASE(TEST_insert_1_ELEMENT);
-        XTESTS_RUN_CASE(TEST_insert_2_ELEMENTS);
-        XTESTS_RUN_CASE(TEST_insert_1000_ELEMENTS);
+        XTESTS_RUN_CASE(TEST_insert_1_ELEMENT_WITH_int_TO_int);
+        XTESTS_RUN_CASE(TEST_insert_2_ELEMENTS_WITH_int_TO_int);
+        XTESTS_RUN_CASE(TEST_insert_1000_ELEMENTS_WITH_int_TO_int);
 
         XTESTS_PRINT_RESULTS();
 
@@ -199,7 +199,7 @@ static void TEST_define_empty(void)
     }
 }
 
-static void TEST_insert_1_ELEMENT(void)
+static void TEST_insert_1_ELEMENT_WITH_int_TO_int(void)
 {
     {
         CLC_TM_define_empty(int, int, m);
@@ -246,7 +246,7 @@ static void TEST_insert_1_ELEMENT(void)
     }
 }
 
-static void TEST_insert_2_ELEMENTS(void)
+static void TEST_insert_2_ELEMENTS_WITH_int_TO_int(void)
 {
     {
         CLC_TM_define_empty(int, int, m);
@@ -420,7 +420,7 @@ static void TEST_insert_2_ELEMENTS(void)
     }
 }
 
-static void TEST_insert_1000_ELEMENTS(void)
+static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
 {
     {
         CLC_TM_define_empty(int, int, m);
