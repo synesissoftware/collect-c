@@ -4,7 +4,7 @@
  * Purpose: Unit-test for vector.
  *
  * Created: 5th February 2025
- * Updated: 11th February 2025
+ * Updated: 22nd March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -35,6 +35,7 @@ static void TEST_V_define_empty_AND_push_back_UNTIL_FULL_THEN_clear_THEN_push_fr
 static void TEST_V_define_empty_AND_allocate_storage_VERY_LARGE_THEN_push_back_1_ELEMENT_THEN_shrink_to_fit(void);
 static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_back_UNTIL_FULL_THEN_reallocate(void);
 static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL_THEN_reallocate(void);
+static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL_THEN_reallocate_WITH_CUSTOM_mem_api(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -59,6 +60,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_V_define_empty_AND_allocate_storage_VERY_LARGE_THEN_push_back_1_ELEMENT_THEN_shrink_to_fit);
         XTESTS_RUN_CASE(TEST_V_define_empty_THEN_allocate_storage_THEN_push_back_UNTIL_FULL_THEN_reallocate);
         XTESTS_RUN_CASE(TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL_THEN_reallocate);
+        XTESTS_RUN_CASE(TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL_THEN_reallocate_WITH_CUSTOM_mem_api);
 
         XTESTS_PRINT_RESULTS();
 
@@ -126,6 +128,85 @@ accumulate_v3(
 
     return r;
 }
+
+
+void*
+custom_alloc(
+    void*   param
+,   size_t  cb_new
+)
+{
+    ((void)&param);
+
+    {
+        char* actual = malloc(8 + cb_new);
+
+        if (NULL != actual)
+        {
+            actual += 8;
+        }
+
+        return actual;
+    }
+}
+
+void*
+custom_realloc(
+    void*   param
+,   void*   pv_curr
+,   size_t  cb_curr
+,   size_t  cb_new
+)
+{
+    ((void)&param);
+    ((void)&cb_curr);
+
+    {
+        if (NULL == pv_curr)
+        {
+            return custom_alloc(param, cb_new);
+        }
+        else
+        {
+            char* p = pv_curr;
+            char* p2;
+
+            p -= 8;
+
+            p2 = realloc(p, cb_new + 8);
+
+            if (NULL != p2)
+            {
+                p2 += 8;
+            }
+
+            return p2;
+        }
+    }
+}
+
+void
+custom_free(
+    void*   param
+,   void*   pv_curr
+,   size_t  cb_curr
+)
+{
+    ((void)&param);
+    ((void)&cb_curr);
+
+    {
+        if (NULL != pv_curr)
+        {
+            char* p = pv_curr;
+
+            p -= 8;
+
+            free(p);
+        }
+    }
+}
+
 
 static void TEST_V_define_empty(void)
 {
@@ -636,6 +717,163 @@ static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL
 {
     {
         CLC_V_define_empty(int, v);
+
+        int const r = collect_c_vec_allocate_storage(&v, 32);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            TEST_BOOLEAN_TRUE(CLC_V_is_empty(v));
+            TEST_INT_EQ( 0, CLC_V_len(v));
+            TEST_INT_EQ( 8, CLC_V_spare_front(v));
+            TEST_INT_EQ(32, CLC_V_spare_back(v));
+            TEST_INT_EQ(40, CLC_V_spare(v));
+
+            /* add 32 elements, then assert that no reallocation occured */
+            {
+                void* const     start_storage   =   v.storage;
+
+                for (int i = 0; 32 != i; ++i)
+                {
+                    int const r2 = CLC_V_push_front_by_ref(v, &i);
+
+                    TEST_INT_EQ(0, r2);
+
+                    TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                    TEST_INT_EQ(i, *CLC_V_cfront_t(v, int));
+                    TEST_INT_EQ(0, *CLC_V_cback_t(v, int));
+
+                    TEST_INT_NE(-1, accumulate_v2(&v, 0));
+                }
+
+                TEST_INT_EQ(32, CLC_V_len(v));
+                TEST_INT_EQ( 1, CLC_V_spare_front(v));
+                TEST_INT_EQ( 7, CLC_V_spare_back(v));
+                TEST_INT_EQ( 8, CLC_V_spare(v));
+
+                TEST_INT_EQ(496, accumulate_v2(&v, 0));
+                TEST_INT_EQ(496, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+                void* const     curr_storage    =   v.storage;
+
+                TEST_PTR_EQ(start_storage, curr_storage);
+            }
+
+            /* add 1 more element, then assert that reallocation occured */
+            {
+                int const       v32             =   32;
+
+                void* const     start_storage   =   v.storage;
+
+                CLC_V_push_front_by_ref(v, &v32);
+
+                TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                TEST_INT_EQ(v32, *CLC_V_cat_t(v, int, 0));
+
+                TEST_INT_EQ(33, CLC_V_len(v));
+                TEST_INT_EQ( 0, CLC_V_spare_front(v));
+                TEST_INT_EQ( 7, CLC_V_spare_back(v));
+                TEST_INT_EQ( 7, CLC_V_spare(v));
+
+                TEST_INT_EQ(528, accumulate_v2(&v, 0));
+                TEST_INT_EQ(528, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+                void* const     curr_storage    =   v.storage;
+
+#if 0 /* This test might fail if reallocate gives back same (albeit extended) block */
+
+                TEST_PTR_NE(start_storage, curr_storage);
+#else
+
+                ((void)&start_storage);
+                ((void)&curr_storage);
+#endif
+            }
+
+            /* add 7 more elements, then assert that reallocation occured */
+            {
+                void* const     start_storage   =   v.storage;
+
+                for (int i = 0; 7 != i; ++i)
+                {
+                    int const   v3x =   33 + i;
+                    int const   r2  =   CLC_V_push_front_by_ref(v, &v3x);
+
+                    TEST_INT_EQ(0, r2);
+
+                    TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                    TEST_INT_EQ(v3x, *CLC_V_cfront_t(v, int));
+
+                    TEST_INT_EQ((size_t)(33 + (i + 1)), CLC_V_len(v));
+                    TEST_INT_EQ( 0, CLC_V_spare_front(v));
+                    TEST_INT_EQ((size_t)(7 - (i + 1)), CLC_V_spare_back(v));
+                    TEST_INT_EQ((size_t)(7 - (i + 1)), CLC_V_spare(v));
+                }
+
+                TEST_INT_EQ(780, accumulate_v2(&v, 0));
+                TEST_INT_EQ(780, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+                void* const     curr_storage    =   v.storage;
+
+#if 0 /* This test might fail if reallocate gives back same (albeit extended) block */
+
+                TEST_PTR_NE(start_storage, curr_storage);
+#else
+
+                ((void)&start_storage);
+                ((void)&curr_storage);
+#endif
+            }
+
+            /* add 1 more element, then assert that reallocation occured */
+            {
+                int const       v40             =   40;
+
+                void* const     start_storage   =   v.storage;
+
+                CLC_V_push_front_by_ref(v, &v40);
+
+                TEST_BOOLEAN_FALSE(CLC_V_is_empty(v));
+
+                TEST_INT_EQ(v40, *CLC_V_cfront_t(v, int));
+
+                TEST_INT_EQ(41, CLC_V_len(v));
+                TEST_INT_EQ(14, CLC_V_spare_front(v));
+                TEST_INT_NE( 0, CLC_V_spare_back(v));
+                TEST_INT_NE( 0, CLC_V_spare(v));
+
+                TEST_INT_EQ(820, accumulate_v2(&v, 0));
+                TEST_INT_EQ(820, accumulate_v3(COLLECT_C_VEC_cbegin_t(v, int), COLLECT_C_VEC_cend_t(v, int), 0));
+
+                void* const     curr_storage    =   v.storage;
+
+#if 0 /* This test might fail if reallocate gives back same (albeit extended) block */
+
+                TEST_PTR_NE(start_storage, curr_storage);
+#else
+
+                ((void)&start_storage);
+                ((void)&curr_storage);
+#endif
+            }
+
+            collect_c_vec_free_storage(&v);
+        }
+    }
+}
+
+static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL_THEN_reallocate_WITH_CUSTOM_mem_api(void)
+{
+    {
+        CLC_V_define_empty(int, v);
+
+        v.mem_api.pfn_alloc = custom_alloc;
+        v.mem_api.pfn_realloc = custom_realloc;
+        v.mem_api.pfn_free = custom_free;
 
         int const r = collect_c_vec_allocate_storage(&v, 32);
 

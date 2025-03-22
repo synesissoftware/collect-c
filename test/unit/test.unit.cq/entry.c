@@ -4,7 +4,7 @@
  * Purpose: Unit-test for circular queue.
  *
  * Created: 5th February 2025
- * Updated: 10th February 2025
+ * Updated: 22nd March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -45,6 +45,7 @@ static void TEST_STACK_AND_collect_c_cq_push_back_n_by_ref_WITH_OVERWRITE(void);
 static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void);
 static void TEST_HEAP_AND_CALLBACK_INDEXES_1(void);
 static void TEST_HEAP_AND_CALLBACK_INDEXES_2(void);
+static void TEST_HEAP_AND_CALLBACK_INDEXES_2_WITH_CUSTOM_mem_api(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -79,6 +80,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP);
         XTESTS_RUN_CASE(TEST_HEAP_AND_CALLBACK_INDEXES_1);
         XTESTS_RUN_CASE(TEST_HEAP_AND_CALLBACK_INDEXES_2);
+        XTESTS_RUN_CASE(TEST_HEAP_AND_CALLBACK_INDEXES_2_WITH_CUSTOM_mem_api);
 
         XTESTS_PRINT_RESULTS();
 
@@ -100,6 +102,84 @@ struct custom_t
     uint64_t    z;
 };
 typedef struct custom_t custom_t;
+
+
+void*
+custom_alloc(
+    void*   param
+,   size_t  cb_new
+)
+{
+    ((void)&param);
+
+    {
+        char* actual = malloc(8 + cb_new);
+
+        if (NULL != actual)
+        {
+            actual += 8;
+        }
+
+        return actual;
+    }
+}
+
+void*
+custom_realloc(
+    void*   param
+,   void*   pv_curr
+,   size_t  cb_curr
+,   size_t  cb_new
+)
+{
+    ((void)&param);
+    ((void)&cb_curr);
+
+    {
+        if (NULL == pv_curr)
+        {
+            return custom_alloc(param, cb_new);
+        }
+        else
+        {
+            char* p = pv_curr;
+            char* p2;
+
+            p -= 8;
+
+            p2 = realloc(p, cb_new + 8);
+
+            if (NULL != p2)
+            {
+                p2 += 8;
+            }
+
+            return p2;
+        }
+    }
+}
+
+void
+custom_free(
+    void*   param
+,   void*   pv_curr
+,   size_t  cb_curr
+)
+{
+    ((void)&param);
+    ((void)&cb_curr);
+
+    {
+        if (NULL != pv_curr)
+        {
+            char* p = pv_curr;
+
+            p -= 8;
+
+            free(p);
+        }
+    }
+}
 
 
 static void fn_element_free_accumulate_on_free(
@@ -1717,6 +1797,152 @@ static void TEST_HEAP_AND_CALLBACK_INDEXES_2(void)
     /* pop_back(): run straight through allocated spaces, pop front, push back one more, and then deallocate */
     {
         CLC_CQ_define_empty(int, q, 8);
+
+        int const r = clc_cq_allocate_storage(&q);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            int const   values[8] = { 1, 2, 3, 4, 5, 6, 7, 8, };
+            int         checks[1];
+
+
+            /* load values */
+            {
+                {
+                    size_t      num_inserted;
+                    int const   r1 = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(values), values, &num_inserted);
+
+                    TEST_INT_EQ(0, r1);
+                    TEST_INT_EQ(8, CLC_CQ_len(q));
+                }
+
+                {
+                    int const r2 = CLC_CQ_pop_front(q);
+
+                    TEST_INT_EQ(0, r2);
+                }
+
+                {
+                    int const r3 = CLC_CQ_push_back_by_value(q, int, 9);
+
+                    TEST_INT_EQ(0, r3);
+                }
+            }
+
+
+            /* pop_back() */
+            {
+                q.pfn_element_free      =   fn_element_free_store_in_array;
+                q.param_element_free    =   &checks[0];
+
+                CLC_CQ_pop_back(q);
+
+                q.pfn_element_free      =   NULL;
+                q.param_element_free    =   NULL;
+            }
+
+
+            /* check cleared values that were recorded */
+
+            { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(checks) != i; ++i)
+            {
+                TEST_INT_EQ(9, checks[i]);
+            }}
+
+
+            clc_cq_free_storage(&q);
+        }
+    }
+}
+
+static void TEST_HEAP_AND_CALLBACK_INDEXES_2_WITH_CUSTOM_mem_api(void)
+{
+    /* pop_front(): run straight through allocated spaces, pop front, push back one more, and then deallocate */
+    {
+        CLC_CQ_define_empty(int, q, 8);
+
+        q.mem_api.pfn_alloc = custom_alloc;
+        q.mem_api.pfn_realloc = custom_realloc;
+        q.mem_api.pfn_free = custom_free;
+
+        int const r = clc_cq_allocate_storage(&q);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            int const   values[8] = { 1, 2, 3, 4, 5, 6, 7, 8, };
+            int         checks[1];
+
+
+            /* load values */
+            {
+                {
+                    size_t      num_inserted;
+                    int const   r1 = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(values), values, &num_inserted);
+
+                    TEST_INT_EQ(0, r1);
+
+                    TEST_INT_EQ(8, CLC_CQ_len(q));
+                    TEST_INT_EQ(1, *CLC_CQ_cat_t(q, int, 0));
+                    TEST_INT_EQ(8, *CLC_CQ_cat_t(q, int, 7));
+                }
+
+                {
+                    int const r2 = CLC_CQ_pop_front(q);
+
+                    TEST_INT_EQ(0, r2);
+
+                    TEST_INT_EQ(7, CLC_CQ_len(q));
+                    TEST_INT_EQ(2, *CLC_CQ_cat_t(q, int, 0));
+                    TEST_INT_EQ(8, *CLC_CQ_cat_t(q, int, 6));
+                }
+
+                {
+                    int const r3 = CLC_CQ_push_back_by_value(q, int, 9);
+
+                    TEST_INT_EQ(0, r3);
+
+                    TEST_INT_EQ(8, CLC_CQ_len(q));
+                    TEST_INT_EQ(2, *CLC_CQ_cat_t(q, int, 0));
+                    TEST_INT_EQ(9, *CLC_CQ_cat_t(q, int, 7));
+                }
+            }
+
+
+            /* pop_front() */
+            {
+                q.pfn_element_free      =   fn_element_free_store_in_array;
+                q.param_element_free    =   &checks[0];
+
+                CLC_CQ_pop_front(q);
+
+                q.pfn_element_free      =   NULL;
+                q.param_element_free    =   NULL;
+            }
+
+
+            /* check cleared values that were recorded */
+
+            { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(checks) != i; ++i)
+            {
+                TEST_INT_EQ(2, checks[i]);
+            }}
+
+
+            clc_cq_free_storage(&q);
+        }
+    }
+
+    /* pop_back(): run straight through allocated spaces, pop front, push back one more, and then deallocate */
+    {
+        CLC_CQ_define_empty(int, q, 8);
+
+        q.mem_api.pfn_alloc = custom_alloc;
+        q.mem_api.pfn_realloc = custom_realloc;
+        q.mem_api.pfn_free = custom_free;
 
         int const r = clc_cq_allocate_storage(&q);
 
