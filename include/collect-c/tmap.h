@@ -141,6 +141,18 @@ typedef int (*collect_c_tmap_pfn_entry_walk)(
 ,   void*       param_walk
 );
 
+/** Prototype for callback function for entries.
+ *
+ */
+typedef int (*collect_c_tmap_pfn_node_walk)(
+    size_t                          key_size
+,   size_t                          val_size
+,   intptr_t                        el_index    /* always -1 */
+,   size_t                          depth
+,   collect_c_tmap_node_t const*    node
+,   void*                           param_walk
+);
+
 enum collect_c_tmap_walkdir_t
 {
     COLLECT_C_TMAP_WALK_DEFAULT     =   0
@@ -295,6 +307,14 @@ int
 collect_c_tmap_entry_walk(
     collect_c_tmap_t*               m
 ,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   collect_c_tmap_walkdir_t        direction
+);
+
+int
+collect_c_tmap_node_walk(
+    collect_c_tmap_t*               m
+,   collect_c_tmap_pfn_node_walk    pfn_walk
 ,   void*                           param_walk
 ,   collect_c_tmap_walkdir_t        direction
 );
