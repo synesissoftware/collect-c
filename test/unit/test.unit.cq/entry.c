@@ -4,7 +4,7 @@
  * Purpose: Unit-test for circular queue.
  *
  * Created: 5th February 2025
- * Updated: 22nd March 2025
+ * Updated: 7th June 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -31,6 +31,7 @@ static void TEST_define_empty_AND_allocate(void);
 
 static void TEST_define_on_stack(void);
 static void TEST_define_on_stack_with_cb(void);
+static void TEST_define_on_stack_with_cb_AND_F_OVERWRITE_FRONT_WHEN_FULL(void);
 
 static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref(void);
 static void TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value(void);
@@ -66,6 +67,7 @@ int main(int argc, char* argv[])
 
         XTESTS_RUN_CASE(TEST_define_on_stack);
         XTESTS_RUN_CASE(TEST_define_on_stack_with_cb);
+        XTESTS_RUN_CASE(TEST_define_on_stack_with_cb_AND_F_OVERWRITE_FRONT_WHEN_FULL);
 
         XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref);
         XTESTS_RUN_CASE(TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value);
@@ -314,6 +316,272 @@ static void TEST_define_on_stack_with_cb(void)
 
         TEST_POINTER_EQUAL(&array[0], q.param_element_free);
         TEST_FUNCTION_POINTER_EQUAL(fn_element_free_stub, q.pfn_element_free);
+    }
+}
+
+static void TEST_define_on_stack_with_cb_AND_F_OVERWRITE_FRONT_WHEN_FULL(void)
+{
+    /* NOTE: the meat of this test is only really exercised by changing the type of `b` and `e` to `uint16_t` */
+
+    {
+        int array[8];
+
+        CLC_CQ_define_on_stack_with_cb(q, array, fn_element_free_stub, &array[0]);
+
+        q.flags |= CLC_CQ_F_OVERWRITE_FRONT_WHEN_FULL;
+
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(8, CLC_CQ_spare(q));
+
+        TEST_POINTER_EQUAL(&array[0], q.param_element_free);
+        TEST_FUNCTION_POINTER_EQUAL(fn_element_free_stub, q.pfn_element_free);
+
+        for (int i = 0; i != 88888; ++i)
+        {
+            int const r = CLC_CQ_push_back_by_value(q, int, i);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+
+            if (i < 8)
+            {
+                TEST_INT_EQ((size_t)i + 1, CLC_CQ_len(q));
+            }
+            else
+            {
+                TEST_INT_EQ(8, CLC_CQ_len(q));
+            }
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88880, *CLC_CQ_cat_t(q, int, 0));
+            TEST_INT_EQ(88881, *CLC_CQ_cat_t(q, int, 1));
+            TEST_INT_EQ(88882, *CLC_CQ_cat_t(q, int, 2));
+            TEST_INT_EQ(88883, *CLC_CQ_cat_t(q, int, 3));
+            TEST_INT_EQ(88884, *CLC_CQ_cat_t(q, int, 4));
+            TEST_INT_EQ(88885, *CLC_CQ_cat_t(q, int, 5));
+            TEST_INT_EQ(88886, *CLC_CQ_cat_t(q, int, 6));
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 7));
+        }
+
+        {
+            for (int i = 0; i != 7; ++i)
+            {
+                CLC_CQ_pop_front(q);
+            }
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(1, CLC_CQ_len(q));
+            TEST_INT_EQ(7, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 0));
+        }
+
+        {
+            int elements[7] =
+            {
+                99990,
+                99991,
+                99992,
+                99993,
+                99994,
+                99995,
+                99996,
+            };
+            size_t      num_inserted;
+            int const   r = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(elements), elements, &num_inserted);
+
+            TEST_INT_EQ(0, r);
+            TEST_INT_EQ(7, num_inserted);
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 0));
+            TEST_INT_EQ(99990, *CLC_CQ_cat_t(q, int, 1));
+            TEST_INT_EQ(99991, *CLC_CQ_cat_t(q, int, 2));
+            TEST_INT_EQ(99992, *CLC_CQ_cat_t(q, int, 3));
+            TEST_INT_EQ(99993, *CLC_CQ_cat_t(q, int, 4));
+            TEST_INT_EQ(99994, *CLC_CQ_cat_t(q, int, 5));
+            TEST_INT_EQ(99995, *CLC_CQ_cat_t(q, int, 6));
+            TEST_INT_EQ(99996, *CLC_CQ_cat_t(q, int, 7));
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        {
+            CLC_CQ_pop_front(q);
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(7, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        {
+            ;
+        }
+
+        CLC_CQ_clear(q);
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(0, CLC_CQ_len(q));
+            TEST_INT_EQ(8, CLC_CQ_spare(q));
+        }
+    }
+
+    {
+        int array[8];
+
+        CLC_CQ_define_on_stack_with_cb(q, array, fn_element_free_stub, &array[0]);
+
+        q.flags |= CLC_CQ_F_OVERWRITE_FRONT_WHEN_FULL;
+
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(8, CLC_CQ_spare(q));
+
+        TEST_POINTER_EQUAL(&array[0], q.param_element_free);
+        TEST_FUNCTION_POINTER_EQUAL(fn_element_free_stub, q.pfn_element_free);
+
+        for (int i = 0; i != 11111; ++i)
+        {
+            int elements[8] =
+            {
+                i * 8 + 0,
+                i * 8 + 1,
+                i * 8 + 2,
+                i * 8 + 3,
+                i * 8 + 4,
+                i * 8 + 5,
+                i * 8 + 6,
+                i * 8 + 7,
+            };
+            size_t      num_inserted;
+            int const   r = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(elements), elements, &num_inserted);
+
+            TEST_INT_EQ(0, r);
+            TEST_INT_EQ(8, num_inserted);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88880, *CLC_CQ_cat_t(q, int, 0));
+            TEST_INT_EQ(88881, *CLC_CQ_cat_t(q, int, 1));
+            TEST_INT_EQ(88882, *CLC_CQ_cat_t(q, int, 2));
+            TEST_INT_EQ(88883, *CLC_CQ_cat_t(q, int, 3));
+            TEST_INT_EQ(88884, *CLC_CQ_cat_t(q, int, 4));
+            TEST_INT_EQ(88885, *CLC_CQ_cat_t(q, int, 5));
+            TEST_INT_EQ(88886, *CLC_CQ_cat_t(q, int, 6));
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 7));
+        }
+
+        {
+            for (int i = 0; i != 7; ++i)
+            {
+                CLC_CQ_pop_front(q);
+            }
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(1, CLC_CQ_len(q));
+            TEST_INT_EQ(7, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 0));
+        }
+
+        {
+            int elements[7] =
+            {
+                99990,
+                99991,
+                99992,
+                99993,
+                99994,
+                99995,
+                99996,
+            };
+            size_t      num_inserted;
+            int const   r = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(elements), elements, &num_inserted);
+
+            TEST_INT_EQ(0, r);
+            TEST_INT_EQ(7, num_inserted);
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 0));
+            TEST_INT_EQ(99990, *CLC_CQ_cat_t(q, int, 1));
+            TEST_INT_EQ(99991, *CLC_CQ_cat_t(q, int, 2));
+            TEST_INT_EQ(99992, *CLC_CQ_cat_t(q, int, 3));
+            TEST_INT_EQ(99993, *CLC_CQ_cat_t(q, int, 4));
+            TEST_INT_EQ(99994, *CLC_CQ_cat_t(q, int, 5));
+            TEST_INT_EQ(99995, *CLC_CQ_cat_t(q, int, 6));
+            TEST_INT_EQ(99996, *CLC_CQ_cat_t(q, int, 7));
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        {
+            CLC_CQ_pop_front(q);
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(7, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        CLC_CQ_clear(q);
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(0, CLC_CQ_len(q));
+            TEST_INT_EQ(8, CLC_CQ_spare(q));
+        }
     }
 }
 

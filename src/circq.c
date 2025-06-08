@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 22nd March 2025
+ * Updated: 8th June 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -14,6 +14,8 @@
  */
 
 #include <collect-c/circq.h>
+
+#include <collect-c/util/limits.h>
 
 #include <errno.h>
 #include <assert.h>
@@ -139,6 +141,13 @@ collect_c_cq_push_back_by_ref(
 
             ++q->e;
 
+            if (COLLECT_C_LIMITS_maximum(&q->e) == q->e)
+            {
+                q->b %= q->capacity;
+                q->e %= q->capacity;
+                q->e += q->capacity;
+            }
+
             return 0;
         }
     }
@@ -197,6 +206,13 @@ collect_c_cq_push_back_n_by_ref(
                 memcpy(pe_dst, pe_src, q->el_size);
 
                 ++q->e;
+
+                if (COLLECT_C_LIMITS_maximum(&q->e) == q->e)
+                {
+                    q->b %= q->capacity;
+                    q->e %= q->capacity;
+                    q->e += q->capacity;
+                }
 
                 *num_inserted += 1;
             }
