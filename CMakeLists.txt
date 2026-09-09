@@ -5,7 +5,7 @@
 # Purpose:  Top-level CMake lists file for collect-c
 #
 # Created:  4th February 2025
-# Updated:  11th February 2025
+# Updated:  10th September 2026
 #
 # ######################################################################## #
 
@@ -203,6 +203,36 @@ include(GNUInstallDirs)
 # targets
 
 # ################################################
+# custom definitions
+
+if(UNIX)
+
+	set(_BUILD_AS_UNIX 1)
+
+	message("-- Operating system Unix")
+else(UNIX)
+
+	if(WIN32)
+
+			if(USE_UNIXEM)
+
+					set(_BUILD_AS_UNIX 1)
+
+					message("-- Operating system Unix (synthesised on Windows)")
+			else(USE_UNIXEM)
+
+					set(_BUILD_AS_WIN32 1)
+
+					message("-- Operating system Windows")
+			endif(USE_UNIXEM)
+	else(WIN32)
+
+			message("-- Operating system unknown")
+	endif(WIN32)
+endif(UNIX)
+
+
+# ################################################
 # main library
 
 add_subdirectory(src)
@@ -278,7 +308,7 @@ install( FILES
 # ##########################################################
 # completion
 
-message(NOTICE "Generating CMake build scripts for ${PROJECT_NAME} ${PROJECT_VERSION}, for C${CMAKE_C_STANDARD} C++${CMAKE_CXX_STANDARD}")
+message(NOTICE "Generating CMake build scripts for ${PROJECT_NAME} ${PROJECT_VERSION}, for C${CMAKE_C_STANDARD} C++${CMAKE_CXX_STANDARD}, with build type ${CMAKE_BUILD_TYPE}")
 
 
 # ############################## end of file ############################# #
