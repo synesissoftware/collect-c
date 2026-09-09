@@ -55,24 +55,53 @@ set(PROJECT_VERSION_MINOR ${_VERSION_MINOR})
 set(PROJECT_VERSION_PATCH ${_VERSION_PATCH})
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-
 # adhere strictly to C and C++ standards plus extensions. These are actually
 # useless since we do not compile anything; they merely state our intention.
-set(CMAKE_C_STANDARD 17)
+if(NOT DEFINED CMAKE_C_STANDARD)
+
+	if(MSVC AND MSVC_VERSION LESS 1930)
+
+		set(CMAKE_C_STANDARD 90)
+	else()
+
+		set(CMAKE_C_STANDARD 17)
+	endif()
+endif()
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON) # GNU extensions and POSIX standard
-set(CMAKE_CXX_STANDARD 20)
+
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+
+	if(MSVC AND MSVC_VERSION LESS 1930)
+
+		set(CMAKE_CXX_STANDARD 98)
+	else()
+
+		set(CMAKE_CXX_STANDARD 20)
+	endif()
+endif()
+
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-
 if(MSVC)
 
-	if(MSVC_VERSION LESS 1930)
+	if(MSVC_VERSION LESS 1800)
 
-		set(CMAKE_C_STANDARD 90)
-		set(CMAKE_CXX_STANDARD 98)
+		add_compile_options("/wd4996")
 	endif()
+
+	if(MSVC_USE_MT)
+
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	endif(MSVC_USE_MT)
+else(MSVC)
+
+	if(MSVC_USE_MT)
+
+		# this here just to absorb warning about not using `MSVC_USE_MT` (to
+		# enable **prepare_cmake.sh** to be simple)
+	endif(MSVC_USE_MT)
 endif(MSVC)
 
 
@@ -88,23 +117,64 @@ include(TargetMacros)
 
 
 # ################################################
-# dependencies and options
+# dependencies, features, and options
+
+# ######################################
+# options
 
 option(BUILD_EXAMPLES "Build examples" ON)
+
+option(BUILD_TESTING "Build tests" ON)
+
+
+# ######################################
+# features
 
 
 # ######################################
 # dependencies
 #
-# required:
-# - cstring - required for testing;
-# - Diagnosticism - required for testing;
-# - STLSoft - required for testing;
-# - xTests - required for testing;
+# | Library          | API | Impl. | Testing  |
+# | ---------------- | --- | ----- | -------- |
+# | STLSoft          |  -  |   -   |    Y     |
+# | cstring          |  -  |   -   |    Y     |
+# | Diagnosticism    |  -  |   -   |    Y     |
+# | shwild           |  -  |   -   | Optional |
+# | xTests           |  -  |   -   |    Y     |
 #
-# optional:
-# - shwild - required for testing;
-#
+
+
+# ############################
+# STLSoft
+
+if(BUILD_TESTING)
+
+	if(NOT DEFINED STLSOFT AND NOT DEFINED ENV{STLSOFT})
+
+		set(STLSoft_REQUIRED_VERSION_ 1.11)
+
+		find_package(STLSoft ${STLSoft_REQUIRED_VERSION_} REQUIRED)
+
+		message("-- CMake package STLSoft found (version ${STLSoft_VERSION}; ${STLSoft_REQUIRED_VERSION_} requested)")
+	else()
+
+		if(DEFINED STLSOFT)
+
+			message("-- STLSOFT provided as CMake variable with value '${STLSOFT}'")
+
+			set(STLSOFT_INCLUDE_DIR ${STLSOFT}/include)
+		else()
+
+			message("-- STLSOFT provided as environment variable with value '$ENV{STLSOFT}'")
+
+			set(STLSOFT_INCLUDE_DIR $ENV{STLSOFT}/include)
+		endif()
+
+		get_filename_component(STLSOFT_INCLUDE_DIR "${STLSOFT_INCLUDE_DIR}" ABSOLUTE)
+
+		include_directories(${STLSOFT_INCLUDE_DIR})
+	endif()
+endif(BUILD_TESTING)
 
 
 # ############################
@@ -134,45 +204,22 @@ endif(BUILD_TESTING)
 
 
 # ############################
-# STLSoft
-
-if(BUILD_TESTING)
-
-	if(DEFINED STLSOFT)
-
-		message("-- STLSOFT provided as CMake variable with value '${STLSOFT}'")
-
-		set(STLSOFT_INCLUDE_DIR ${STLSOFT}/include)
-	elseif(DEFINED ENV{STLSOFT})
-
-		message("-- STLSOFT provided as environment variable with value '$ENV{STLSOFT}'")
-
-		set(STLSOFT_INCLUDE_DIR $ENV{STLSOFT}/include)
-	else()
-
-		set(STLSoft_REQUIRED_VERSION_ 1.11)
-
-		find_package(STLSoft ${STLSoft_REQUIRED_VERSION_} REQUIRED)
-
-		message("-- CMake package STLSoft found (version ${STLSoft_VERSION}; ${STLSoft_REQUIRED_VERSION_} requested)")
-	endif()
-
-	if(DEFINED STLSOFT_INCLUDE_DIR)
-
-		include_directories(${STLSOFT_INCLUDE_DIR})
-	endif()
-endif(BUILD_TESTING)
-
-
-# ############################
 # shwild
 
-if(BUILD_TESTING)
+if(NOT (NO_SHWILD))
 
-	find_package(shwild QUIET)
+	if(BUILD_TESTING)
 
-	message("-- CMake package shwild found (version ${shwild_VERSION})")
-endif(BUILD_TESTING)
+		find_package(shwild QUIET)
+
+		if(shwild_FOUND)
+
+			message("-- CMake package shwild found (version ${shwild_VERSION})")
+
+			add_compile_definitions(XTESTS_HAS_SHWILD)
+		endif(shwild_FOUND)
+	endif(BUILD_TESTING)
+endif()
 
 
 # ############################
@@ -278,7 +325,7 @@ set(EXPORT_NAME ${PROJECT_NAME_LOWER})
 configure_package_config_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/cmake/${EXPORT_NAME}-config.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/cmake/${EXPORT_NAME}-config.cmake
-	INSTALL_DESTINATION ${LIB_INSTALL_DIR}/${EXPORT_NAME}/cmake
+	INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/${EXPORT_NAME}/cmake
 )
 
 write_basic_package_version_file(
