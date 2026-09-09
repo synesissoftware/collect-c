@@ -4,6 +4,8 @@ ScriptPath=$0
 Dir=$(cd $(dirname "$ScriptPath"); pwd)
 Basename=$(basename "$ScriptPath")
 CMakeDir=${SIS_CMAKE_BUILD_DIR:-$Dir/_build}
+ProjectNameFile="$Dir/.sis/project_name.txt"
+ProjectName=$(tr -d '[:space:]' < "$ProjectNameFile")
 
 Directories=(
   CMakeFiles
@@ -22,6 +24,24 @@ Files=(
   cmake_install.cmake
   install_manifest.txt
 )
+
+
+# ##########################################################
+# colours
+
+if [ -n "${TERM:-}" ] && [ -t 1 ] && command -v tput >/dev/null 2>&1; then
+
+  RbEnvClr_Blue=${FG_BLUE:-$(tput setaf 4)}
+  RbEnvClr_Red=${FG_BLUE:-$(tput setaf 1)}
+  RbEnvClr_Bold=${FD_BOLD:-$(tput bold)}
+  RbEnvClr_None=${FD_NONE:-$(tput sgr0)}
+else
+
+  RbEnvClr_Blue=
+  RbEnvClr_Red=
+  RbEnvClr_Bold=
+  RbEnvClr_None=
+fi
 
 
 # ##########################################################
@@ -98,7 +118,7 @@ if [ ! -d "$CMakeDir" ]; then
   exit 0
 else
 
-  echo "Removing all cmake artefacts in '$CMakeDir'"
+  echo "Removing all ${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None} cmake artefacts in '$CMakeDir'"
 
   num_dirs_removed=0
   num_files_removed=0

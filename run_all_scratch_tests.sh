@@ -13,6 +13,24 @@ Verbosity=${XTESTS_VERBOSITY:-${TEST_VERBOSITY:-3}}
 
 
 # ##########################################################
+# colours
+
+if [ -n "${TERM:-}" ] && [ -t 1 ] && command -v tput >/dev/null 2>&1; then
+
+  RbEnvClr_Blue=${FG_BLUE:-$(tput setaf 4)}
+  RbEnvClr_Red=${FG_BLUE:-$(tput setaf 1)}
+  RbEnvClr_Bold=${FD_BOLD:-$(tput bold)}
+  RbEnvClr_None=${FD_NONE:-$(tput sgr0)}
+else
+
+  RbEnvClr_Blue=
+  RbEnvClr_Red=
+  RbEnvClr_Bold=
+  RbEnvClr_None=
+fi
+
+
+# ##########################################################
 # command-line handling
 
 while [[ $# -gt 0 ]]; do
@@ -119,7 +137,7 @@ if [ $status -eq 0 ]; then
 
     if [ $ListOnly -ne 0 ]; then
 
-      echo "would execute $f:"
+      echo "would execute ${RbEnvClr_Blue}${RbEnvClr_Bold}${f}${RbEnvClr_None}:"
 
       continue
     fi
@@ -130,7 +148,7 @@ if [ $status -eq 0 ]; then
     fi
     if [ $Verbosity -ge 2 ]; then
 
-      echo "executing $f:"
+      echo "executing ${RbEnvClr_Blue}${RbEnvClr_Bold}${f}${RbEnvClr_None}:"
     fi
 
     # NOTE: we do not break on fail, because, this being a unit-testing library, some tests actually fail intentionally

@@ -12,6 +12,8 @@ else
   DefaultMakeCmd=make
 fi
 MakeCmd=${SIS_CMAKE_MAKE_COMMAND:-${SIS_CMAKE_COMMAND:-$DefaultMakeCmd}}
+ProjectNameFile="$Dir/.sis/project_name.txt"
+ProjectName=$(tr -d '[:space:]' < "$ProjectNameFile")
 
 Configuration=Release
 ExamplesDisabled=0
@@ -21,6 +23,24 @@ RunMake=0
 STLSoftDirGiven=
 TestingDisabled=0
 VerboseMakefile=0
+
+
+# ##########################################################
+# colours
+
+if [ -n "${TERM:-}" ] && [ -t 1 ] && command -v tput >/dev/null 2>&1; then
+
+  RbEnvClr_Blue=${FG_BLUE:-$(tput setaf 4)}
+  RbEnvClr_Red=${FG_BLUE:-$(tput setaf 1)}
+  RbEnvClr_Bold=${FD_BOLD:-$(tput bold)}
+  RbEnvClr_None=${FD_NONE:-$(tput sgr0)}
+else
+
+  RbEnvClr_Blue=
+  RbEnvClr_Red=
+  RbEnvClr_Bold=
+  RbEnvClr_None=
+fi
 
 
 # ##########################################################
@@ -140,7 +160,7 @@ mkdir -p $CMakeDir || exit 1
 
 cd $CMakeDir
 
-echo "Executing CMake (in ${CMakeDir})"
+echo "Executing CMake for ${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None} (in ${RbEnvClr_Blue}${RbEnvClr_Bold}${CMakeDir}${RbEnvClr_None})"
 
 if [ $ExamplesDisabled -eq 0 ]; then CMakeBuildExamplesFlag="ON" ; else CMakeBuildExamplesFlag="OFF" ; fi
 if [ $MSVC_MT -eq 0 ]; then CMakeMsvcMtFlag="OFF" ; else CMakeMsvcMtFlag="ON" ; fi
@@ -177,7 +197,8 @@ status=0
 
 if [ $RunMake -ne 0 ]; then
 
-  echo "Executing build (via command \`$MakeCmd\`)"
+  echo
+  echo "Executing build for ${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None} (via command \`${RbEnvClr_Blue}${RbEnvClr_Bold}${MakeCmd}${RbEnvClr_None}\`)"
 
   $MakeCmd
   status=$?
