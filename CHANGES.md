@@ -3,7 +3,7 @@
 
 ## 0.1.0-alpha2 - 10th September 2026
 
-* Added modular GitHub Actions CI (**ci.yml** + **ci-cell.yml**) covering Linux/macOS/Windows with Clang, GCC, VC++, and MinGW, plus install-smoke;
+* Added modular GitHub Actions CI (**ci.yml** + **ci-cell.yml**) covering Linux/macOS/Windows with Clang, GCC, VC++, and MinGW, plus install-smoke (consumer sets `CMAKE_C_STANDARD` 17 for MSVC `__STDC_VERSION__`);
 * Added **install-sis-deps** composite action for test dependency installation;
 * Added/filled customary markdown: **AUTHORS.md**, **CHANGES.md**, **FAQ.md**, **INSTALL.md**, **NEWS.md**, **README.md**;
 * CMake helper scripts: coloured status output and related chore improvements;

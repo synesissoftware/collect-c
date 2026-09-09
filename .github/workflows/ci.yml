@@ -183,6 +183,10 @@ jobs:
           cat > "$CONSUMER/CMakeLists.txt" <<'EOF'
           cmake_minimum_required(VERSION 3.20)
           project(collect_c_install_smoke C)
+          # collect-c headers require C99+ (__STDC_VERSION__); MSVC only
+          # defines that when /std:c11|c17 is selected via CMAKE_C_STANDARD.
+          set(CMAKE_C_STANDARD 17)
+          set(CMAKE_C_STANDARD_REQUIRED ON)
           find_package(collect-c REQUIRED)
           add_executable(consumer consumer.c)
           target_link_libraries(consumer PRIVATE collect-c::core)
