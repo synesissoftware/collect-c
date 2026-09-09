@@ -1,4 +1,4 @@
-# collect-c - README <!-- omit in toc -->
+# collect-c <!-- omit in toc -->
 
 Special and custom Collections and Containers, for C
 

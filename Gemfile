@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-gem 'libclimate-ruby'
-gem 'recls-ruby'
-gem 'xqsr3'
+gem "libclimate-ruby"
+gem "recls-ruby"
+gem "xqsr3", [ '>= 0.39.5', '< 1.0' ]
 
