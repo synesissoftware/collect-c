@@ -36,8 +36,10 @@ include(BuildType)
 
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+
     set(DEFAULT_BUILD_TYPE "Debug")
 else()
+
     set(DEFAULT_BUILD_TYPE "Release")
 endif()
 
