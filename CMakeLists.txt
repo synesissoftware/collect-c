@@ -30,7 +30,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 # project
 
 project(collect-c
-	DESCRIPTION "Special and custom Collections and Containers (for C++)"
+	DESCRIPTION "Special and custom Collections and Containers (for C)"
 	HOMEPAGE_URL "https://github.com/synesissoftware/collect-c"
 	LANGUAGES C CXX
 )
@@ -134,20 +134,20 @@ option(BUILD_TESTING "Build tests" ON)
 # ######################################
 # dependencies
 #
-# | Library          | API | Impl. | Testing  |
-# | ---------------- | --- | ----- | -------- |
-# | STLSoft          |  -  |   -   |    Y     |
-# | cstring          |  -  |   -   |    Y     |
-# | Diagnosticism    |  -  |   -   |    Y     |
-# | shwild           |  -  |   -   | Optional |
-# | xTests           |  -  |   -   |    Y     |
+# | Library          | API | Impl. | Testing  | Examples |
+# | ---------------- | --- | ----- | -------- | -------- |
+# | STLSoft          |  -  |   -   |    Y     |    Y     |
+# | cstring          |  -  |   -   |    Y     |    Y     |
+# | Diagnosticism    |  -  |   -   |    Y     |    Y     |
+# | shwild           |  -  |   -   | Optional |    -     |
+# | xTests           |  -  |   -   |    Y     |    -     |
 #
 
 
 # ############################
 # STLSoft
 
-if(BUILD_TESTING)
+if(BUILD_EXAMPLES OR BUILD_TESTING)
 
 	if(NOT DEFINED STLSOFT AND NOT DEFINED ENV{STLSOFT})
 
@@ -174,33 +174,33 @@ if(BUILD_TESTING)
 
 		include_directories(${STLSOFT_INCLUDE_DIR})
 	endif()
-endif(BUILD_TESTING)
+endif()
 
 
 # ############################
 # cstring
 
-if(BUILD_TESTING)
+if(BUILD_EXAMPLES OR BUILD_TESTING)
 
 	set(cstring_REQUIRED_VERSION_ 0.0)
 
 	find_package(cstring ${cstring_REQUIRED_VERSION_} REQUIRED)
 
 	message("-- CMake package cstring found (version ${cstring_VERSION}; ${cstring_REQUIRED_VERSION_} requested)")
-endif(BUILD_TESTING)
+endif()
 
 
 # ############################
 # Diagnosticism
 
-if(BUILD_TESTING)
+if(BUILD_EXAMPLES OR BUILD_TESTING)
 
 	set(Diagnosticism_REQUIRED_VERSION_ 0.0)
 
 	find_package(Diagnosticism ${Diagnosticism_REQUIRED_VERSION_} REQUIRED)
 
 	message("-- CMake package Diagnosticism found (version ${Diagnosticism_VERSION}; ${Diagnosticism_REQUIRED_VERSION_} requested)")
-endif(BUILD_TESTING)
+endif()
 
 
 # ############################

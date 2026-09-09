@@ -20,7 +20,9 @@
 
 ## Packaging improvements
 
-* \<none>
+* [ ] Example programs under **examples/** (and **EXAMPLES.md**);
+* [x] ~~~Modular GitHub Actions CI (**ci.yml** / **ci-cell.yml**)~~~ - ✅;
+* [x] ~~~Customary markdown (**AUTHORS**, **CHANGES**, **FAQ**, **INSTALL**, **NEWS**, **README**)~~~ - ✅;
 
 
 <!-- ########################### end of file ########################### -->
