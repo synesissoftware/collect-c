@@ -21,19 +21,19 @@ VerboseMakefile=0
 while [[ $# -gt 0 ]]; do
 
   case $1 in
-    -v|--cmake-verbose-makefile)
+    --cmake-verbose-makefile|-v)
 
       VerboseMakefile=1
       ;;
-    -d|--debug-configuration)
+    --debug-configuration|-d)
 
       Configuration=Debug
       ;;
-    -E|--disable-examples)
+    --disable-examples|-E)
 
       ExamplesDisabled=1
       ;;
-    -T|--disable-testing)
+    --disable-testing|-T)
 
       TestingDisabled=1
       ;;
@@ -41,20 +41,23 @@ while [[ $# -gt 0 ]]; do
 
       MinGW=1
       ;;
-    -m|--run-make)
+    --msvc-mt)
+
+      MSVC_MT=1
+      ;;
+    --run-make|-m)
 
       RunMake=1
       ;;
-    -s|--stlsoft-root-dir)
+    --stlsoft-root-dir|-s)
 
       shift
       STLSoftDirGiven=$1
       ;;
     --help)
 
+      [ -f "$Dir/.sis/script_info_lines.txt" ] && cat "$Dir/.sis/script_info_lines.txt"
       cat << EOF
-collect-c Special and custom Collections and Containers (for C)
-Copyright (c) 2025, Matthew Wilson and Synesis Information Systems
 Creates/reinitialises the CMake build script(s)
 
 $ScriptPath [ ... flags/options ... ]
@@ -79,10 +82,16 @@ Flags/options:
 
     -T
     --disable-testing
-        disables building of tests (by setting BUILD_TESTING=OFF)
+        disables building of tests (by setting BUILD_TESTING=OFF). Unless
+        testing is disabled the STLSoft and xTests libraries will be
+        required to be available to CMake
 
     --mingw
         uses explicitly the "MinGW Makefiles" generator
+
+    --msvc-mt
+        when using Visual C++ (MSVC), the static runtime library will be
+        selected; the default is the dynamic runtime library
 
     -m
     --run-make

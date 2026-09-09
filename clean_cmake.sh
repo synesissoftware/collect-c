@@ -15,9 +15,8 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     --help)
 
+      [ -f "$Dir/.sis/script_info_lines.txt" ] && cat "$Dir/.sis/script_info_lines.txt"
       cat << EOF
-collect-c Special and custom Collections and Containers (for C)
-Copyright (c) 2025, Matthew Wilson and Synesis Information Systems
 Executes CMake-generated artefacts to clean project
 
 $ScriptPath [ ... flags/options ... ]
