@@ -42,6 +42,9 @@ else
   RbEnvClr_None=
 fi
 
+MakeCmdClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${MakeCmd}${RbEnvClr_None}"
+ProjectNameClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None}"
+
 
 # ##########################################################
 # command-line handling
@@ -143,7 +146,7 @@ EOF
       ;;
     *)
 
-      >&2 echo "$ScriptPath: unrecognised argument '$1'; use --help for usage"
+      >&2 echo "$ScriptPath: unrecognised argument '${RbEnvClr_Red}${RbEnvClr_Bold}$1${RbEnvClr_None}'; use --help for usage"
 
       exit 1
       ;;
@@ -160,7 +163,7 @@ mkdir -p $CMakeDir || exit 1
 
 cd $CMakeDir
 
-echo "Executing CMake for ${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None} (in ${RbEnvClr_Blue}${RbEnvClr_Bold}${CMakeDir}${RbEnvClr_None})"
+echo "Executing CMake for ${ProjectNameClr} (in ${RbEnvClr_Blue}${RbEnvClr_Bold}${CMakeDir}${RbEnvClr_None})"
 
 if [ $ExamplesDisabled -eq 0 ]; then CMakeBuildExamplesFlag="ON" ; else CMakeBuildExamplesFlag="OFF" ; fi
 if [ $MSVC_MT -eq 0 ]; then CMakeMsvcMtFlag="OFF" ; else CMakeMsvcMtFlag="ON" ; fi
@@ -198,7 +201,7 @@ status=0
 if [ $RunMake -ne 0 ]; then
 
   echo
-  echo "Executing build for ${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None} (via command \`${RbEnvClr_Blue}${RbEnvClr_Bold}${MakeCmd}${RbEnvClr_None}\`)"
+  echo "Executing build for ${ProjectNameClr} (via command \`${MakeCmdClr}\`)"
 
   $MakeCmd
   status=$?

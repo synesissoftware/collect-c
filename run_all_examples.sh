@@ -30,6 +30,9 @@ else
   RbEnvClr_None=
 fi
 
+MakeCmdClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${MakeCmd}${RbEnvClr_None}"
+ProjectNameClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None}"
+
 
 # ##########################################################
 # command-line handling
@@ -77,7 +80,7 @@ EOF
       ;;
     *)
 
-      >&2 echo "$ScriptPath: unrecognised argument '$1'; use --help for usage"
+      >&2 echo "$ScriptPath: unrecognised argument '${RbEnvClr_Red}${RbEnvClr_Bold}$1${RbEnvClr_None}'; use --help for usage"
 
       exit 1
       ;;
@@ -96,7 +99,7 @@ if [ $RunMake -ne 0 ]; then
 
   if [ $ListOnly -eq 0 ]; then
 
-    echo "Executing build of ${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None} (via command \`$MakeCmd\`) and then running all example programs"
+    echo "Executing build of ${ProjectNameClr} (via command \`${MakeCmdClr}\`) and then running all example programs"
 
     mkdir -p $CMakeDir || exit 1
 
@@ -119,10 +122,10 @@ if [ $status -eq 0 ]; then
 
   if [ $ListOnly -ne 0 ]; then
 
-    echo "Listing all ${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None} example programs"
+    echo "Listing all ${ProjectNameClr} example programs"
   else
 
-    echo "Running all ${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None} example programs"
+    echo "Running all ${ProjectNameClr} example programs"
   fi
 
   for f in $(find $CMakeDir/examples -type f -exec test -x {} \; -print)

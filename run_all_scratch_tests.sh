@@ -29,6 +29,9 @@ else
   RbEnvClr_None=
 fi
 
+MakeCmdClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${MakeCmd}${RbEnvClr_None}"
+ProjectNameClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None}"
+
 
 # ##########################################################
 # command-line handling
@@ -84,7 +87,7 @@ EOF
       ;;
     *)
 
-      >&2 echo "$ScriptPath: unrecognised argument '$1'; use --help for usage"
+      >&2 echo "$ScriptPath: unrecognised argument '${RbEnvClr_Red}${RbEnvClr_Bold}$1${RbEnvClr_None}'; use --help for usage"
 
       exit 1
       ;;
@@ -103,7 +106,7 @@ if [ $RunMake -ne 0 ]; then
 
   if [ $ListOnly -eq 0 ]; then
 
-    echo "Executing build (via command \`$MakeCmd\`) and then running all scratch (and performance) test programs"
+    echo "Executing build (via command \`${MakeCmdClr}\`) and then running all scratch (and performance) test programs"
 
     mkdir -p $CMakeDir || exit 1
 

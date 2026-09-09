@@ -43,6 +43,9 @@ else
   RbEnvClr_None=
 fi
 
+MakeCmdClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${MakeCmd}${RbEnvClr_None}"
+ProjectNameClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None}"
+
 
 # ##########################################################
 # operating environment detection
@@ -98,7 +101,7 @@ EOF
       ;;
     *)
 
-      >&2 echo "$ScriptPath: unrecognised argument '$1'; use --help for usage"
+      >&2 echo "$ScriptPath: unrecognised argument '${RbEnvClr_Red}${RbEnvClr_Bold}$1${RbEnvClr_None}'; use --help for usage"
 
       exit 1
       ;;
@@ -118,7 +121,7 @@ if [ ! -d "$CMakeDir" ]; then
   exit 0
 else
 
-  echo "Removing all ${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None} cmake artefacts in '$CMakeDir'"
+  echo "Removing all ${ProjectNameClr} cmake artefacts in '$CMakeDir'"
 
   num_dirs_removed=0
   num_files_removed=0
