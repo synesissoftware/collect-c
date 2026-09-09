@@ -204,7 +204,7 @@ endif()
 
 
 # ############################
-# shwild (optional)
+# shwild
 
 if(NOT (NO_SHWILD))
 
