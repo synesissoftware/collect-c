@@ -75,11 +75,6 @@ target_include_directories(core
 		$<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(core
-	PRIVATE
-		$<$<STREQUAL:${STLSOFT_INCLUDE_DIR},>:STLSoft::STLSoft>
-)
-
 target_compile_options(core
 	PRIVATE
 		$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:

@@ -4,7 +4,7 @@
  * Purpose: Common elements for collect-c library.
  *
  * Created: 4th February 2025
- * Updated: 19th March 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 

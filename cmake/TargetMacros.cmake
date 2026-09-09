@@ -53,13 +53,13 @@ function(define_automated_test_program program_name entry_point_source_name)
 			$<IF:$<VERSION_LESS:${xTests_VERSION},"0.23">,xTests::xTests.core,xTests::core>
 	)
 
-	if(WIN32)
+	if(_BUILD_AS_WIN32)
 
 		target_link_libraries(${program_name}
 			PRIVATE
 				wininet
 		)
-	endif(WIN32)
+	endif(_BUILD_AS_WIN32)
 
 	define_target_compile_options(${program_name})
 endfunction(define_automated_test_program)
@@ -79,13 +79,13 @@ function(define_example_program program_name entry_point_source_name)
 			$<$<STREQUAL:${STLSOFT_INCLUDE_DIR},>:STLSoft::STLSoft>
 	)
 
-	if(WIN32)
+	if(_BUILD_AS_WIN32)
 
 		target_link_libraries(${program_name}
 			PRIVATE
 				wininet
 		)
-	endif(WIN32)
+	endif(_BUILD_AS_WIN32)
 
 	define_target_compile_options(${program_name})
 endfunction(define_example_program)
