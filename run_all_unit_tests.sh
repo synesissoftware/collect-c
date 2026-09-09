@@ -12,16 +12,37 @@ Verbosity=${XTESTS_VERBOSITY:-${TEST_VERBOSITY:-3}}
 
 
 # ##########################################################
+# colours
+
+if [ -n "${TERM:-}" ] && [ -t 1 ] && command -v tput >/dev/null 2>&1; then
+
+  RbEnvClr_Blue=${FG_BLUE:-$(tput setaf 4)}
+  RbEnvClr_Red=${FG_BLUE:-$(tput setaf 1)}
+  RbEnvClr_Bold=${FD_BOLD:-$(tput bold)}
+  RbEnvClr_None=${FD_NONE:-$(tput sgr0)}
+else
+
+  RbEnvClr_Blue=
+  RbEnvClr_Red=
+  RbEnvClr_Bold=
+  RbEnvClr_None=
+fi
+
+MakeCmdClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${MakeCmd}${RbEnvClr_None}"
+ProjectNameClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None}"
+
+
+# ##########################################################
 # command-line handling
 
 while [[ $# -gt 0 ]]; do
 
   case $1 in
-    -l|--list-only)
+    --list-only|-l)
 
       ListOnly=1
       ;;
-    -M|--no-make)
+    --no-make|-M)
 
       RunMake=0
       ;;
@@ -65,7 +86,7 @@ EOF
       ;;
     *)
 
-      >&2 echo "$ScriptPath: unrecognised argument '$1'; use --help for usage"
+      >&2 echo "$ScriptPath: unrecognised argument '${RbEnvClr_Red}${RbEnvClr_Bold}$1${RbEnvClr_None}'; use --help for usage"
 
       exit 1
       ;;
@@ -84,7 +105,7 @@ if [ $RunMake -ne 0 ]; then
 
   if [ $ListOnly -eq 0 ]; then
 
-    echo "Executing build (via command \`$MakeCmd\`) and then running all component and unit test programs"
+    echo "Executing build (via command \`${MakeCmdClr}\`) and then running all component and unit test programs"
 
     mkdir -p $CMakeDir || exit 1
 
@@ -118,7 +139,7 @@ if [ $status -eq 0 ]; then
 
     if [ $ListOnly -ne 0 ]; then
 
-      echo "would execute $f:"
+      echo "would execute ${RbEnvClr_Blue}${RbEnvClr_Bold}${f}${RbEnvClr_None}:"
 
       continue
     fi
@@ -129,7 +150,7 @@ if [ $status -eq 0 ]; then
     fi
     if [ $Verbosity -ge 2 ]; then
 
-      echo "executing $f:"
+      echo "executing ${RbEnvClr_Blue}${RbEnvClr_Bold}${f}${RbEnvClr_None}:"
     fi
 
     if $f --verbosity=$Verbosity; then

@@ -4,10 +4,34 @@ ScriptPath=$0
 Dir=$(cd $(dirname "$ScriptPath"); pwd)
 Basename=$(basename "$ScriptPath")
 CMakeDir=${SIS_CMAKE_BUILD_DIR:-$Dir/_build}
-MakeCmd=${SIS_MAKE_COMMAND:-${SIS_CMAKE_COMMAND:-make}}
+[[ -n "$MSYSTEM" ]] && DefaultMakeCmd=mingw32-make.exe || DefaultMakeCmd=make
+MakeCmd=${SIS_CMAKE_MAKE_COMMAND:-${SIS_CMAKE_COMMAND:-$DefaultMakeCmd}}
+ProjectNameFile="$Dir/.sis/project_name.txt"
+ProjectName=$(tr -d '[:space:]' < "$ProjectNameFile")
 
 IgnoreRemainingFlagsAndOptions=0
 Targets=()
+
+
+# ##########################################################
+# colours
+
+if [ -n "${TERM:-}" ] && [ -t 1 ] && command -v tput >/dev/null 2>&1; then
+
+  RbEnvClr_Blue=${FG_BLUE:-$(tput setaf 4)}
+  RbEnvClr_Red=${FG_BLUE:-$(tput setaf 1)}
+  RbEnvClr_Bold=${FD_BOLD:-$(tput bold)}
+  RbEnvClr_None=${FD_NONE:-$(tput sgr0)}
+else
+
+  RbEnvClr_Blue=
+  RbEnvClr_Red=
+  RbEnvClr_Bold=
+  RbEnvClr_None=
+fi
+
+MakeCmdClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${MakeCmd}${RbEnvClr_None}"
+ProjectNameClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None}"
 
 
 # ##########################################################
@@ -69,7 +93,7 @@ EOF
       ;;
     *)
 
-      >&2 echo "$ScriptPath: unrecognised argument '$1'; use --help for usage"
+      >&2 echo "$ScriptPath: unrecognised argument '${RbEnvClr_Red}${RbEnvClr_Bold}$1${RbEnvClr_None}'; use --help for usage"
 
       exit 1
       ;;
@@ -102,10 +126,10 @@ else
 
     if [ -z "$Targets" ]; then
 
-      echo "Executing build (via command \`$MakeCmd\`)"
+      echo "Executing build for ${ProjectNameClr} (via command \`${MakeCmdClr}\`)"
     else
 
-      echo "Executing build (via command \`$MakeCmd\`) with specific target(s) $(join_by , "${Targets[@]}")"
+      echo "Executing build for ${ProjectNameClr} (via command \`${MakeCmdClr}\`) with specific target(s) $(join_by , "${Targets[@]}")"
     fi
 
     $MakeCmd ${Targets[*]}
