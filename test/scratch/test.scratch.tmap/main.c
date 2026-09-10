@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 
     CLC_TM_define_empty(int, cstring_t, m);
 
-    collect_c_tmap_walkdir_t    direction   =   COLLECT_C_TMAP_WALK_DEFAULT;
+    collect_c_tmap_walkdir_t direction = COLLECT_C_TMAP_WALK_DEFAULT;
 
     m.pfn_element_free = free_element;
 
