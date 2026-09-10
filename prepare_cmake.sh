@@ -118,7 +118,9 @@ Flags/options:
 
     -T
     --disable-testing
-        disables building of tests (by setting BUILD_TESTING=OFF)
+        disables building of tests (by setting BUILD_TESTING=OFF). Unless
+        testing is disabled the STLSoft and xTests libraries will be
+        required to be available to CMake
 
     --mingw
         uses explicitly the "MinGW Makefiles" generator, and defaults the
@@ -130,6 +132,10 @@ Flags/options:
 
     --no-shwild
         prevents recognising shwild library
+
+    --msvc-mt
+        when using Visual C++ (MSVC), the static runtime library will be
+        selected; the default is the dynamic runtime library
 
     -m
     --run-make

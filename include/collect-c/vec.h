@@ -4,7 +4,7 @@
  * Purpose: Vector container.
  *
  * Created: 5th February 2025
- * Updated: 11th February 2025
+ * Updated: 22nd March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -25,9 +25,9 @@
  */
 
 #define COLLECT_C_VEC_VER_MAJOR     0
-#define COLLECT_C_VEC_VER_MINOR     1
+#define COLLECT_C_VEC_VER_MINOR     2
 #define COLLECT_C_VEC_VER_PATCH     0
-#define COLLECT_C_VEC_VER_ALPHABETA 41
+#define COLLECT_C_VEC_VER_ALPHABETA 42
 
 #define COLLECT_C_VEC_VER \
     (0\
@@ -94,6 +94,7 @@ typedef void (*collect_c_vec_pfn_free)(
  */
 struct collect_c_vec_t
 {
+    collect_c_mem_api_t     mem_api;
     size_t                  el_size;            /*! The element size. */
     size_t                  capacity;           /*! The capacity. */
     size_t                  offset;             /*! The base offset. */
@@ -105,7 +106,7 @@ struct collect_c_vec_t
     collect_c_vec_pfn_free  pfn_element_free;   /*! Custom function to be invoked when element erased/replaced. */
 };
 #ifndef __cplusplus
-typedef struct collect_c_vec_t  collect_c_vec_t;
+typedef struct collect_c_vec_t                              collect_c_vec_t;
 #endif
 
 
@@ -152,7 +153,16 @@ typedef struct collect_c_vec_t  collect_c_vec_t;
  */
 #define COLLECT_C_VEC_define_empty(el_type, v_name)         \
                                                             \
-    collect_c_vec_t v_name = { .el_size = sizeof(el_type), }
+    collect_c_vec_t v_name = {                              \
+        .mem_api =                                          \
+        {                                                   \
+            .pfn_alloc = collect_c_mem_std_alloc,           \
+            .pfn_realloc = collect_c_mem_std_realloc,       \
+            .pfn_free = collect_c_mem_std_free,             \
+            .param = NULL,                                  \
+        },                                                  \
+        .el_size = sizeof(el_type),                         \
+    }
 
 
 /** @def COLLECT_C_VEC_define_empty_with_callback(el_type, v_name, elf_fn, elf_param)
@@ -167,8 +177,19 @@ typedef struct collect_c_vec_t  collect_c_vec_t;
  * @param elf_param Parameter to be given to the callback function;
  */
 #define COLLECT_C_VEC_define_empty_with_callback(el_type, v_name, elf_fn, elf_param)    \
-                                                                                        \
-                                                            collect_c_vec_t v_name = { .el_size = sizeof(el_type), .pfn_element_free = elf_fn, .param_element_free = elf_param, }
+                                                            \
+    collect_c_vec_t v_name = {                              \
+        .mem_api =                                          \
+        {                                                   \
+            .pfn_alloc = collect_c_mem_std_alloc,           \
+            .pfn_realloc = collect_c_mem_std_realloc,       \
+            .pfn_free = collect_c_mem_std_free,             \
+            .param = NULL,                                  \
+        },                                                  \
+        .el_size = sizeof(el_type),                         \
+        .pfn_element_free = elf_fn,                         \
+        .param_element_free = elf_param,                    \
+    }
 
 
 /** @def COLLECT_C_VEC_define_on_stack(v_name, ar_name)
@@ -361,17 +382,24 @@ collect_c_v_push_front_by_ref(
  */
 
 #define COLLECT_C_VEC_EMPTY_INITIALIZER_(vec_el_type, vec_cap, vec_flags, vec_storage, elf_fn, elf_param) \
-                                                                            \
-    {                                                                       \
-        .el_size = sizeof(vec_el_type),                                     \
-        .capacity = (vec_cap),                                              \
-        .offset = 0,                                                        \
-        .size = 0,                                                          \
-        .flags = (vec_flags),                                               \
-        .reserved0 = 0,                                                     \
-        .storage = (vec_storage),                                           \
-        .param_element_free = (elf_param),                                  \
-        .pfn_element_free = (elf_fn),                                       \
+                                                            \
+    {                                                       \
+        .mem_api =                                          \
+        {                                                   \
+            .pfn_alloc = collect_c_mem_std_alloc,           \
+            .pfn_realloc = collect_c_mem_std_realloc,       \
+            .pfn_free = collect_c_mem_std_free,             \
+            .param = NULL,                                  \
+        },                                                  \
+        .el_size = sizeof(vec_el_type),                     \
+        .capacity = (vec_cap),                              \
+        .offset = 0,                                        \
+        .size = 0,                                          \
+        .flags = (vec_flags),                               \
+        .reserved0 = 0,                                     \
+        .storage = (vec_storage),                           \
+        .param_element_free = (elf_param),                  \
+        .pfn_element_free = (elf_fn),                       \
     }
 
 

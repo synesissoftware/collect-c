@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 10th February 2025
+ * Updated: 8th June 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -14,6 +14,8 @@
  */
 
 #include <collect-c/circq.h>
+
+#include <collect-c/util/limits.h>
 
 #include <errno.h>
 #include <assert.h>
@@ -45,12 +47,14 @@ collect_c_cq_allocate_storage(
 )
 {
     assert(NULL != q);
+    assert(NULL != q->mem_api);
     assert(NULL == q->storage);
 
     {
-        size_t const cb = q->el_size * q->capacity;
+        collect_c_mem_api_t* const  mem_api =   &q->mem_api;
+        size_t const                cb      =   q->el_size * q->capacity;
 
-        if (NULL == (q->storage = malloc(cb)))
+        if (NULL == (q->storage = (mem_api->pfn_alloc)(mem_api->param, cb)))
         {
             return errno;
         }
@@ -69,6 +73,7 @@ collect_c_cq_free_storage(
 )
 {
     assert(NULL != q);
+    assert(NULL != q->mem_api || (0 != (COLLECT_C_CIRCQ_F_USE_STACK_ARRAY & q->flags)));
     assert(NULL != q->storage);
 
     {
@@ -87,7 +92,10 @@ collect_c_cq_free_storage(
 
         if (0 == (COLLECT_C_CIRCQ_F_USE_STACK_ARRAY & q->flags))
         {
-            free(q->storage);
+            collect_c_mem_api_t* const  mem_api =   &q->mem_api;
+            size_t const                cb_curr =   q->el_size * q->capacity;
+
+            (mem_api->pfn_free)(mem_api->param, q->storage, cb_curr);
 
             q->storage = NULL;
         }
@@ -132,6 +140,13 @@ collect_c_cq_push_back_by_ref(
             memcpy(pe, ptr_new_el, q->el_size);
 
             ++q->e;
+
+            if (COLLECT_C_LIMITS_maximum(&q->e) == q->e)
+            {
+                q->b %= q->capacity;
+                q->e %= q->capacity;
+                q->e += q->capacity;
+            }
 
             return 0;
         }
@@ -191,6 +206,13 @@ collect_c_cq_push_back_n_by_ref(
                 memcpy(pe_dst, pe_src, q->el_size);
 
                 ++q->e;
+
+                if (COLLECT_C_LIMITS_maximum(&q->e) == q->e)
+                {
+                    q->b %= q->capacity;
+                    q->e %= q->capacity;
+                    q->e += q->capacity;
+                }
 
                 *num_inserted += 1;
             }

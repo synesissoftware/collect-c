@@ -17,7 +17,9 @@ Special and custom Collections and Containers, for C
 - [Components](#components)
   - [Circular Queue](#circular-queue)
   - [Doubly-linked List](#doubly-linked-list)
+  - [Tree-map](#tree-map)
   - [Vector](#vector)
+  - [Common facilities](#common-facilities)
 - [Examples](#examples)
 - [Project Information](#project-information)
   - [Where to get help](#where-to-get-help)
@@ -57,7 +59,16 @@ optional element free callbacks, and either heap or caller-supplied storage.
 Header: **collect-c/dlist.h** (terse macros in **collect-c/terse/dlist.h**).
 
 Intrusive-style doubly-linked list (`collect_c_dlist_t`) with front/back
-operations and walk/clear helpers.
+operations, insert/erase/find, spare-node reuse, and walk/clear helpers.
+
+
+### Tree-map
+
+Header: **collect-c/tmap.h** (terse macros in **collect-c/terse/tmap.h**).
+
+Binary tree-map (`collect_c_tmap_t`) of key/value pairs with insert, find,
+and entry/node walk in forward, backward, or downward order. Stock key
+comparators are provided for common integer and C-string types.
 
 
 ### Vector
@@ -68,10 +79,19 @@ Contiguous growable vector (`collect_c_vec_t`) of typed elements, with
 push/pop and storage management APIs.
 
 
+### Common facilities
+
+* **collect-c/common/mem_api.h** — pluggable alloc/realloc/free used by all
+  heap-backed containers (defaults to the C standard library);
+* **collect-c/util/limits.h** — type-detecting min/max macros used internally
+  (e.g. circular-queue index wrap safety);
+
+
 ## Examples
 
-Example programs are not yet published in this alpha. See [FAQ.md](./FAQ.md)
-for notes on tests and scratch programs.
+Example programs under **examples/** are not yet published in this alpha.
+Unit, component, scratch, and performance programs under **test/** exercise
+the containers (including **test.scratch.tmap**). See [FAQ.md](./FAQ.md).
 
 
 ## Project Information
@@ -101,7 +121,7 @@ depends on:
 * [**STLSoft**](https://github.com/synesissoftware/STLSoft/) 1.11+;
 * [**cstring**](https://github.com/synesissoftware/cstring/);
 * [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism/);
-* [**xTests**](https://github.com/synesissoftware/xTests/);
+* [**xTests**](https://github.com/synesissoftware/xTests/) 0.26.4+;
 
 and may optionally recognise:
 
