@@ -111,9 +111,9 @@
 ))
 
 
-#define COLLECT_C_LIMITS_maximum(v)                         COLLECT_C_LIMITS_maximum_(v)
+#define COLLECT_C_LIMITS_maximum(v)                         ((void)sizeof(v), COLLECT_C_LIMITS_maximum_(v))
 
-#define COLLECT_C_LIMITS_minimum(v)                         COLLECT_C_LIMITS_minimum_(v)
+#define COLLECT_C_LIMITS_minimum(v)                         ((void)sizeof(v), COLLECT_C_LIMITS_minimum_(v))
 
 
 /* /////////////////////////////////////////////////////////////////////////

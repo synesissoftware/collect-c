@@ -4,7 +4,7 @@
  * Purpose: Unit-test for Type-detecting limits functions/macros.
  *
  * Created: 7th June 2025
- * Updated: 7th June 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -67,8 +67,8 @@ static void TEST_FOR_BUILT_IN_INTEGRAL_TYPES(void)
             signed char const   maximum =   COLLECT_C_LIMITS_maximum(v);
             signed char const   minimum =   COLLECT_C_LIMITS_minimum(v);
 
-            TEST_INT_EQ(CHAR_MAX, maximum);
-            TEST_INT_EQ(CHAR_MIN, minimum);
+            TEST_INT_EQ(SCHAR_MAX, maximum);
+            TEST_INT_EQ(SCHAR_MIN, minimum);
         }
 
         // by pionter
@@ -78,8 +78,8 @@ static void TEST_FOR_BUILT_IN_INTEGRAL_TYPES(void)
             signed char const   maximum =   COLLECT_C_LIMITS_maximum(&v);
             signed char const   minimum =   COLLECT_C_LIMITS_minimum(&v);
 
-            TEST_INT_EQ(CHAR_MAX, maximum);
-            TEST_INT_EQ(CHAR_MIN, minimum);
+            TEST_INT_EQ(SCHAR_MAX, maximum);
+            TEST_INT_EQ(SCHAR_MIN, minimum);
         }
     }
 

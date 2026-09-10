@@ -4,7 +4,7 @@
  * Purpose: Unit-test for Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 22nd February 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -66,6 +66,11 @@ int main(int argc, char* argv[])
 /* /////////////////////////////////////////////////////////////////////////
  * test helpers
  */
+
+/* Prefer xTests' compiler-selected function symbol (see BDUT_FUNCTION_ /
+ * STLSOFT_FUNCTION_SYMBOL) over raw __FUNCTION__ / __func__.
+ */
+#define CLC_TEST_FUNCTION_()                                XTESTS_GET_FUNCTION_()
 
 struct custom_t
 {
@@ -625,12 +630,19 @@ static void TEST_insert_2_ELEMENTS_WITH_VeryLargeKey_TO_int(void)
     {
         CLC_TM_define_empty_with_cmp(VeryLargeKey_t, int, cmp_VeryLargeKey_t, m);
 
+        int was_replaced;
+        int r;
+        int r2;
+        int r3;
+        int r4;
 
         /* insert 101:-101 for something to find */
-        int                     was_replaced;
-        VeryLargeKey_t const    key =   { .key = 101, };
-        int const               val =   -101;
-        int const               r   =   collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
+        {
+            VeryLargeKey_t const    key =   { .key = 101, };
+            int const               val =   -101;
+
+            r = collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
+        }
 
         TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
 
@@ -657,17 +669,75 @@ static void TEST_insert_2_ELEMENTS_WITH_VeryLargeKey_TO_int(void)
             {
                 VeryLargeKey_t const    key =   { .key = 202, };
                 int const               val =   -202;
-                int const               r2  =   collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
 
-                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r2);
+                r2 = collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
+            }
 
-                if (0 == r2)
+            TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r2);
+
+            if (0 == r2)
+            {
+                TEST_INT_EQ(0, was_replaced);
+
+                TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
+                TEST_INT_EQ(2, CLC_TM_len(m));
+
+                /* verify can find 101 */
+                {
+                    VeryLargeKey_t const            key     =   { .key = 101, };
+                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                    TEST_PTR_NE(NULL, node);
+                    TEST_PTR_EQ(NULL, node->left);
+                    TEST_PTR_NE(NULL, node->right);
+
+                    TEST_INT_EQ(-101, *(int const*)node->value);
+                }
+
+                /* verify can find 202 */
+                {
+                    VeryLargeKey_t const            key     =   { .key = 202, };
+                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                    TEST_PTR_NE(NULL, node);
+                    TEST_PTR_EQ(NULL, node->left);
+                    TEST_PTR_EQ(NULL, node->right);
+
+                    TEST_INT_EQ(-202, *(int const*)node->value);
+                }
+
+                /* verify cannot find 201 */
+                {
+                    VeryLargeKey_t const            key     =   { .key = 201, };
+                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                    TEST_PTR_EQ(NULL, node);
+                }
+
+                /* verify cannot find 303 */
+                {
+                    VeryLargeKey_t const            key     =   { .key = 303, };
+                    collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+
+                    TEST_PTR_EQ(NULL, node);
+                }
+
+                /* insert 201:-201 for something to find */
+                {
+                    VeryLargeKey_t const    key =   { .key = 201, };
+                    int const               val =   -201;
+
+                    r3 = collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
+                }
+
+                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r3);
+
+                if (0 == r3)
                 {
                     TEST_INT_EQ(0, was_replaced);
 
                     TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
-                    TEST_INT_EQ(2, CLC_TM_len(m));
-
+                    TEST_INT_EQ(3, CLC_TM_len(m));
 
                     /* verify can find 101 */
                     {
@@ -681,24 +751,28 @@ static void TEST_insert_2_ELEMENTS_WITH_VeryLargeKey_TO_int(void)
                         TEST_INT_EQ(-101, *(int const*)node->value);
                     }
 
-                    /* verify can find 202 */
+                    /* verify can find 201 */
                     {
-                        VeryLargeKey_t const            key     =   { .key = 202, };
+                        VeryLargeKey_t const            key     =   { .key = 201, };
                         collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
                         TEST_PTR_NE(NULL, node);
                         TEST_PTR_EQ(NULL, node->left);
                         TEST_PTR_EQ(NULL, node->right);
 
-                        TEST_INT_EQ(-202, *(int const*)node->value);
+                        TEST_INT_EQ(-201, *(int const*)node->value);
                     }
 
-                    /* verify cannot find 201 */
+                    /* verify can find 202 */
                     {
-                        VeryLargeKey_t const            key     =   { .key = 201, };
+                        VeryLargeKey_t const            key     =   { .key = 202, };
                         collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                        TEST_PTR_EQ(NULL, node);
+                        TEST_PTR_NE(NULL, node);
+                        TEST_PTR_NE(NULL, node->left);
+                        TEST_PTR_EQ(NULL, node->right);
+
+                        TEST_INT_EQ(-202, *(int const*)node->value);
                     }
 
                     /* verify cannot find 303 */
@@ -709,137 +783,77 @@ static void TEST_insert_2_ELEMENTS_WITH_VeryLargeKey_TO_int(void)
                         TEST_PTR_EQ(NULL, node);
                     }
 
-                    /* insert 201:-201 for something to find */
+                    /* insert 303:-303 for something to find */
                     {
-                        VeryLargeKey_t const    key =   { .key = 201, };
-                        int const               val =   -201;
-                        int const               r3  =   collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
+                        VeryLargeKey_t const    key =   { .key = 303, };
+                        int const               val =   -303;
 
-                        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r3);
+                        r4 = collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
+                    }
 
-                        if (0 == r3)
+                    TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r4);
+
+                    if (0 == r4)
+                    {
+                        TEST_INT_EQ(0, was_replaced);
+
+                        TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
+                        TEST_INT_EQ(4, CLC_TM_len(m));
+
+                        /* verify can find 101 */
                         {
-                            TEST_INT_EQ(0, was_replaced);
+                            VeryLargeKey_t const            key     =   { .key = 101, };
+                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
-                            TEST_INT_EQ(3, CLC_TM_len(m));
+                            TEST_PTR_NE(NULL, node);
+                            TEST_PTR_EQ(NULL, node->left);
+                            TEST_PTR_NE(NULL, node->right);
 
-                            /* verify can find 101 */
-                            {
-                                VeryLargeKey_t const            key     =   { .key = 101, };
-                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            TEST_INT_EQ(-101, *(int const*)node->value);
+                        }
 
-                                TEST_PTR_NE(NULL, node);
-                                TEST_PTR_EQ(NULL, node->left);
-                                TEST_PTR_NE(NULL, node->right);
+                        /* verify can find 201 */
+                        {
+                            VeryLargeKey_t const            key     =   { .key = 201, };
+                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                                TEST_INT_EQ(-101, *(int const*)node->value);
-                            }
+                            TEST_PTR_NE(NULL, node);
+                            TEST_PTR_EQ(NULL, node->left);
+                            TEST_PTR_EQ(NULL, node->right);
 
-                            /* verify can find 201 */
-                            {
-                                VeryLargeKey_t const            key     =   { .key = 201, };
-                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            TEST_INT_EQ(-201, *(int const*)node->value);
+                        }
 
-                                TEST_PTR_NE(NULL, node);
-                                TEST_PTR_EQ(NULL, node->left);
-                                TEST_PTR_EQ(NULL, node->right);
+                        /* verify can find 202 */
+                        {
+                            VeryLargeKey_t const            key     =   { .key = 202, };
+                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                                TEST_INT_EQ(-201, *(int const*)node->value);
-                            }
+                            TEST_PTR_NE(NULL, node);
+                            TEST_PTR_NE(NULL, node->left);
+                            TEST_PTR_NE(NULL, node->right);
 
-                            /* verify can find 202 */
-                            {
-                                VeryLargeKey_t const            key     =   { .key = 202, };
-                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            TEST_INT_EQ(-202, *(int const*)node->value);
+                        }
 
-                                TEST_PTR_NE(NULL, node);
-                                TEST_PTR_NE(NULL, node->left);
-                                TEST_PTR_EQ(NULL, node->right);
+                        /* verify can find 303 */
+                        {
+                            VeryLargeKey_t const            key     =   { .key = 303, };
+                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                                TEST_INT_EQ(-202, *(int const*)node->value);
-                            }
+                            TEST_PTR_NE(NULL, node);
+                            TEST_PTR_EQ(NULL, node->left);
+                            TEST_PTR_EQ(NULL, node->right);
 
-                            /* verify cannot find 303 */
-                            {
-                                VeryLargeKey_t const            key     =   { .key = 303, };
-                                collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
+                            TEST_INT_EQ(-303, *(int const*)node->value);
+                        }
 
-                                TEST_PTR_EQ(NULL, node);
-                            }
+                        /* verify cannot find 404 */
+                        {
+                            VeryLargeKey_t const            key     =   { .key = 404, };
+                            collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
 
-                            /* insert 303:-303 for something to find */
-                            {
-                                VeryLargeKey_t const            key =   { .key = 303, };
-                                int const                       val =   -303;
-                                int const                       r4  =   collect_c_tmap_insert(&m, &key, &val, NULL, &was_replaced);
-
-                                TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r4);
-
-                                if (0 == r4)
-                                {
-                                    TEST_INT_EQ(0, was_replaced);
-
-                                    TEST_BOOLEAN_FALSE(CLC_TM_is_empty(m));
-                                    TEST_INT_EQ(4, CLC_TM_len(m));
-
-                                    /* verify can find 101 */
-                                    {
-                                        VeryLargeKey_t const            key     =   { .key = 101, };
-                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                                        TEST_PTR_NE(NULL, node);
-                                        TEST_PTR_EQ(NULL, node->left);
-                                        TEST_PTR_NE(NULL, node->right);
-
-                                        TEST_INT_EQ(-101, *(int const*)node->value);
-                                    }
-
-                                    /* verify can find 201 */
-                                    {
-                                        VeryLargeKey_t const            key     =   { .key = 201, };
-                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                                        TEST_PTR_NE(NULL, node);
-                                        TEST_PTR_EQ(NULL, node->left);
-                                        TEST_PTR_EQ(NULL, node->right);
-
-                                        TEST_INT_EQ(-201, *(int const*)node->value);
-                                    }
-
-                                    /* verify can find 202 */
-                                    {
-                                        VeryLargeKey_t const            key     =   { .key = 202, };
-                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                                        TEST_PTR_NE(NULL, node);
-                                        TEST_PTR_NE(NULL, node->left);
-                                        TEST_PTR_NE(NULL, node->right);
-
-                                        TEST_INT_EQ(-202, *(int const*)node->value);
-                                    }
-
-                                    /* verify can find 303 */
-                                    {
-                                        VeryLargeKey_t const            key     =   { .key = 303, };
-                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                                        TEST_PTR_NE(NULL, node);
-                                        TEST_PTR_EQ(NULL, node->left);
-                                        TEST_PTR_EQ(NULL, node->right);
-
-                                        TEST_INT_EQ(-303, *(int const*)node->value);
-                                    }
-
-                                    /* verify cannot find 404 */
-                                    {
-                                        VeryLargeKey_t const            key     =   { .key = 404, };
-                                        collect_c_tmap_node_t const*    node    =   collect_c_tmap_find_node(&m, &key);
-
-                                        TEST_PTR_EQ(NULL, node);
-                                    }
-                                }
-                            }
+                            TEST_PTR_EQ(NULL, node);
                         }
                     }
                 }
@@ -879,13 +893,16 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
         {
             if (verbosity >= 4)
             {
-                fprintf(stdout, "%s() - walking entries:\n", __FUNCTION__);
+                fprintf(stdout, "%s() - walking entries:\n", CLC_TEST_FUNCTION_());
             }
 
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -893,7 +910,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -901,7 +921,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -909,7 +932,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -919,13 +945,16 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
         {
             if (verbosity >= 4)
             {
-                fprintf(stdout, "%s() - walking nodes:\n", __FUNCTION__);
+                fprintf(stdout, "%s() - walking nodes:\n", CLC_TEST_FUNCTION_());
             }
 
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -933,7 +962,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -941,7 +973,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -949,7 +984,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1001,13 +1039,16 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
         {
             if (verbosity >= 4)
             {
-                fprintf(stdout, "%s() - walking entries:\n", __FUNCTION__);
+                fprintf(stdout, "%s() - walking entries:\n", CLC_TEST_FUNCTION_());
             }
 
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1015,7 +1056,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1023,7 +1067,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1031,7 +1078,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1041,13 +1091,16 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
         {
             if (verbosity >= 4)
             {
-                fprintf(stdout, "%s() - walking nodes:\n", __FUNCTION__);
+                fprintf(stdout, "%s() - walking nodes:\n", CLC_TEST_FUNCTION_());
             }
 
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1055,7 +1108,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1063,7 +1119,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1071,7 +1130,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1114,13 +1176,16 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
         {
             if (verbosity >= 4)
             {
-                fprintf(stdout, "%s() - walking entries:\n", __FUNCTION__);
+                fprintf(stdout, "%s() - walking entries:\n", CLC_TEST_FUNCTION_());
             }
 
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1128,7 +1193,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1136,7 +1204,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1144,7 +1215,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1154,13 +1228,16 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
         {
             if (verbosity >= 4)
             {
-                fprintf(stdout, "%s() - walking nodes:\n", __FUNCTION__);
+                fprintf(stdout, "%s() - walking nodes:\n", CLC_TEST_FUNCTION_());
             }
 
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1168,7 +1245,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1176,7 +1256,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1184,7 +1267,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1236,13 +1322,16 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
         {
             if (verbosity >= 4)
             {
-                fprintf(stdout, "%s() - walking entries:\n", __FUNCTION__);
+                fprintf(stdout, "%s() - walking entries:\n", CLC_TEST_FUNCTION_());
             }
 
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1250,7 +1339,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1258,7 +1350,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1266,7 +1361,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_entry_walk(&m, entry_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1276,13 +1374,16 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
         {
             if (verbosity >= 4)
             {
-                fprintf(stdout, "%s() - walking nodes:\n", __FUNCTION__);
+                fprintf(stdout, "%s() - walking nodes:\n", CLC_TEST_FUNCTION_());
             }
 
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DEFAULT);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1290,7 +1391,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_DOWNWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1298,7 +1402,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_FORWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }
@@ -1306,7 +1413,10 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
             {
                 int const r = collect_c_tmap_node_walk(&m, node_walk_int_int, NULL, CLC_TM_WALK_BACKWARD);
 
-                (verbosity >= 4) && fprintf(stdout, "\n");
+                if (verbosity >= 4)
+                {
+                    fprintf(stdout, "\n");
+                }
 
                 TEST_INT_EQ(0, r);
             }

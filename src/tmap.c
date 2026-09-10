@@ -590,6 +590,11 @@ collect_c_tmap_entry_walk(
     assert(NULL != m);
     assert(NULL != pfn_walk);
 
+    if (NULL == m->root)
+    {
+        return 0;
+    }
+
     {
         switch (direction)
         {
@@ -627,6 +632,11 @@ collect_c_tmap_node_walk(
 {
     assert(NULL != m);
     assert(NULL != pfn_walk);
+
+    if (NULL == m->root)
+    {
+        return 0;
+    }
 
     {
         switch (direction)
