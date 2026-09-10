@@ -10,7 +10,7 @@
 * Circular queue: fixed index wrap when `b`/`e` approach the end of their integral value space; custom **mem_api** support;
 * Doubly-linked list: spare-node reuse (cap 64), push-back/front by-ref macros, **COLLECT_C_DLIST_free_storage**, element-free `el_index` always `-1`, shared **collect_c_common_node_data_t**, custom **mem_api**;
 * Vector: custom **mem_api** for allocate/realloc/free paths;
-* Unit tests: **test.unit.tmap**, **test.unit.stock_cmp_fns**, **test.unit.util.limits**; expanded **cq** / **dlist** / **vec** / **version** coverage (including custom **mem_api** cases);
+* Unit tests: **test.unit.tmap**, **test.unit.stock_cmp_fns**, **test.unit.util.limits**; expanded **cq** / **dlist** / **vec** / **version** coverage (including custom **mem_api** cases); GCC/MSVC warning fixes in **stock_cmp_fns.c**, **string_fns.c**, **tmap.c**;
 * Performance: **test.performance.dlist** and **test.performance.std_list**; scratch: **test.scratch.tmap**;
 * Helper scripts: **run_all_unit_tests.sh** `--unit-only` / `--component-only`; **prepare_cmake.sh** `--msvc-mt` and clearer testing-deps help;
 * Required **xTests** version raised to **0.26.4**;

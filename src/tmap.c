@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 22nd March 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -552,18 +552,18 @@ collect_c_tmap_insert(
                 /* NOTE: might be a way to have `clc_c_tm_find_()` return whether should go left or right */
 
                 {
-                    node_t* const new_node = clc_c_tm_alloc_node_(&m->mem_api, m->key_size, m->val_size);
+                    node_t* const nd = clc_c_tm_alloc_node_(&m->mem_api, m->key_size, m->val_size);
 
-                    if (NULL == new_node)
+                    if (NULL == nd)
                     {
                         return ENOMEM;
                     }
                     else
                     {
-                        memcpy(CLC_TMAP_node_key_ptr_(new_node), ptr_new_key, m->key_size);
-                        memcpy(CLC_TMAP_node_val_ptr_(new_node, m->key_size), ptr_new_val, m->val_size);
+                        memcpy(CLC_TMAP_node_key_ptr_(nd), ptr_new_key, m->key_size);
+                        memcpy(CLC_TMAP_node_val_ptr_(nd, m->key_size), ptr_new_val, m->val_size);
 
-                        add_node_to_(m, m->root, new_node);
+                        add_node_to_(m, m->root, nd);
 
                         ++m->size;
 

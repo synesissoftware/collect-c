@@ -4,7 +4,7 @@
  * Purpose: Stock comparison functions.
  *
  * Created: 19th February 2025
- * Updated: 19th February 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -24,27 +24,30 @@
  * internal functions & macros
  */
 
-typedef int (*pfn_cmp_t)(
-    void const* _lhs
-,   void const* _rhs
-);
-
-extern
+static
 int
 collect_c_fn_cmp_undiscriminated_(
     void const* _lhs
 ,   void const* _rhs
-);
+)
+{
+    ((void)_lhs);
+    ((void)_rhs);
+
+    assert(!"undiscriminated comparison type");
+
+    return 0;
+}
 
 static
 int
 collect_c_fn_cmp_int16_(
-    int16_t const*  pe_lhs
-,   int16_t const*  pe_rhs
+    void const* pe_lhs
+,   void const* pe_rhs
 )
 {
-    int16_t const   lhs =   *pe_lhs;
-    int16_t const   rhs =   *pe_rhs;
+    int16_t const   lhs =   *(int16_t const*)pe_lhs;
+    int16_t const   rhs =   *(int16_t const*)pe_rhs;
 
     if (lhs < rhs)
     {
@@ -62,12 +65,12 @@ collect_c_fn_cmp_int16_(
 static
 int
 collect_c_fn_cmp_int32_(
-    int32_t const*  pe_lhs
-,   int32_t const*  pe_rhs
+    void const* pe_lhs
+,   void const* pe_rhs
 )
 {
-    int32_t const   lhs =   *pe_lhs;
-    int32_t const   rhs =   *pe_rhs;
+    int32_t const   lhs =   *(int32_t const*)pe_lhs;
+    int32_t const   rhs =   *(int32_t const*)pe_rhs;
 
     if (lhs < rhs)
     {
@@ -85,12 +88,12 @@ collect_c_fn_cmp_int32_(
 static
 int
 collect_c_fn_cmp_int64_(
-    int64_t const*  pe_lhs
-,   int64_t const*  pe_rhs
+    void const* pe_lhs
+,   void const* pe_rhs
 )
 {
-    int64_t const   lhs =   *pe_lhs;
-    int64_t const   rhs =   *pe_rhs;
+    int64_t const   lhs =   *(int64_t const*)pe_lhs;
+    int64_t const   rhs =   *(int64_t const*)pe_rhs;
 
     if (lhs < rhs)
     {
@@ -108,12 +111,12 @@ collect_c_fn_cmp_int64_(
 static
 int
 collect_c_fn_cmp_uint16_(
-    uint16_t const* pe_lhs
-,   uint16_t const* pe_rhs
+    void const* pe_lhs
+,   void const* pe_rhs
 )
 {
-    uint16_t const  lhs =   *pe_lhs;
-    uint16_t const  rhs =   *pe_rhs;
+    uint16_t const  lhs =   *(uint16_t const*)pe_lhs;
+    uint16_t const  rhs =   *(uint16_t const*)pe_rhs;
 
     if (lhs < rhs)
     {
@@ -131,12 +134,12 @@ collect_c_fn_cmp_uint16_(
 static
 int
 collect_c_fn_cmp_uint32_(
-    uint32_t const* pe_lhs
-,   uint32_t const* pe_rhs
+    void const* pe_lhs
+,   void const* pe_rhs
 )
 {
-    uint32_t const  lhs =   *pe_lhs;
-    uint32_t const  rhs =   *pe_rhs;
+    uint32_t const  lhs =   *(uint32_t const*)pe_lhs;
+    uint32_t const  rhs =   *(uint32_t const*)pe_rhs;
 
     if (lhs < rhs)
     {
@@ -154,12 +157,12 @@ collect_c_fn_cmp_uint32_(
 static
 int
 collect_c_fn_cmp_uint64_(
-    uint64_t const*  pe_lhs
-,   uint64_t const*  pe_rhs
+    void const* pe_lhs
+,   void const* pe_rhs
 )
 {
-    uint64_t const  lhs =   *pe_lhs;
-    uint64_t const  rhs =   *pe_rhs;
+    uint64_t const  lhs =   *(uint64_t const*)pe_lhs;
+    uint64_t const  rhs =   *(uint64_t const*)pe_rhs;
 
     if (lhs < rhs)
     {
@@ -175,8 +178,8 @@ collect_c_fn_cmp_uint64_(
 }
 
 
-#define CLC_INTERNAL_SIGNED_SELECT_(n)                      (8 == (n)) ? (pfn_cmp_t)collect_c_fn_cmp_int64_ : (4 == (n)) ? (pfn_cmp_t)collect_c_fn_cmp_int32_ : (pfn_cmp_t)collect_c_fn_cmp_int16_
-#define CLC_INTERNAL_UNSIGNED_SELECT_(n)                    (8 == (n)) ? (pfn_cmp_t)collect_c_fn_cmp_uint64_ : (4 == (n)) ? (pfn_cmp_t)collect_c_fn_cmp_uint32_ : (pfn_cmp_t)collect_c_fn_cmp_uint16_
+#define CLC_INTERNAL_SIGNED_SELECT_(n)                      ((8 == (n)) ? collect_c_fn_cmp_int64_ : (4 == (n)) ? collect_c_fn_cmp_int32_ : collect_c_fn_cmp_int16_)
+#define CLC_INTERNAL_UNSIGNED_SELECT_(n)                    ((8 == (n)) ? collect_c_fn_cmp_uint64_ : (4 == (n)) ? collect_c_fn_cmp_uint32_ : collect_c_fn_cmp_uint16_)
 
 #define CLC_INTERNAL_SELECT_CMPFN_FOR_SIZED_T_(t_int)  _Generic(((t_int)0), \
                                                                             \

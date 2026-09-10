@@ -1,10 +1,10 @@
 /* /////////////////////////////////////////////////////////////////////////
- * File:    src/stock_cmp_fns.c
+ * File:    src/string_fns.c
  *
- * Purpose: Stock comparison functions.
+ * Purpose: Common string helpers.
  *
  * Created: 19th February 2025
- * Updated: 19th February 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -15,12 +15,11 @@
 
 #include <collect-c/common.h>
 
+#include <string.h>
+
 #if 0
 #elif 0 ||\
       defined(__MACH__) ||\
-      defined(__MINGW32__) ||\
-      defined(__MINGW64__) ||\
-      defined(__MINGW__) ||\
       defined(__linux) ||\
       defined(__linux__) ||\
       defined(linux) ||\
@@ -52,14 +51,7 @@
   /* Microsoft Visual C++ */
 # elif defined(_MSC_VER)
 
-#  if 0
-#  elif !defined(STLSOFT_API_EXTERNAL_string_USE_MSVC_COMPILER_EXTENSION_FORMS_)
-
-#   define STLSOFT_API_EXTERNAL_string_stricmp              STLSOFT_NS_GLOBAL_(stricmp)
-#  else
-
-#   define STLSOFT_API_EXTERNAL_string_stricmp              STLSOFT_NS_GLOBAL_(_stricmp)
-#  endif
+#  define STLSOFT_API_EXTERNAL_string_stricmp               STLSOFT_NS_GLOBAL_(_stricmp)
 
   /* Borland */
 # elif defined(__BORLANDC__)
@@ -78,13 +70,10 @@
 
 #  define STLSOFT_API_EXTERNAL_string_stricmp               STLSOFT_NS_GLOBAL_(stricmp)
 
-  /* GCC */
+  /* GCC / MinGW */
 # elif defined(__GNUC__)
 
 #  if 0
-/*
-#  elif !defined(__STRICT_ANSI__)
-*/
 #  elif 0 ||\
         defined(__MINGW32__) ||\
         defined(__MINGW64__) ||\
