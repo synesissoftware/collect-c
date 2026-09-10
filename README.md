@@ -21,10 +21,12 @@ Special and custom Collections and Containers, for C
   - [Vector](#vector)
   - [Common facilities](#common-facilities)
 - [Examples](#examples)
+- [Helper scripts](#helper-scripts)
 - [Project Information](#project-information)
   - [Where to get help](#where-to-get-help)
   - [Contribution guidelines](#contribution-guidelines)
   - [Dependencies](#dependencies)
+    - [Tests-only Dependencies](#tests-only-dependencies)
   - [Related projects](#related-projects)
   - [License](#license)
 
@@ -92,6 +94,34 @@ push/pop and storage management APIs.
 Example programs under **examples/** are not yet published in this alpha.
 Unit, component, scratch, and performance programs under **test/** exercise
 the containers (including **test.scratch.tmap**). See [FAQ.md](./FAQ.md).
+
+
+## Helper scripts
+
+CMake build helpers (**prepare_cmake.sh**, **build_cmake.sh**, and so on)
+are documented in [INSTALL.md](./INSTALL.md).
+
+**scripts/binary_split.rb** is an optional Ruby tool that prints every
+integer in `[first, exclusive-last)` in binary-chop order — as if the
+values were laid out in a (mostly) balanced binary tree. **tmap** is a
+plain binary search tree, not self-balancing, so insertion order
+determines tree shape. **test.performance.tmap** pastes these sequences
+into the `BBT_*` arrays to compare balanced insert and walk against
+ascending (degenerate) order.
+
+`--format` selects the output form:
+
+* **C-compatible-list** (`c`) — a C initializer, e.g. `{ 2, 1, 3 }`;
+* **plain-sequence** (`p`) — space-separated numbers (the default), e.g. `2 1 3`;
+* **ruby-list** (`r`) — a Ruby array, e.g. `[ 2, 1, 3 ]`
+
+Ruby gems are listed in **Gemfile**. From the project root:
+
+```bash
+$ bundle install
+$ bundle exec ./scripts/binary_split.rb 1 1001
+$ bundle exec ./scripts/binary_split.rb --format c 1 1001
+```
 
 
 ## Project Information

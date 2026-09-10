@@ -6,7 +6,7 @@
 # Purpose:  Generates all numbers in a range in a binary-chop order.
 #
 # Created:  19th March 2025
-# Updated:  20th March 2025
+# Updated:  10th September 2026
 #
 # Author:   Matthew Wilson
 #
@@ -16,8 +16,9 @@
 # ######################################################################## #
 # requires
 
-require 'libclimate'
 require 'highline'
+require 'libclimate'
+require 'xqsr3/extensions/string/map_option_string'
 
 
 # ######################################################################## #
@@ -27,9 +28,16 @@ require 'highline'
 # ######################################################################## #
 # constants
 
+FORMAT_TYPES = %w{
+  C-[c]ompatible-list
+  [p]lain-sequence
+  [r]uby-list
+}
+
 PROGRAM_VER_MAJOR = 0
 PROGRAM_VER_MINOR = 0
-PROGRAM_VER_PATCH = 0
+PROGRAM_VER_PATCH = 1
+
 
 
 # ######################################################################## #
@@ -68,6 +76,24 @@ def generate first, exclusive_last
   r
 end
 
+def format_list l, **options
+
+  case options[:format]
+  when nil, :plain_sequence
+
+    l.join(' ')
+  when :C_compatible_list
+
+    '{ ' + l.join(', ') + ' }'
+  when :ruby_list
+
+    l
+  else
+
+    (options[:climate] || ::Kernel).abort "VIOLATION: unexpected value for options[:format]"
+  end
+end
+
 
 # ######################################################################## #
 # command-line handling
@@ -75,17 +101,25 @@ end
 options = {}
 climate = LibCLImate::Climate.new do |cl|
 
+  cl.add_option('--format', alias: '-f', values: FORMAT_TYPES) do |o, sp|
+
+    options[:format] = o.value.map_option_string(FORMAT_TYPES) or cl.abort "invalid value '#{o.value}' passed to '--format'"
+  end
+
   cl.info_lines = [
 
     'collect-c Special and custom Collections and Containers (for C)',
-    'Copyright (c) 2025, Matthew Wilson and Synesis Information Systems',
+    'Copyright (c) 2025-2026, Matthew Wilson and Synesis Information Systems',
     'Generates numbers in a range as if arrayed in a (mostly) balanced binary tree',
     :version,
     nil,
   ]
 
   cl.constrain_values = 2
+  cl.usage_values = '<first> <exclusive-last>'
   cl.value_names = %w{ first last }
+
+  options[:climate] = cl
 end
 
 r = climate.run ARGV
@@ -97,6 +131,8 @@ last = r.values[1].to_i
 # main
 
 numbers = generate first, last
+
+numbers = format_list numbers, **options
 
 $stdout.puts "#{numbers}"
 
