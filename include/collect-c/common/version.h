@@ -33,7 +33,7 @@
 #define COLLECT_C_VER_MAJOR         0
 #define COLLECT_C_VER_MINOR         1
 #define COLLECT_C_VER_PATCH         0
-#define COLLECT_C_VER_ALPHABETA     42
+#define COLLECT_C_VER_ALPHABETA     43
 
 #define COLLECT_C_VER \
     (0\
