@@ -4,7 +4,7 @@
  * Purpose: Type-detecting limits functions/macros.
  *
  * Created: 7th June 2025
- * Updated: 7th June 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -14,7 +14,6 @@
  */
 
 #include <limits.h>
-#include <stdint.h>
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -26,136 +25,87 @@
  * API functions & macros (internal)
  */
 
-#define COLLECT_C_LIMIT_ENTRY_short_(slim, ulim)            \
-                                                            \
-               short        : (slim),                       \
-               short      * : (slim),                       \
-               short const* : (slim),                       \
-      unsigned short        : (ulim),                       \
-      unsigned short      * : (ulim),                       \
-      unsigned short const* : (ulim),
-
-#define COLLECT_C_LIMIT_ENTRY_int_(slim, ulim)              \
-                                                            \
-                 int        : (slim),                       \
-                 int      * : (slim),                       \
-                 int const* : (slim),                       \
-        unsigned int        : (ulim),                       \
-        unsigned int      * : (ulim),                       \
-        unsigned int const* : (ulim),
-
-#define COLLECT_C_LIMIT_ENTRY_long_(slim, ulim)             \
-                                                            \
-                long        : (slim),                       \
-                long      * : (slim),                       \
-                long const* : (slim),                       \
-       unsigned long        : (ulim),                       \
-       unsigned long      * : (ulim),                       \
-       unsigned long const* : (ulim),
-
-#define COLLECT_C_LIMIT_ENTRY_long_long_(slim, ulim)        \
-                                                            \
-           long long        : (slim),                       \
-           long long      * : (slim),                       \
-           long long const* : (slim),                       \
-  unsigned long long        : (ulim),                       \
-  unsigned long long      * : (ulim),                       \
-  unsigned long long const* : (ulim),
-
-#if 0
-#elif defined(__clang__)
-
-# undef COLLECT_C_LIMIT_ENTRY_short_
-# define COLLECT_C_LIMIT_ENTRY_short_(slim, ulim)
-# undef COLLECT_C_LIMIT_ENTRY_int_
-# define COLLECT_C_LIMIT_ENTRY_int_(slim, ulim)
-# undef COLLECT_C_LIMIT_ENTRY_long_long_
-# define COLLECT_C_LIMIT_ENTRY_long_long_(slim, ulim)
-#elif defined(__GNUC__)
-
-#elif defined(_MSC_VER)
-
-#endif
-
+/* Associations use only distinct built-in types. stdint typedefs (int16_t,
+ * int64_t, size_t, …) match via their underlying type — listing both would
+ * make _Generic reject duplicate compatible types (ABI-dependent).
+ */
 
 #define COLLECT_C_LIMITS_maximum_(v)    ( _Generic((v),     \
                                                             \
-             int8_t         : (INT8_MAX),                   \
-             int8_t      *  : (INT8_MAX),                   \
-             int8_t const*  : (INT8_MAX),                   \
-            uint8_t         : (UINT8_MAX),                  \
-            uint8_t      *  : (UINT8_MAX),                  \
-            uint8_t const*  : (UINT8_MAX),                  \
+        signed char         : (SCHAR_MAX),                  \
+        signed char      *  : (SCHAR_MAX),                  \
+        signed char const*  : (SCHAR_MAX),                  \
+      unsigned char         : (UCHAR_MAX),                  \
+      unsigned char      *  : (UCHAR_MAX),                  \
+      unsigned char const*  : (UCHAR_MAX),                  \
                                                             \
-             int16_t        : (INT16_MAX),                  \
-             int16_t      * : (INT16_MAX),                  \
-             int16_t const* : (INT16_MAX),                  \
-            uint16_t        : (UINT16_MAX),                 \
-            uint16_t      * : (UINT16_MAX),                 \
-            uint16_t const* : (UINT16_MAX),                 \
+               short        : (SHRT_MAX),                   \
+               short      * : (SHRT_MAX),                   \
+               short const* : (SHRT_MAX),                   \
+      unsigned short        : (USHRT_MAX),                  \
+      unsigned short      * : (USHRT_MAX),                  \
+      unsigned short const* : (USHRT_MAX),                  \
                                                             \
-             int32_t        : (INT32_MAX),                  \
-             int32_t      * : (INT32_MAX),                  \
-             int32_t const* : (INT32_MAX),                  \
-            uint32_t        : (UINT32_MAX),                 \
-            uint32_t      * : (UINT32_MAX),                 \
-            uint32_t const* : (UINT32_MAX),                 \
+                 int        : (INT_MAX),                    \
+                 int      * : (INT_MAX),                    \
+                 int const* : (INT_MAX),                    \
+        unsigned int        : (UINT_MAX),                   \
+        unsigned int      * : (UINT_MAX),                   \
+        unsigned int const* : (UINT_MAX),                   \
                                                             \
-             int64_t        : (INT64_MAX),                  \
-             int64_t      * : (INT64_MAX),                  \
-             int64_t const* : (INT64_MAX),                  \
-            uint64_t        : (UINT64_MAX),                 \
-            uint64_t      * : (UINT64_MAX),                 \
-            uint64_t const* : (UINT64_MAX),                 \
+                long        : (LONG_MAX),                   \
+                long      * : (LONG_MAX),                   \
+                long const* : (LONG_MAX),                   \
+       unsigned long        : (ULONG_MAX),                  \
+       unsigned long      * : (ULONG_MAX),                  \
+       unsigned long const* : (ULONG_MAX),                  \
                                                             \
-    COLLECT_C_LIMIT_ENTRY_short_(LONG_MAX, ULONG_MAX)       \
-                                                            \
-    COLLECT_C_LIMIT_ENTRY_int_(LONG_MAX, ULONG_MAX)         \
-                                                            \
-    COLLECT_C_LIMIT_ENTRY_long_(LONG_MAX, ULONG_MAX)        \
-                                                            \
-    COLLECT_C_LIMIT_ENTRY_long_long_(LLONG_MAX, ULLONG_MAX) \
+           long long        : (LLONG_MAX),                  \
+           long long      * : (LLONG_MAX),                  \
+           long long const* : (LLONG_MAX),                  \
+  unsigned long long        : (ULLONG_MAX),                 \
+  unsigned long long      * : (ULLONG_MAX),                 \
+  unsigned long long const* : (ULLONG_MAX),                 \
                                                             \
                 char   **** : 0                             \
 ))
 
 #define COLLECT_C_LIMITS_minimum_(v)    ( _Generic((v),     \
                                                             \
-             int8_t         : (INT8_MIN),                   \
-             int8_t      *  : (INT8_MIN),                   \
-             int8_t const*  : (INT8_MIN),                   \
-            uint8_t         : (0),                          \
-            uint8_t      *  : (0),                          \
-            uint8_t const*  : (0),                          \
+        signed char         : (SCHAR_MIN),                  \
+        signed char      *  : (SCHAR_MIN),                  \
+        signed char const*  : (SCHAR_MIN),                  \
+      unsigned char         : (0),                          \
+      unsigned char      *  : (0),                          \
+      unsigned char const*  : (0),                          \
                                                             \
-             int16_t        : (INT16_MIN),                  \
-             int16_t      * : (INT16_MIN),                  \
-             int16_t const* : (INT16_MIN),                  \
-            uint16_t        : (0),                          \
-            uint16_t      * : (0),                          \
-            uint16_t const* : (0),                          \
+               short        : (SHRT_MIN),                   \
+               short      * : (SHRT_MIN),                   \
+               short const* : (SHRT_MIN),                   \
+      unsigned short        : (0),                          \
+      unsigned short      * : (0),                          \
+      unsigned short const* : (0),                          \
                                                             \
-             int32_t        : (INT32_MIN),                  \
-             int32_t      * : (INT32_MIN),                  \
-             int32_t const* : (INT32_MIN),                  \
-            uint32_t        : (0),                          \
-            uint32_t      * : (0),                          \
-            uint32_t const* : (0),                          \
+                 int        : (INT_MIN),                    \
+                 int      * : (INT_MIN),                    \
+                 int const* : (INT_MIN),                    \
+        unsigned int        : (0),                          \
+        unsigned int      * : (0),                          \
+        unsigned int const* : (0),                          \
                                                             \
-             int64_t        : (INT64_MIN),                  \
-             int64_t      * : (INT64_MIN),                  \
-             int64_t const* : (INT64_MIN),                  \
-            uint64_t        : (0),                          \
-            uint64_t      * : (0),                          \
-            uint64_t const* : (0),                          \
+                long        : (LONG_MIN),                   \
+                long      * : (LONG_MIN),                   \
+                long const* : (LONG_MIN),                   \
+       unsigned long        : (0),                          \
+       unsigned long      * : (0),                          \
+       unsigned long const* : (0),                          \
                                                             \
-    COLLECT_C_LIMIT_ENTRY_short_(LONG_MIN, 0)               \
-                                                            \
-    COLLECT_C_LIMIT_ENTRY_int_(LONG_MIN, 0)                 \
-                                                            \
-    COLLECT_C_LIMIT_ENTRY_long_(LONG_MIN, 0)                \
-                                                            \
-    COLLECT_C_LIMIT_ENTRY_long_long_(LLONG_MIN, 0)          \
+           long long        : (LLONG_MIN),                  \
+           long long      * : (LLONG_MIN),                  \
+           long long const* : (LLONG_MIN),                  \
+  unsigned long long        : (0),                          \
+  unsigned long long      * : (0),                          \
+  unsigned long long const* : (0),                          \
                                                             \
                 char   **** : 0                             \
 ))
@@ -174,4 +124,3 @@
 
 
 /* ///////////////////////////// end of file //////////////////////////// */
-

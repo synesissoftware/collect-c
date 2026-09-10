@@ -6,7 +6,7 @@
 * Added tree-map container (**tmap** / **collect-c/tmap.h**, terse API in **collect-c/terse/tmap.h**) with insert, find, entry/node walk, and free-storage;
 * Added custom memory API (**collect-c/common/mem_api.h**) and applied it across **circq**, **dlist**, **vec**, and **tmap**;
 * Added stock comparison functions (sized and built-in integers; C-strings, including case-insensitive) and **collect_c_stricmp**;
-* Added type-detecting limits macros (**COLLECT_C_LIMITS_maximum** / **COLLECT_C_LIMITS_minimum** in **collect-c/util/limits.h**);
+* Added type-detecting limits macros (**COLLECT_C_LIMITS_maximum** / **COLLECT_C_LIMITS_minimum** in **collect-c/util/limits.h**); `_Generic` associations use distinct built-in types only so stdint typedefs do not create duplicate matches across ABIs;
 * Circular queue: fixed index wrap when `b`/`e` approach the end of their integral value space; custom **mem_api** support;
 * Doubly-linked list: spare-node reuse (cap 64), push-back/front by-ref macros, **COLLECT_C_DLIST_free_storage**, element-free `el_index` always `-1`, shared **collect_c_common_node_data_t**, custom **mem_api**;
 * Vector: custom **mem_api** for allocate/realloc/free paths;
