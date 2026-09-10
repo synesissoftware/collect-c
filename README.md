@@ -107,7 +107,8 @@ values were laid out in a (mostly) balanced binary tree. **tmap** is a
 plain binary search tree, not self-balancing, so insertion order
 determines tree shape. **test.performance.tmap** pastes these sequences
 into the `BBT_*` arrays to compare balanced insert and walk against
-ascending (degenerate) order.
+ascending (degenerate) order. **test.performance.std_map** uses the same
+sequences as a **std::map** counterpart.
 
 `--format` selects the output form:
 
