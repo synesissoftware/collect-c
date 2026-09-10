@@ -44,8 +44,8 @@ typedef collect_c_tmap_node_t                               node_t;
 #define CLC_TMAP_node_key_ptr_(n)                           (&(n)->data->data[0])
 #define CLC_TMAP_node_val_ptr_(n, key_size)                 ((void*)(CLC_TMAP_node_key_ptr_(n) + (CLC_TMAP_INTERNAL_NUM_nd_FOR_key_(key_size) * sizeof(collect_c_common_node_data_t))))
 
-#define CLC_TMAP_INTERNAL_NUM_nd_FOR_key_(key_size)         (((key_size) + (sizeof(sizeof(collect_c_common_node_data_t)) - 1)) / sizeof(collect_c_common_node_data_t))
-#define CLC_TMAP_INTERNAL_NUM_nd_FOR_val_(val_size)         (((val_size) + (sizeof(sizeof(collect_c_common_node_data_t)) - 1)) / sizeof(collect_c_common_node_data_t))
+#define CLC_TMAP_INTERNAL_NUM_nd_FOR_key_(key_size)         (((key_size) + (sizeof(collect_c_common_node_data_t) - 1)) / sizeof(collect_c_common_node_data_t))
+#define CLC_TMAP_INTERNAL_NUM_nd_FOR_val_(val_size)         (((val_size) + (sizeof(collect_c_common_node_data_t) - 1)) / sizeof(collect_c_common_node_data_t))
 
 #define CLC_TMAP_INTERNAL_sizeof_node_(key_size, val_size)  (offsetof(node_t, data) + (CLC_TMAP_INTERNAL_NUM_nd_FOR_key_((key_size)) * sizeof(collect_c_common_node_data_t)) + val_size)
 
@@ -75,6 +75,9 @@ clc_c_tm_alloc_node_(
 
         size_t const    v_off   =   cb - val_size;
         void** const    ppvalue =   (void**)&nd->value;
+
+        nd->left    =   NULL;
+        nd->right   =   NULL;
 
         *ppvalue = ((char*)nd) + v_off;
     }

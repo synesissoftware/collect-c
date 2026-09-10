@@ -109,7 +109,7 @@ int cmp_custom_t(
 {
     assert(NULL != pe_lhs);
     assert(NULL != pe_rhs);
-    assert(sizeof(custom_t) != el_size);
+    assert(sizeof(custom_t) == el_size);
 
     ((void)&el_size);
 
