@@ -4,15 +4,47 @@ ScriptPath=$0
 Dir=$(cd $(dirname "$ScriptPath"); pwd)
 Basename=$(basename "$ScriptPath")
 CMakeDir=${SIS_CMAKE_BUILD_DIR:-$Dir/_build}
-MakeCmd=${SIS_MAKE_COMMAND:-${SIS_CMAKE_COMMAND:-make}}
+if [[ -n "$MSYSTEM" ]]; then
+
+  DefaultMakeCmd=mingw32-make.exe
+else
+
+  DefaultMakeCmd=make
+fi
+MakeCmd=${SIS_CMAKE_MAKE_COMMAND:-${SIS_CMAKE_COMMAND:-$DefaultMakeCmd}}
+ProjectNameFile="$Dir/.sis/project_name.txt"
+ProjectName=$(tr -d '[:space:]' < "$ProjectNameFile")
 
 Configuration=Release
 ExamplesDisabled=0
-MinGW=0
+MSVC_MT="${MSVC_MT:=0}"
+MinGW="${MinGW:=0}"
+NO_shwild=0
 RunMake=0
 STLSoftDirGiven=
 TestingDisabled=0
 VerboseMakefile=0
+
+
+# ##########################################################
+# colours
+
+if [ -n "${TERM:-}" ] && [ -t 1 ] && command -v tput >/dev/null 2>&1; then
+
+  RbEnvClr_Blue=${FG_BLUE:-$(tput setaf 4)}
+  RbEnvClr_Red=${FG_BLUE:-$(tput setaf 1)}
+  RbEnvClr_Bold=${FD_BOLD:-$(tput bold)}
+  RbEnvClr_None=${FD_NONE:-$(tput sgr0)}
+else
+
+  RbEnvClr_Blue=
+  RbEnvClr_Red=
+  RbEnvClr_Bold=
+  RbEnvClr_None=
+fi
+
+MakeCmdClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${MakeCmd}${RbEnvClr_None}"
+ProjectNameClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None}"
 
 
 # ##########################################################
@@ -21,19 +53,19 @@ VerboseMakefile=0
 while [[ $# -gt 0 ]]; do
 
   case $1 in
-    -v|--cmake-verbose-makefile)
+    --cmake-verbose-makefile|-v)
 
       VerboseMakefile=1
       ;;
-    -d|--debug-configuration)
+    --debug-configuration|-d)
 
       Configuration=Debug
       ;;
-    -E|--disable-examples)
+    --disable-examples|-E)
 
       ExamplesDisabled=1
       ;;
-    -T|--disable-testing)
+    --disable-testing|-T)
 
       TestingDisabled=1
       ;;
@@ -41,20 +73,27 @@ while [[ $# -gt 0 ]]; do
 
       MinGW=1
       ;;
-    -m|--run-make)
+    --msvc-mt)
+
+      MSVC_MT=1
+      ;;
+    --no-shwild)
+
+      NO_shwild=1
+      ;;
+    --run-make|-m)
 
       RunMake=1
       ;;
-    -s|--stlsoft-root-dir)
+    --stlsoft-root-dir|-s)
 
       shift
       STLSoftDirGiven=$1
       ;;
     --help)
 
+      [ -f "$Dir/.sis/script_info_lines.txt" ] && cat "$Dir/.sis/script_info_lines.txt"
       cat << EOF
-collect-c Special and custom Collections and Containers (for C)
-Copyright (c) 2025, Matthew Wilson and Synesis Information Systems
 Creates/reinitialises the CMake build script(s)
 
 $ScriptPath [ ... flags/options ... ]
@@ -79,10 +118,24 @@ Flags/options:
 
     -T
     --disable-testing
-        disables building of tests (by setting BUILD_TESTING=OFF)
+        disables building of tests (by setting BUILD_TESTING=OFF). Unless
+        testing is disabled the STLSoft and xTests libraries will be
+        required to be available to CMake
 
     --mingw
-        uses explicitly the "MinGW Makefiles" generator
+        uses explicitly the "MinGW Makefiles" generator, and defaults the
+        make-command to "mingw32-make.exe"
+
+    --msvc-mt
+        when using Visual C++ (MSVC), the static runtime library will be
+        selected; the default is the dynamic runtime library
+
+    --no-shwild
+        prevents recognising shwild library
+
+    --msvc-mt
+        when using Visual C++ (MSVC), the static runtime library will be
+        selected; the default is the dynamic runtime library
 
     -m
     --run-make
@@ -106,7 +159,7 @@ EOF
       ;;
     *)
 
-      >&2 echo "$ScriptPath: unrecognised argument '$1'; use --help for usage"
+      >&2 echo "$ScriptPath: unrecognised argument '${RbEnvClr_Red}${RbEnvClr_Bold}$1${RbEnvClr_None}'; use --help for usage"
 
       exit 1
       ;;
@@ -123,9 +176,11 @@ mkdir -p $CMakeDir || exit 1
 
 cd $CMakeDir
 
-echo "Executing CMake (in ${CMakeDir})"
+echo "Executing CMake for ${ProjectNameClr} (in ${RbEnvClr_Blue}${RbEnvClr_Bold}${CMakeDir}${RbEnvClr_None})"
 
 if [ $ExamplesDisabled -eq 0 ]; then CMakeBuildExamplesFlag="ON" ; else CMakeBuildExamplesFlag="OFF" ; fi
+if [ $MSVC_MT -eq 0 ]; then CMakeMsvcMtFlag="OFF" ; else CMakeMsvcMtFlag="ON" ; fi
+if [ $NO_shwild -eq 0 ]; then CMakeNoShwild="OFF" ; else CMakeNoShwild="ON" ; fi
 if [ -z $STLSoftDirGiven ]; then CMakeSTLSoftVariable="" ; else CMakeSTLSoftVariable="-DSTLSOFT=$STLSoftDirGiven/" ; fi
 if [ $TestingDisabled -eq 0 ]; then CMakeBuildTestingFlag="ON" ; else CMakeBuildTestingFlag="OFF" ; fi
 if [ $VerboseMakefile -eq 0 ]; then CMakeVerboseMakefileFlag="OFF" ; else CMakeVerboseMakefileFlag="ON" ; fi
@@ -137,6 +192,7 @@ if [ $MinGW -ne 0 ]; then
     -DBUILD_EXAMPLES:BOOL=$CMakeBuildExamplesFlag \
     -DBUILD_TESTING:BOOL=$CMakeBuildTestingFlag \
     -DCMAKE_BUILD_TYPE=$Configuration \
+    -DNO_SHWILD:BOOL=$CMakeNoShwild \
     -G "MinGW Makefiles" \
     -S $Dir \
     -B $CMakeDir \
@@ -149,6 +205,8 @@ else
     -DBUILD_TESTING:BOOL=$CMakeBuildTestingFlag \
     -DCMAKE_BUILD_TYPE=$Configuration \
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=$CMakeVerboseMakefileFlag \
+    -DMSVC_USE_MT:BOOL=$CMakeMsvcMtFlag \
+    -DNO_SHWILD:BOOL=$CMakeNoShwild \
     -S $Dir \
     -B $CMakeDir \
     || (cd ->/dev/null ; exit 1)
@@ -158,7 +216,8 @@ status=0
 
 if [ $RunMake -ne 0 ]; then
 
-  echo "Executing build (via command \`$MakeCmd\`)"
+  echo
+  echo "Executing build for ${ProjectNameClr} (via command \`${MakeCmdClr}\`)"
 
   $MakeCmd
   status=$?

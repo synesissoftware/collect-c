@@ -5,17 +5,24 @@
 
 - [Functional improvements](#functional-improvements)
 - [Performance improvements](#performance-improvements)
+- [Packaging improvements](#packaging-improvements)
 
 
 ## Functional improvements
 
-* [ ] T.B.C.;
+* \<none>
 
 
 ## Performance improvements
 
-* [ ] T.B.C.;
+* \<none>
+
+
+## Packaging improvements
+
+* [ ] Example programs under **examples/** (and **EXAMPLES.md**);
+* [x] ~~~Modular GitHub Actions CI (**ci.yml** / **ci-cell.yml**)~~~ - ✅;
+* [x] ~~~Customary markdown (**AUTHORS**, **CHANGES**, **FAQ**, **INSTALL**, **NEWS**, **README**)~~~ - ✅;
 
 
 <!-- ########################### end of file ########################### -->
-

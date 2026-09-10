@@ -4,7 +4,7 @@
  * Purpose: Vector container.
  *
  * Created: 5th February 2025
- * Updated: 19th February 2025
+ * Updated: 22nd March 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -48,11 +48,13 @@ collect_c_vec_allocate_storage(
 )
 {
     assert(NULL != v);
+    assert(NULL != v->mem_api);
     assert(NULL == v->storage);
 
     {
-        bool const uses_stack_array =   0 != (COLLECT_C_VEC_F_USE_STACK_ARRAY & v->flags);
-        bool const uses_boo         =   0 == (COLLECT_C_VEC_F_NO_BOO & v->flags);
+        collect_c_mem_api_t* const  mem_api             =   &v->mem_api;
+        bool const                  uses_stack_array    =   0 != (COLLECT_C_VEC_F_USE_STACK_ARRAY & v->flags);
+        bool const                  uses_boo            =   0 == (COLLECT_C_VEC_F_NO_BOO & v->flags);
 
         if (uses_stack_array)
         {
@@ -65,7 +67,7 @@ collect_c_vec_allocate_storage(
 
             size_t const    cb      =   cap_all * v->el_size;
 
-            if (NULL == (v->storage = malloc(cb)))
+            if (NULL == (v->storage = (mem_api->pfn_alloc)(mem_api->param, cb)))
             {
                 return ENOMEM;
             }
@@ -87,9 +89,12 @@ collect_c_vec_free_storage(
 )
 {
     assert(NULL != v);
+    assert(NULL != v->mem_api);
     assert(NULL != v->storage);
 
     {
+        collect_c_mem_api_t* const  mem_api =   &v->mem_api;
+
         if (NULL != v->pfn_element_free)
         {
             for (size_t i = 0; v->size != i; ++i)
@@ -103,7 +108,9 @@ collect_c_vec_free_storage(
 
         if (0 == (COLLECT_C_VEC_F_USE_STACK_ARRAY & v->flags))
         {
-            free(v->storage);
+            size_t const cb_curr = v->capacity * v->el_size;
+
+            (mem_api->pfn_free)(mem_api->param, v->storage, cb_curr);
 
             v->storage = NULL;
         }
@@ -126,6 +133,7 @@ collect_c_vec_clear(
     ((void)&reserved1);
 
     assert(NULL != v);
+    assert(NULL != v->mem_api);
     assert(NULL != v->storage);
     assert(NULL == reserved0);
     assert(NULL == reserved1);
@@ -168,11 +176,13 @@ collect_c_vec_shrink_to_fit(
 )
 {
     assert(NULL != v);
+    assert(NULL != v->mem_api);
     assert(NULL != v->storage);
 
     {
-        bool const uses_stack_array =   0 != (COLLECT_C_VEC_F_USE_STACK_ARRAY & v->flags);
-        bool const uses_boo         =   0 == (COLLECT_C_VEC_F_NO_BOO & v->flags);
+        collect_c_mem_api_t* const  mem_api             =   &v->mem_api;
+        bool const                  uses_stack_array    =   0 != (COLLECT_C_VEC_F_USE_STACK_ARRAY & v->flags);
+        bool const                  uses_boo            =   0 == (COLLECT_C_VEC_F_NO_BOO & v->flags);
 
         if (uses_stack_array)
         {
@@ -183,8 +193,9 @@ collect_c_vec_shrink_to_fit(
             size_t const    cb_boo  =   uses_boo ? v->size / 4 : 0;
             size_t const    cb_els  =   v->size * v->el_size;
 
-            size_t const    cb      =   cb_boo + cb_els;
-            void* const     pv_new  =   realloc(v->storage, cb);
+            size_t const    cb_curr =   v->capacity * v->el_size;
+            size_t const    cb_new  =   cb_boo + cb_els;
+            void* const     pv_new  =   (mem_api->pfn_realloc)(mem_api->param, v->storage, cb_curr, cb_new);
 
             if (NULL == pv_new)
             {
@@ -207,11 +218,13 @@ collect_c_v_push_back_by_ref(
 )
 {
     assert(NULL != v);
+    assert(NULL != v->mem_api);
     assert(NULL != v->storage);
 
     {
-        bool const uses_stack_array =   0 != (COLLECT_C_VEC_F_USE_STACK_ARRAY & v->flags);
-        bool const uses_boo         =   0 == (COLLECT_C_VEC_F_NO_BOO & v->flags);
+        collect_c_mem_api_t* const  mem_api             =   &v->mem_api;
+        bool const                  uses_stack_array    =   0 != (COLLECT_C_VEC_F_USE_STACK_ARRAY & v->flags);
+        bool const                  uses_boo            =   0 == (COLLECT_C_VEC_F_NO_BOO & v->flags);
 
         assert(!uses_stack_array || 0 == v->offset);
 
@@ -242,8 +255,9 @@ collect_c_v_push_back_by_ref(
                 {
                     size_t const    cap_new =   (v->capacity * 3) / 2;
                     size_t const    off_new =   uses_boo ? cap_new / 4 : 0;
+                    size_t const    cb_curr =   v->capacity * v->el_size;
                     size_t const    cb_new  =   (cap_new + off_new) * v->el_size;
-                    void* const     pv_new  =   realloc(v->storage, cb_new);
+                    void* const     pv_new  =   (mem_api->pfn_realloc)(mem_api->param, v->storage, cb_curr, cb_new);
 
                     if (NULL == pv_new)
                     {
@@ -292,11 +306,13 @@ collect_c_v_push_front_by_ref(
 )
 {
     assert(NULL != v);
+    assert(NULL != v->mem_api);
     assert(NULL != v->storage);
 
     {
-        bool const uses_stack_array =   0 != (COLLECT_C_VEC_F_USE_STACK_ARRAY & v->flags);
-        bool const uses_boo         =   0 == (COLLECT_C_VEC_F_NO_BOO & v->flags);
+        collect_c_mem_api_t* const  mem_api             =   &v->mem_api;
+        bool const                  uses_stack_array    =   0 != (COLLECT_C_VEC_F_USE_STACK_ARRAY & v->flags);
+        bool const                  uses_boo            =   0 == (COLLECT_C_VEC_F_NO_BOO & v->flags);
 
         assert(!uses_stack_array || 0 == v->offset);
 
@@ -316,8 +332,9 @@ collect_c_v_push_front_by_ref(
 
                     size_t const    cap_new =   (v->capacity * 3) / 2;
                     size_t const    off_new =   uses_boo ? cap_new / 4 : 0;
+                    size_t const    cb_curr =   v->capacity * v->el_size;
                     size_t const    cb_new  =   (cap_new + off_new) * v->el_size;
-                    void* const     pv_new  =   realloc(v->storage, cb_new);
+                    void* const     pv_new  =   (mem_api->pfn_realloc)(mem_api->param, v->storage, cb_curr, cb_new);
 
                     if (NULL == pv_new)
                     {
@@ -367,7 +384,7 @@ collect_c_v_push_front_by_ref(
 
                 if (0 != v->offset)
                 {
-                size_t const    ix_src  =   0 + v->offset--;
+                    size_t const    ix_src  =   0 + v->offset--;
                     size_t const    ix_dst  =   0 + v->offset;
                     void* const     pe_src   =   ((char*)v->storage) + (ix_src * v->el_size);
                     void* const     pe_dst   =   ((char*)v->storage) + (ix_dst * v->el_size);
@@ -378,10 +395,11 @@ collect_c_v_push_front_by_ref(
                 }
                 else
                 {
-                size_t const    cap_new =   (v->capacity * 3) / 2;
+                    size_t const    cap_new =   (v->capacity * 3) / 2;
                     size_t const    off_new =   uses_boo ? cap_new / 4 : 0;
+                    size_t const    cb_curr =   v->capacity * v->el_size;
                     size_t const    cb_new  =   (cap_new + off_new) * v->el_size;
-                    void* const     pv_new  =   realloc(v->storage, cb_new);
+                    void* const     pv_new  =   (mem_api->pfn_realloc)(mem_api->param, v->storage, cb_curr, cb_new);
 
                     if (NULL == pv_new)
                     {

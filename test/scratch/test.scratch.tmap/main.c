@@ -4,7 +4,7 @@
  * Purpose: Scratch-test for tree-map.
  *
  * Created: 19th March 2025
- * Updated: 19th March 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -20,6 +20,7 @@
 #include <stlsoft/stlsoft.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -93,7 +94,7 @@ int main(int argc, char* argv[])
 
     CLC_TM_define_empty(int, cstring_t, m);
 
-    collect_c_tmap_walkdir_t    direction   =   COLLECT_C_TMAP_WALK_DEFAULT;
+    collect_c_tmap_walkdir_t direction = COLLECT_C_TMAP_WALK_DEFAULT;
 
     m.pfn_element_free = free_element;
 
@@ -133,10 +134,11 @@ int main(int argc, char* argv[])
         else
         {
             char*       endptr;
-            int const   value = strtod(arg, &endptr);
+            long const  value_l = strtol(arg, &endptr, 10);
+            int const   value   = (int)value_l;
 
-            if (0 == value &&
-                '\0' != *endptr)
+            if (('\0' != *endptr) ||
+                (value_l != (long)value))
             {
                 fprintf(stderr, "%.*s: argument-%d '%s' could not be converted into an integer\n"
                 ,   (int)program_name.len, program_name.ptr
@@ -171,9 +173,9 @@ int main(int argc, char* argv[])
 
                     if (0 != rm)
                     {
-                        fprintf(stderr, "%.*s: could not prepare value to insert: %s\n"
+                        fprintf(stderr, "%.*s: could not prepare value to insert: %d\n"
                         ,   (int)program_name.len, program_name.ptr
-                        ,   strerror(rm)
+                        ,   rm
                         );
 
                         cstring_destroy(&cs);

@@ -73,7 +73,7 @@
  * inclusion control
  */
 
- #pragma once
+#pragma once
 
 
  /* ///////////////////////////// end of file //////////////////////////// */

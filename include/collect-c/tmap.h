@@ -141,6 +141,18 @@ typedef int (*collect_c_tmap_pfn_entry_walk)(
 ,   void*       param_walk
 );
 
+/** Prototype for callback function for entries.
+ *
+ */
+typedef int (*collect_c_tmap_pfn_node_walk)(
+    size_t                          key_size
+,   size_t                          val_size
+,   intptr_t                        el_index    /* always -1 */
+,   size_t                          depth
+,   collect_c_tmap_node_t const*    node
+,   void*                           param_walk
+);
+
 enum collect_c_tmap_walkdir_t
 {
     COLLECT_C_TMAP_WALK_DEFAULT     =   0
@@ -210,8 +222,32 @@ typedef struct collect_c_tmap_t                             collect_c_tmap_t;
 
 /* modifiers */
 
+/** @def COLLECT_C_TMAP_insert_by_val(m_name, t_key, v_key, t_val, v_val, p_was_replaced)
+ *
+ * Attempts to insert/update an entry (key + value) into the map, where both key
+ * and map are presented by-value.
+ *
+ * @param m_name The map - by-value or by-reference (pointer) - into which
+ *  the new entry is to be inserted (or updated);
+ * @param t_key The type of the key;
+ * @param v_key The entry key, presented by-value;
+ * @param t_val The type of the value;
+ * @param v_val The entry value, presented by-value;
+ * @param p_was_replaced Pointer to a variable that will receive an integer representing whether ;
+ *
+ * @return Indicates whether operation succeeded.
+ * @retval 0 Operation succeed;
+ * @retval ENOMEM Sufficient memory not available;
+ */
 #define COLLECT_C_TMAP_insert_by_val(m_name, t_key, v_key, t_val, v_val, p_was_replaced)    \
-                                                            collect_c_tmap_insert(COLLECT_C_TMAP_get_l_ptr_(m_name), &((t_key){(v_key)}), &((t_val){(v_val)}), NULL, p_was_replaced)
+                                                                                            \
+    collect_c_tmap_insert(                                                                  \
+        COLLECT_C_TMAP_get_l_ptr_(m_name)                                                   \
+    ,   &((t_key){(v_key)})                                                                 \
+    ,   &((t_val){(v_val)})                                                                 \
+    ,   NULL                                                                                \
+    ,   p_was_replaced                                                                      \
+    )
 
 
 /* attributes */
@@ -271,6 +307,14 @@ int
 collect_c_tmap_entry_walk(
     collect_c_tmap_t*               m
 ,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   void*                           param_walk
+,   collect_c_tmap_walkdir_t        direction
+);
+
+int
+collect_c_tmap_node_walk(
+    collect_c_tmap_t*               m
+,   collect_c_tmap_pfn_node_walk    pfn_walk
 ,   void*                           param_walk
 ,   collect_c_tmap_walkdir_t        direction
 );

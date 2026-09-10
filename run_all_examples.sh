@@ -4,26 +4,13 @@ ScriptPath=$0
 Dir=$(cd $(dirname "$ScriptPath"); pwd)
 Basename=$(basename "$ScriptPath")
 CMakeDir=${SIS_CMAKE_BUILD_DIR:-$Dir/_build}
+[[ -n "$MSYSTEM" ]] && DefaultMakeCmd=mingw32-make.exe || DefaultMakeCmd=make
+MakeCmd=${SIS_CMAKE_MAKE_COMMAND:-${SIS_CMAKE_COMMAND:-$DefaultMakeCmd}}
 ProjectNameFile="$Dir/.sis/project_name.txt"
 ProjectName=$(tr -d '[:space:]' < "$ProjectNameFile")
 
-Directories=(
-  CMakeFiles
-  Testing
-  cmake
-  examples
-  projects
-  src
-  test
-)
-Files=(
-  CMakeCache.txt
-  CTestTestfile.cmake
-  DartConfiguration.tcl
-  Makefile
-  cmake_install.cmake
-  install_manifest.txt
-)
+ListOnly=0
+RunMake=1
 
 
 # ##########################################################
@@ -48,46 +35,38 @@ ProjectNameClr="${RbEnvClr_Blue}${RbEnvClr_Bold}${ProjectName}${RbEnvClr_None}"
 
 
 # ##########################################################
-# operating environment detection
-
-OsName="$(uname -s)"
-case "${OsName}" in
-  CYGWIN*|MINGW*|MSYS_NT*)
-
-    Directories+=(
-      ARM64
-      Win32
-      x64
-    )
-    Files+=(
-      "*.filters"
-      "*.sln"
-      "*.vcxproj"
-    )
-    ;;
-  *)
-
-    ;;
-esac
-
-
-# ##########################################################
 # command-line handling
 
 while [[ $# -gt 0 ]]; do
 
   case $1 in
+    --list-only|-l)
+
+      ListOnly=1
+      ;;
+    --no-make|-M)
+
+      RunMake=0
+      ;;
     --help)
 
       [ -f "$Dir/.sis/script_info_lines.txt" ] && cat "$Dir/.sis/script_info_lines.txt"
       cat << EOF
-Removes all known CMake artefacts
+Runs all (matching) example programs
 
 $ScriptPath [ ... flags/options ... ]
 
 Flags/options:
 
     behaviour:
+
+    -l
+    --list-only
+        lists the target programs but does not execute them
+
+    -M
+    --no-make
+        does not execute CMake and make before running tests
 
 
     standard flags:
@@ -114,60 +93,59 @@ done
 # ##########################################################
 # main()
 
-if [ ! -d "$CMakeDir" ]; then
+status=0
 
-  echo "$ScriptPath: CMake build directory '$CMakeDir' not found so nothing to do; use script 'prepare_cmake.sh' if you wish to prepare CMake artefacts"
+if [ $RunMake -ne 0 ]; then
 
-  exit 0
+  if [ $ListOnly -eq 0 ]; then
+
+    echo "Executing build of ${ProjectNameClr} (via command \`${MakeCmdClr}\`) and then running all example programs"
+
+    mkdir -p $CMakeDir || exit 1
+
+    cd $CMakeDir
+
+    $MakeCmd
+    status=$?
+
+    cd ->/dev/null
+  fi
 else
 
-  echo "Removing all ${ProjectNameClr} cmake artefacts in '$CMakeDir'"
+  if [ ! -d "$CMakeDir" ] || [ ! -f "$CMakeDir/CMakeCache.txt" ] || [ ! -d "$CMakeDir/CMakeFiles" ]; then
 
-  num_dirs_removed=0
-  num_files_removed=0
-
-  for d in ${Directories[@]}
-  do
-
-    fq_dir_path="$CMakeDir/$d"
-
-    [ -d "$fq_dir_path" ] || continue
-
-    echo "removing directory '$d'"
-
-    rm -dfr "$fq_dir_path"
-
-    num_dirs_removed=$((num_dirs_removed+1))
-  done
-
-  cd "$CMakeDir"
-
-  for f in ${Files[@]}
-  do
-
-    for fq_file_path in $f
-    do
-
-      [ -f "$fq_file_path" ] || continue
-
-      echo "removing file '$fq_file_path'"
-
-      rm -f "$fq_file_path"
-
-      num_files_removed=$((num_files_removed+1))
-    done
-  done
-
-  cd ->/dev/null
-
-  if [ 0 -eq $num_dirs_removed ] && [ 0 -eq $num_files_removed ]; then
-
-    echo "nothing to do"
-  else
-
-    echo "removed $num_dirs_removed directories and $num_files_removed files"
+    >&2 echo "$ScriptPath: cannot run in '--no-make' mode without a previous successful build step"
   fi
 fi
+
+if [ $status -eq 0 ]; then
+
+  if [ $ListOnly -ne 0 ]; then
+
+    echo "Listing all ${ProjectNameClr} example programs"
+  else
+
+    echo "Running all ${ProjectNameClr} example programs"
+  fi
+
+  for f in $(find $CMakeDir/examples -type f -exec test -x {} \; -print)
+  do
+
+    if [ $ListOnly -ne 0 ]; then
+
+      echo "would execute ${RbEnvClr_Blue}${RbEnvClr_Bold}${f}${RbEnvClr_None}:"
+
+      continue
+    fi
+
+    echo
+    echo "executing ${RbEnvClr_Blue}${RbEnvClr_Bold}${f}${RbEnvClr_None}:"
+
+    $f
+  done
+fi
+
+exit $status
 
 
 # ############################## end of file ############################# #

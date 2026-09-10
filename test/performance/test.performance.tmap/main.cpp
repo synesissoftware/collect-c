@@ -4,7 +4,7 @@
  * Purpose: Performance-test for tree-map.
  *
  * Created: 19th March 2025
- * Updated: 20th March 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -416,7 +416,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -474,7 +474,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -532,7 +532,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -641,7 +641,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -699,7 +699,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -757,7 +757,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -866,7 +866,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -924,7 +924,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -982,7 +982,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -1091,7 +1091,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -1149,7 +1149,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth
@@ -1207,7 +1207,7 @@ namespace {
             {
                 size_t max_depth = 0;
 
-                collect_c_tmap_walk(
+                collect_c_tmap_entry_walk(
                     &m
                 ,   element_walk_function_max_depth
                 ,   &max_depth

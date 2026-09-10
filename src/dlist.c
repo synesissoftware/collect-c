@@ -132,7 +132,7 @@ clc_dlist_free_storage(
 
             n = n->next;
 
-            free(n2);
+            (mem_api->pfn_free)(mem_api->param, n2, cb);
 
             --l->num_spares;
         }
@@ -159,7 +159,9 @@ collect_c_dlist_clear(
     assert(NULL == reserved1);
 
     {
-        size_t dummy;
+        collect_c_mem_api_t* const  mem_api =   &l->mem_api;
+        size_t const                cb      =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(l->el_size);
+        size_t                      dummy;
 
         if (NULL == num_dropped)
         {
@@ -185,7 +187,7 @@ collect_c_dlist_clear(
             }
             else
             {
-                free(n2);
+                (mem_api->pfn_free)(mem_api->param, n2, cb);
             }
 
             ++*num_dropped;
@@ -208,6 +210,9 @@ collect_c_dlist_erase_node(
     assert(NULL != node);
 
     {
+        collect_c_mem_api_t* const  mem_api =   &l->mem_api;
+        size_t const                cb      =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(l->el_size);
+
         /* simple set of actions:
          *
          * 1. "destruct" element;
@@ -264,7 +269,7 @@ collect_c_dlist_erase_node(
             }
             else
             {
-                free(node);
+                (mem_api->pfn_free)(mem_api->param, node, cb);
             }
         }
 

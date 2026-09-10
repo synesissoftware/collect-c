@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 22nd March 2025
+ * Updated: 10th September 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -44,8 +44,8 @@ typedef collect_c_tmap_node_t                               node_t;
 #define CLC_TMAP_node_key_ptr_(n)                           (&(n)->data->data[0])
 #define CLC_TMAP_node_val_ptr_(n, key_size)                 ((void*)(CLC_TMAP_node_key_ptr_(n) + (CLC_TMAP_INTERNAL_NUM_nd_FOR_key_(key_size) * sizeof(collect_c_common_node_data_t))))
 
-#define CLC_TMAP_INTERNAL_NUM_nd_FOR_key_(key_size)         (((key_size) + (sizeof(sizeof(collect_c_common_node_data_t)) - 1)) / sizeof(collect_c_common_node_data_t))
-#define CLC_TMAP_INTERNAL_NUM_nd_FOR_val_(val_size)         (((val_size) + (sizeof(sizeof(collect_c_common_node_data_t)) - 1)) / sizeof(collect_c_common_node_data_t))
+#define CLC_TMAP_INTERNAL_NUM_nd_FOR_key_(key_size)         (((key_size) + (sizeof(collect_c_common_node_data_t) - 1)) / sizeof(collect_c_common_node_data_t))
+#define CLC_TMAP_INTERNAL_NUM_nd_FOR_val_(val_size)         (((val_size) + (sizeof(collect_c_common_node_data_t) - 1)) / sizeof(collect_c_common_node_data_t))
 
 #define CLC_TMAP_INTERNAL_sizeof_node_(key_size, val_size)  (offsetof(node_t, data) + (CLC_TMAP_INTERNAL_NUM_nd_FOR_key_((key_size)) * sizeof(collect_c_common_node_data_t)) + val_size)
 
@@ -75,6 +75,9 @@ clc_c_tm_alloc_node_(
 
         size_t const    v_off   =   cb - val_size;
         void** const    ppvalue =   (void**)&nd->value;
+
+        nd->left    =   NULL;
+        nd->right   =   NULL;
 
         *ppvalue = ((char*)nd) + v_off;
     }
@@ -269,14 +272,15 @@ bool
 node_walk_backward_(
     collect_c_tmap_t*               m
 ,   node_t const*                   node
-,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   collect_c_tmap_pfn_entry_walk   pfn_entry_walk
+,   collect_c_tmap_pfn_node_walk    pfn_node_walk
 ,   void*                           param_walk
 ,   size_t                          depth
 )
 {
     assert(NULL != m);
     assert(NULL != node);
-    assert(NULL != pfn_walk);
+    assert(NULL != pfn_entry_walk || NULL != pfn_node_walk);
 
     {
         void const* const   p_key   =   CLC_TMAP_node_key_ptr_(node);
@@ -284,20 +288,30 @@ node_walk_backward_(
 
         if (NULL != node->right)
         {
-            if (!node_walk_backward_(m, node->right, pfn_walk, param_walk, depth + 1))
+            if (!node_walk_backward_(m, node->right, pfn_entry_walk, pfn_node_walk, param_walk, depth + 1))
             {
                 return false;
             }
         }
 
-        if (0 == (*pfn_walk)(m->key_size, m->val_size, -1, depth, p_key, p_val, param_walk))
+        if (NULL != pfn_entry_walk)
         {
-            return false;
+            if (0 == (*pfn_entry_walk)(m->key_size, m->val_size, -1, depth, p_key, p_val, param_walk))
+            {
+                return false;
+            }
+        }
+        if (NULL != pfn_node_walk)
+        {
+            if (0 == (*pfn_node_walk)(m->key_size, m->val_size, -1, depth, node, param_walk))
+            {
+                return false;
+            }
         }
 
         if (NULL != node->left)
         {
-            if (!node_walk_backward_(m, node->left, pfn_walk, param_walk, depth + 1))
+            if (!node_walk_backward_(m, node->left, pfn_entry_walk, pfn_node_walk, param_walk, depth + 1))
             {
                 return false;
             }
@@ -311,27 +325,38 @@ bool
 node_walk_downward_(
     collect_c_tmap_t*               m
 ,   node_t const*                   node
-,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   collect_c_tmap_pfn_entry_walk   pfn_entry_walk
+,   collect_c_tmap_pfn_node_walk    pfn_node_walk
 ,   void*                           param_walk
 ,   size_t                          depth
 )
 {
     assert(NULL != m);
     assert(NULL != node);
-    assert(NULL != pfn_walk);
+    assert(NULL != pfn_entry_walk || NULL != pfn_node_walk);
 
     {
-        void const* const   p_key   =   CLC_TMAP_node_key_ptr_(node);
-        void* const         p_val   =   CLC_TMAP_node_val_ptr_(node, m->key_size);
-
-        if (0 == (*pfn_walk)(m->key_size, m->val_size, -1, depth, p_key, p_val, param_walk))
+        if (NULL != pfn_entry_walk)
         {
-            return false;
+            void const* const   p_key   =   CLC_TMAP_node_key_ptr_(node);
+            void* const         p_val   =   CLC_TMAP_node_val_ptr_(node, m->key_size);
+
+            if (0 == (*pfn_entry_walk)(m->key_size, m->val_size, -1, depth, p_key, p_val, param_walk))
+            {
+                return false;
+            }
+        }
+        if (NULL != pfn_node_walk)
+        {
+            if (0 == (*pfn_node_walk)(m->key_size, m->val_size, -1, depth, node, param_walk))
+            {
+                return false;
+            }
         }
 
         if (NULL != node->right)
         {
-            if (!node_walk_downward_(m, node->right, pfn_walk, param_walk, depth + 1))
+            if (!node_walk_downward_(m, node->right, pfn_entry_walk, pfn_node_walk, param_walk, depth + 1))
             {
                 return false;
             }
@@ -339,7 +364,7 @@ node_walk_downward_(
 
         if (NULL != node->left)
         {
-            if (!node_walk_downward_(m, node->left, pfn_walk, param_walk, depth + 1))
+            if (!node_walk_downward_(m, node->left, pfn_entry_walk, pfn_node_walk, param_walk, depth + 1))
             {
                 return false;
             }
@@ -353,14 +378,15 @@ bool
 node_walk_forward_(
     collect_c_tmap_t*               m
 ,   node_t const*                   node
-,   collect_c_tmap_pfn_entry_walk   pfn_walk
+,   collect_c_tmap_pfn_entry_walk   pfn_entry_walk
+,   collect_c_tmap_pfn_node_walk    pfn_node_walk
 ,   void*                           param_walk
 ,   size_t                          depth
 )
 {
     assert(NULL != m);
     assert(NULL != node);
-    assert(NULL != pfn_walk);
+    assert(NULL != pfn_entry_walk || NULL != pfn_node_walk);
 
     {
         void const* const   p_key   =   CLC_TMAP_node_key_ptr_(node);
@@ -368,20 +394,30 @@ node_walk_forward_(
 
         if (NULL != node->left)
         {
-            if (!node_walk_forward_(m, node->left, pfn_walk, param_walk, depth + 1))
+            if (!node_walk_forward_(m, node->left, pfn_entry_walk, pfn_node_walk, param_walk, depth + 1))
             {
                 return false;
             }
         }
 
-        if (0 == (*pfn_walk)(m->key_size, m->val_size, -1, depth, p_key, p_val, param_walk))
+        if (NULL != pfn_entry_walk)
         {
-            return false;
+            if (0 == (*pfn_entry_walk)(m->key_size, m->val_size, -1, depth, p_key, p_val, param_walk))
+            {
+                return false;
+            }
+        }
+        if (NULL != pfn_node_walk)
+        {
+            if (0 == (*pfn_node_walk)(m->key_size, m->val_size, -1, depth, node, param_walk))
+            {
+                return false;
+            }
         }
 
         if (NULL != node->right)
         {
-            if (!node_walk_forward_(m, node->right, pfn_walk, param_walk, depth + 1))
+            if (!node_walk_forward_(m, node->right, pfn_entry_walk, pfn_node_walk, param_walk, depth + 1))
             {
                 return false;
             }
@@ -519,18 +555,18 @@ collect_c_tmap_insert(
                 /* NOTE: might be a way to have `clc_c_tm_find_()` return whether should go left or right */
 
                 {
-                    node_t* const new_node = clc_c_tm_alloc_node_(&m->mem_api, m->key_size, m->val_size);
+                    node_t* const nd = clc_c_tm_alloc_node_(&m->mem_api, m->key_size, m->val_size);
 
-                    if (NULL == new_node)
+                    if (NULL == nd)
                     {
                         return ENOMEM;
                     }
                     else
                     {
-                        memcpy(CLC_TMAP_node_key_ptr_(new_node), ptr_new_key, m->key_size);
-                        memcpy(CLC_TMAP_node_val_ptr_(new_node, m->key_size), ptr_new_val, m->val_size);
+                        memcpy(CLC_TMAP_node_key_ptr_(nd), ptr_new_key, m->key_size);
+                        memcpy(CLC_TMAP_node_val_ptr_(nd, m->key_size), ptr_new_val, m->val_size);
 
-                        add_node_to_(m, m->root, new_node);
+                        add_node_to_(m, m->root, nd);
 
                         ++m->size;
 
@@ -557,16 +593,21 @@ collect_c_tmap_entry_walk(
     assert(NULL != m);
     assert(NULL != pfn_walk);
 
+    if (NULL == m->root)
+    {
+        return 0;
+    }
+
     {
         switch (direction)
         {
         case COLLECT_C_TMAP_WALK_FORWARD:
 
-            node_walk_forward_(m, m->root, pfn_walk, param_walk, 0);
+            node_walk_forward_(m, m->root, pfn_walk, NULL, param_walk, 0);
             break;
         case COLLECT_C_TMAP_WALK_BACKWARD:
 
-            node_walk_backward_(m, m->root, pfn_walk, param_walk, 0);
+            node_walk_backward_(m, m->root, pfn_walk, NULL, param_walk, 0);
             break;
 
         default:
@@ -576,7 +617,50 @@ collect_c_tmap_entry_walk(
         case COLLECT_C_TMAP_WALK_DEFAULT:
         case COLLECT_C_TMAP_WALK_DOWNWARD:
 
-            node_walk_downward_(m, m->root, pfn_walk, param_walk, 0);
+            node_walk_downward_(m, m->root, pfn_walk, NULL, param_walk, 0);
+            break;
+        }
+
+        return 0;
+    }
+}
+
+int
+collect_c_tmap_node_walk(
+    collect_c_tmap_t*               m
+,   collect_c_tmap_pfn_node_walk    pfn_walk
+,   void*                           param_walk
+,   collect_c_tmap_walkdir_t        direction
+)
+{
+    assert(NULL != m);
+    assert(NULL != pfn_walk);
+
+    if (NULL == m->root)
+    {
+        return 0;
+    }
+
+    {
+        switch (direction)
+        {
+        case COLLECT_C_TMAP_WALK_FORWARD:
+
+            node_walk_forward_(m, m->root, NULL, pfn_walk, param_walk, 0);
+            break;
+        case COLLECT_C_TMAP_WALK_BACKWARD:
+
+            node_walk_backward_(m, m->root, NULL, pfn_walk, param_walk, 0);
+            break;
+
+        default:
+            assert(!"invalid walk direction");
+
+            /* fallthrough */
+        case COLLECT_C_TMAP_WALK_DEFAULT:
+        case COLLECT_C_TMAP_WALK_DOWNWARD:
+
+            node_walk_downward_(m, m->root, NULL, pfn_walk, param_walk, 0);
             break;
         }
 

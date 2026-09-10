@@ -5,7 +5,7 @@
 # Purpose:  Top-level CMake lists file for collect-c
 #
 # Created:  4th February 2025
-# Updated:  11th February 2025
+# Updated:  10th September 2026
 #
 # ######################################################################## #
 
@@ -30,7 +30,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 # project
 
 project(collect-c
-	DESCRIPTION "Special and custom Collections and Containers (for C++)"
+	DESCRIPTION "Special and custom Collections and Containers (for C)"
 	HOMEPAGE_URL "https://github.com/synesissoftware/collect-c"
 	LANGUAGES C CXX
 )
@@ -55,24 +55,53 @@ set(PROJECT_VERSION_MINOR ${_VERSION_MINOR})
 set(PROJECT_VERSION_PATCH ${_VERSION_PATCH})
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-
 # adhere strictly to C and C++ standards plus extensions. These are actually
 # useless since we do not compile anything; they merely state our intention.
-set(CMAKE_C_STANDARD 17)
+if(NOT DEFINED CMAKE_C_STANDARD)
+
+	if(MSVC AND MSVC_VERSION LESS 1930)
+
+		set(CMAKE_C_STANDARD 90)
+	else()
+
+		set(CMAKE_C_STANDARD 17)
+	endif()
+endif()
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON) # GNU extensions and POSIX standard
-set(CMAKE_CXX_STANDARD 20)
+
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+
+	if(MSVC AND MSVC_VERSION LESS 1930)
+
+		set(CMAKE_CXX_STANDARD 98)
+	else()
+
+		set(CMAKE_CXX_STANDARD 20)
+	endif()
+endif()
+
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-
 if(MSVC)
 
-	if(MSVC_VERSION LESS 1930)
+	if(MSVC_VERSION LESS 1800)
 
-		set(CMAKE_C_STANDARD 90)
-		set(CMAKE_CXX_STANDARD 98)
+		add_compile_options("/wd4996")
 	endif()
+
+	if(MSVC_USE_MT)
+
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	endif(MSVC_USE_MT)
+else(MSVC)
+
+	if(MSVC_USE_MT)
+
+		# this here just to absorb warning about not using `MSVC_USE_MT` (to
+		# enable **prepare_cmake.sh** to be simple)
+	endif(MSVC_USE_MT)
 endif(MSVC)
 
 
@@ -88,91 +117,109 @@ include(TargetMacros)
 
 
 # ################################################
-# dependencies and options
+# dependencies, features, and options
+
+# ######################################
+# options
 
 option(BUILD_EXAMPLES "Build examples" ON)
+
+option(BUILD_TESTING "Build tests" ON)
+
+
+# ######################################
+# features
 
 
 # ######################################
 # dependencies
 #
-# required:
-# - cstring - required for testing;
-# - Diagnosticism - required for testing;
-# - STLSoft - required for testing;
-# - xTests - required for testing;
+# | Library          | API | Impl. | Testing  | Examples |
+# | ---------------- | --- | ----- | -------- | -------- |
+# | STLSoft          |  -  |   -   |    Y     |    Y     |
+# | cstring          |  -  |   -   |    Y     |    Y     |
+# | Diagnosticism    |  -  |   -   |    Y     |    Y     |
+# | shwild           |  -  |   -   | Optional |    -     |
+# | xTests           |  -  |   -   |    Y     |    -     |
 #
-# optional:
-# - shwild - required for testing;
-#
-
-
-# ############################
-# cstring
-
-if(BUILD_TESTING)
-
-	set(cstring_REQUIRED_VERSION_ 0.0)
-
-	find_package(cstring ${cstring_REQUIRED_VERSION_} REQUIRED)
-
-	message("-- CMake package cstring found (version ${cstring_VERSION}; ${cstring_REQUIRED_VERSION_} requested)")
-endif(BUILD_TESTING)
-
-
-# ############################
-# Diagnosticism
-
-if(BUILD_TESTING)
-
-	set(Diagnosticism_REQUIRED_VERSION_ 0.0)
-
-	find_package(Diagnosticism ${Diagnosticism_REQUIRED_VERSION_} REQUIRED)
-
-	message("-- CMake package Diagnosticism found (version ${Diagnosticism_VERSION}; ${Diagnosticism_REQUIRED_VERSION_} requested)")
-endif(BUILD_TESTING)
 
 
 # ############################
 # STLSoft
 
-if(BUILD_TESTING)
+if(BUILD_EXAMPLES OR BUILD_TESTING)
 
-	if(DEFINED STLSOFT)
-
-		message("-- STLSOFT provided as CMake variable with value '${STLSOFT}'")
-
-		set(STLSOFT_INCLUDE_DIR ${STLSOFT}/include)
-	elseif(DEFINED ENV{STLSOFT})
-
-		message("-- STLSOFT provided as environment variable with value '$ENV{STLSOFT}'")
-
-		set(STLSOFT_INCLUDE_DIR $ENV{STLSOFT}/include)
-	else()
+	if(NOT DEFINED STLSOFT AND NOT DEFINED ENV{STLSOFT})
 
 		set(STLSoft_REQUIRED_VERSION_ 1.11)
 
 		find_package(STLSoft ${STLSoft_REQUIRED_VERSION_} REQUIRED)
 
 		message("-- CMake package STLSoft found (version ${STLSoft_VERSION}; ${STLSoft_REQUIRED_VERSION_} requested)")
-	endif()
+	else()
 
-	if(DEFINED STLSOFT_INCLUDE_DIR)
+		if(DEFINED STLSOFT)
+
+			message("-- STLSOFT provided as CMake variable with value '${STLSOFT}'")
+
+			set(STLSOFT_INCLUDE_DIR ${STLSOFT}/include)
+		else()
+
+			message("-- STLSOFT provided as environment variable with value '$ENV{STLSOFT}'")
+
+			set(STLSOFT_INCLUDE_DIR $ENV{STLSOFT}/include)
+		endif()
+
+		get_filename_component(STLSOFT_INCLUDE_DIR "${STLSOFT_INCLUDE_DIR}" ABSOLUTE)
 
 		include_directories(${STLSOFT_INCLUDE_DIR})
 	endif()
-endif(BUILD_TESTING)
+endif()
+
+
+# ############################
+# cstring
+
+if(BUILD_EXAMPLES OR BUILD_TESTING)
+
+	set(cstring_REQUIRED_VERSION_ 0.0)
+
+	find_package(cstring ${cstring_REQUIRED_VERSION_} REQUIRED)
+
+	message("-- CMake package cstring found (version ${cstring_VERSION}; ${cstring_REQUIRED_VERSION_} requested)")
+endif()
+
+
+# ############################
+# Diagnosticism
+
+if(BUILD_EXAMPLES OR BUILD_TESTING)
+
+	set(Diagnosticism_REQUIRED_VERSION_ 0.0)
+
+	find_package(Diagnosticism ${Diagnosticism_REQUIRED_VERSION_} REQUIRED)
+
+	message("-- CMake package Diagnosticism found (version ${Diagnosticism_VERSION}; ${Diagnosticism_REQUIRED_VERSION_} requested)")
+endif()
 
 
 # ############################
 # shwild
 
-if(BUILD_TESTING)
+if(NOT (NO_SHWILD))
 
-	find_package(shwild QUIET)
+	if(BUILD_TESTING)
 
-	message("-- CMake package shwild found (version ${shwild_VERSION})")
-endif(BUILD_TESTING)
+		find_package(shwild QUIET)
+
+		if(shwild_FOUND)
+
+			message("-- CMake package shwild found (version ${shwild_VERSION})")
+
+			add_compile_definitions(XTESTS_HAS_SHWILD)
+		endif(shwild_FOUND)
+	endif(BUILD_TESTING)
+endif()
 
 
 # ############################
@@ -180,7 +227,7 @@ endif(BUILD_TESTING)
 
 if(BUILD_TESTING)
 
-	set(xTests_REQUIRED_VERSION_ 0.26)
+	set(xTests_REQUIRED_VERSION_ 0.26.4)
 
 	find_package(xTests ${xTests_REQUIRED_VERSION_} REQUIRED)
 
@@ -201,6 +248,36 @@ include(GNUInstallDirs)
 
 # ##########################################################
 # targets
+
+# ################################################
+# custom definitions
+
+if(UNIX)
+
+	set(_BUILD_AS_UNIX 1)
+
+	message("-- Operating system Unix")
+else(UNIX)
+
+	if(WIN32)
+
+		if(USE_UNIXEM)
+
+			set(_BUILD_AS_UNIX 1)
+
+			message("-- Operating system Unix (synthesised on Windows)")
+		else(USE_UNIXEM)
+
+			set(_BUILD_AS_WIN32 1)
+
+			message("-- Operating system Windows")
+		endif(USE_UNIXEM)
+	else(WIN32)
+
+		message("-- Operating system unknown")
+	endif(WIN32)
+endif(UNIX)
+
 
 # ################################################
 # main library
@@ -248,7 +325,7 @@ set(EXPORT_NAME ${PROJECT_NAME_LOWER})
 configure_package_config_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/cmake/${EXPORT_NAME}-config.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/cmake/${EXPORT_NAME}-config.cmake
-	INSTALL_DESTINATION ${LIB_INSTALL_DIR}/${EXPORT_NAME}/cmake
+	INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/${EXPORT_NAME}/cmake
 )
 
 write_basic_package_version_file(
@@ -278,7 +355,7 @@ install( FILES
 # ##########################################################
 # completion
 
-message(NOTICE "Generating CMake build scripts for ${PROJECT_NAME} ${PROJECT_VERSION}, for C${CMAKE_C_STANDARD} C++${CMAKE_CXX_STANDARD}")
+message(NOTICE "Generating CMake build scripts for ${PROJECT_NAME} ${PROJECT_VERSION}, for C${CMAKE_C_STANDARD} C++${CMAKE_CXX_STANDARD}, with build type ${CMAKE_BUILD_TYPE}")
 
 
 # ############################## end of file ############################# #
