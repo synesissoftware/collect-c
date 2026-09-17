@@ -1,6 +1,12 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## Unreleased
+
+* Applied **misc-dev-scripts** **0.6.0** editor/Git/`.sis` drop-in templates on **boilerplate**;
+* Restored historical **.gitignore** patterns as a sorted union with **misc-dev-scripts** gold section layout;
+
+
 ## 0.1.0-alpha2 - 10th September 2026
 
 * Added modular GitHub Actions CI (**ci.yml** + **ci-cell.yml**) covering Linux/macOS/Windows with Clang, GCC, VC++, and MinGW, plus install-smoke (consumer sets `CMAKE_C_STANDARD` 17 for MSVC `__STDC_VERSION__`);
