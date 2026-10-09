@@ -46,22 +46,26 @@ See [INSTALL.md](./INSTALL.md) for details of how to install **collect-c**.
 ## Q3: "How do I use collect-c?"
 
 Include the container header you need — for example **collect-c/circq.h**,
-**collect-c/dlist.h**, or **collect-c/vec.h** — and link against
-**libcollect-c.core** (the **CMake** target is `collect-c::core`). The
-headers are C99; they are not currently intended for direct C++ compilation.
+**collect-c/dlist.h**, **collect-c/tmap.h**, or **collect-c/vec.h** — and
+link against **libcollect-c.core** (the **CMake** target is
+`collect-c::core`). The headers are C99; they are not currently intended for
+direct C++ compilation. Optional custom allocators are configured via
+**collect_c_mem_api_t** on each container instance.
 
 
 ## Q4: "Does collect-c have its own unit-tests?"
 
 Yes. Unit-test programs live under **test/unit/** and are built when
-`BUILD_TESTING` is enabled. Run them with **run_all_unit_tests.sh**. Building
-tests requires **STLSoft**, **cstring**, **Diagnosticism**, and **xTests**.
+`BUILD_TESTING` is enabled. Run them with **run_all_unit_tests.sh** (see
+`--unit-only` / `--component-only`). Building tests requires **STLSoft**,
+**cstring**, **Diagnosticism**, and **xTests** **0.26.4**+.
 
 
 ## Q5: "Where are the examples?"
 
-Example programs are not yet published in this alpha. Scratch and performance
-programs under **test/** may be useful while examples are prepared.
+Example programs under **examples/** are not yet published in this alpha.
+Scratch and performance programs under **test/** (e.g. **test.scratch.tmap**,
+**test.performance.dlist**) may be useful while examples are prepared.
 
 
 <!-- ########################### end of file ########################### -->

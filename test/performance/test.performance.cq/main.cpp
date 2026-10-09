@@ -4,7 +4,7 @@
  * Purpose: Performance-test for circular queue.
  *
  * Created: 6th February 2025
- * Updated: 10th February 2025
+ * Updated: 8th June 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -16,8 +16,6 @@
 #define COLLECT_C_CIRCQ_SUPPRESS_CXX_WARNING
 #include <collect-c/terse/circq.h>
 #undef COLLECT_C_CIRCQ_SUPPRESS_CXX_WARNING
-
-#include <xtests/terse-api.h>
 
 #include <stlsoft/diagnostics/doomgram.hpp>
 #include <stlsoft/diagnostics/std_chrono_hrc_stopwatch.hpp>
@@ -168,8 +166,10 @@ display_results(
 ,   std::uint64_t   anchor_value
 )
 {
-    ((void)&num_iterations);
-    ((void)&tm_ns);
+    if (function_name == strstr(function_name, "`anonymous-namespace'::"))
+    {
+        function_name += 23;
+    }
 
     std::cout
         << '\t'
@@ -515,7 +515,7 @@ namespace {
             for (std::size_t i = 0; num_iterations != i; ++i)
             {
                 {
-                    int ar[256];
+                    int ar[255];
 
                     CLC_CQ_define_on_stack(q, ar);
 
@@ -570,7 +570,7 @@ namespace {
             for (std::size_t i = 0; num_iterations != i; ++i)
             {
                 {
-                    COLLECT_C_CIRCQ_define_empty(int, q, 256);
+                    COLLECT_C_CIRCQ_define_empty(int, q, 255);
 
                     int const r = clc_cq_allocate_storage(&q);
 
@@ -630,7 +630,7 @@ namespace {
             for (std::size_t i = 0; num_iterations != i; ++i)
             {
                 {
-                    int ar[256];
+                    int ar[255];
 
                     CLC_CQ_define_on_stack_with_cb(q, ar, int_callback, &anchor_value);
 
@@ -687,7 +687,7 @@ namespace {
             for (std::size_t i = 0; num_iterations != i; ++i)
             {
                 {
-                    COLLECT_C_CIRCQ_define_empty(int, q, 256);
+                    COLLECT_C_CIRCQ_define_empty(int, q, 255);
 
                     q.pfn_element_free      =   int_callback;
                     q.param_element_free    =   &anchor_value;
@@ -754,7 +754,7 @@ namespace {
             for (std::size_t i = 0; num_iterations != i; ++i)
             {
                 {
-                    CLC_CQ_define_empty_with_cb(int, q, 256, int_callback, &anchor_value);
+                    CLC_CQ_define_empty_with_cb(int, q, 255, int_callback, &anchor_value);
 
                     int const r = clc_cq_allocate_storage(&q);
 

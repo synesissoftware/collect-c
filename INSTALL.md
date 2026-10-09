@@ -3,13 +3,13 @@
 **collect-c** is a classic-form C library, with implementation files under
 **src** and headers under **include/collect-c**. Once installed, include the
 appropriate headers (for example **collect-c/circq.h**, **collect-c/dlist.h**,
-**collect-c/vec.h**) and link against the library (the **CMake** target is
-`collect-c::core`).
+**collect-c/tmap.h**, **collect-c/vec.h**) and link against the library (the
+**CMake** target is `collect-c::core`).
 
 The **C** API has no non-standard dependencies. Building the project's tests
 (and example programs, when present) additionally requires **STLSoft**,
-**cstring**, **Diagnosticism**, and **xTests** (and may optionally recognise
-**shwild**).
+**cstring**, **Diagnosticism**, and **xTests** **0.26.4**+ (and may
+optionally recognise **shwild**).
 
 
 ## Table of Contents <!-- omit in toc -->

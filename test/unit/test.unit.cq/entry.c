@@ -4,7 +4,7 @@
  * Purpose: Unit-test for circular queue.
  *
  * Created: 5th February 2025
- * Updated: 10th February 2025
+ * Updated: 7th June 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -31,6 +31,7 @@ static void TEST_define_empty_AND_allocate(void);
 
 static void TEST_define_on_stack(void);
 static void TEST_define_on_stack_with_cb(void);
+static void TEST_define_on_stack_with_cb_AND_F_OVERWRITE_FRONT_WHEN_FULL(void);
 
 static void TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref(void);
 static void TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value(void);
@@ -45,6 +46,7 @@ static void TEST_STACK_AND_collect_c_cq_push_back_n_by_ref_WITH_OVERWRITE(void);
 static void TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP(void);
 static void TEST_HEAP_AND_CALLBACK_INDEXES_1(void);
 static void TEST_HEAP_AND_CALLBACK_INDEXES_2(void);
+static void TEST_HEAP_AND_CALLBACK_INDEXES_2_WITH_CUSTOM_mem_api(void);
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -65,6 +67,7 @@ int main(int argc, char* argv[])
 
         XTESTS_RUN_CASE(TEST_define_on_stack);
         XTESTS_RUN_CASE(TEST_define_on_stack_with_cb);
+        XTESTS_RUN_CASE(TEST_define_on_stack_with_cb_AND_F_OVERWRITE_FRONT_WHEN_FULL);
 
         XTESTS_RUN_CASE(TEST_STACK_AND_push_by_ref_UNTIL_FULL_THEN_FAIL_TO_push_by_ref);
         XTESTS_RUN_CASE(TEST_STACK_AND_push_by_value_UNTIL_FULL_THEN_pop_front_TWO_THEN_push_by_value);
@@ -79,6 +82,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_HEAP_AND_push_by_ref_WITHOUT_WRAP);
         XTESTS_RUN_CASE(TEST_HEAP_AND_CALLBACK_INDEXES_1);
         XTESTS_RUN_CASE(TEST_HEAP_AND_CALLBACK_INDEXES_2);
+        XTESTS_RUN_CASE(TEST_HEAP_AND_CALLBACK_INDEXES_2_WITH_CUSTOM_mem_api);
 
         XTESTS_PRINT_RESULTS();
 
@@ -100,6 +104,84 @@ struct custom_t
     uint64_t    z;
 };
 typedef struct custom_t custom_t;
+
+
+void*
+custom_alloc(
+    void*   param
+,   size_t  cb_new
+)
+{
+    ((void)&param);
+
+    {
+        char* actual = malloc(8 + cb_new);
+
+        if (NULL != actual)
+        {
+            actual += 8;
+        }
+
+        return actual;
+    }
+}
+
+void*
+custom_realloc(
+    void*   param
+,   void*   pv_curr
+,   size_t  cb_curr
+,   size_t  cb_new
+)
+{
+    ((void)&param);
+    ((void)&cb_curr);
+
+    {
+        if (NULL == pv_curr)
+        {
+            return custom_alloc(param, cb_new);
+        }
+        else
+        {
+            char* p = pv_curr;
+            char* p2;
+
+            p -= 8;
+
+            p2 = realloc(p, cb_new + 8);
+
+            if (NULL != p2)
+            {
+                p2 += 8;
+            }
+
+            return p2;
+        }
+    }
+}
+
+void
+custom_free(
+    void*   param
+,   void*   pv_curr
+,   size_t  cb_curr
+)
+{
+    ((void)&param);
+    ((void)&cb_curr);
+
+    {
+        if (NULL != pv_curr)
+        {
+            char* p = pv_curr;
+
+            p -= 8;
+
+            free(p);
+        }
+    }
+}
 
 
 static void fn_element_free_accumulate_on_free(
@@ -234,6 +316,272 @@ static void TEST_define_on_stack_with_cb(void)
 
         TEST_POINTER_EQUAL(&array[0], q.param_element_free);
         TEST_FUNCTION_POINTER_EQUAL(fn_element_free_stub, q.pfn_element_free);
+    }
+}
+
+static void TEST_define_on_stack_with_cb_AND_F_OVERWRITE_FRONT_WHEN_FULL(void)
+{
+    /* NOTE: the meat of this test is only really exercised by changing the type of `b` and `e` to `uint16_t` */
+
+    {
+        int array[8];
+
+        CLC_CQ_define_on_stack_with_cb(q, array, fn_element_free_stub, &array[0]);
+
+        q.flags |= CLC_CQ_F_OVERWRITE_FRONT_WHEN_FULL;
+
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(8, CLC_CQ_spare(q));
+
+        TEST_POINTER_EQUAL(&array[0], q.param_element_free);
+        TEST_FUNCTION_POINTER_EQUAL(fn_element_free_stub, q.pfn_element_free);
+
+        for (int i = 0; i != 88888; ++i)
+        {
+            int const r = CLC_CQ_push_back_by_value(q, int, i);
+
+            TEST_INT_EQ(0, r);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+
+            if (i < 8)
+            {
+                TEST_INT_EQ((size_t)i + 1, CLC_CQ_len(q));
+            }
+            else
+            {
+                TEST_INT_EQ(8, CLC_CQ_len(q));
+            }
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88880, *CLC_CQ_cat_t(q, int, 0));
+            TEST_INT_EQ(88881, *CLC_CQ_cat_t(q, int, 1));
+            TEST_INT_EQ(88882, *CLC_CQ_cat_t(q, int, 2));
+            TEST_INT_EQ(88883, *CLC_CQ_cat_t(q, int, 3));
+            TEST_INT_EQ(88884, *CLC_CQ_cat_t(q, int, 4));
+            TEST_INT_EQ(88885, *CLC_CQ_cat_t(q, int, 5));
+            TEST_INT_EQ(88886, *CLC_CQ_cat_t(q, int, 6));
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 7));
+        }
+
+        {
+            for (int i = 0; i != 7; ++i)
+            {
+                CLC_CQ_pop_front(q);
+            }
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(1, CLC_CQ_len(q));
+            TEST_INT_EQ(7, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 0));
+        }
+
+        {
+            int elements[7] =
+            {
+                99990,
+                99991,
+                99992,
+                99993,
+                99994,
+                99995,
+                99996,
+            };
+            size_t      num_inserted;
+            int const   r = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(elements), elements, &num_inserted);
+
+            TEST_INT_EQ(0, r);
+            TEST_INT_EQ(7, num_inserted);
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 0));
+            TEST_INT_EQ(99990, *CLC_CQ_cat_t(q, int, 1));
+            TEST_INT_EQ(99991, *CLC_CQ_cat_t(q, int, 2));
+            TEST_INT_EQ(99992, *CLC_CQ_cat_t(q, int, 3));
+            TEST_INT_EQ(99993, *CLC_CQ_cat_t(q, int, 4));
+            TEST_INT_EQ(99994, *CLC_CQ_cat_t(q, int, 5));
+            TEST_INT_EQ(99995, *CLC_CQ_cat_t(q, int, 6));
+            TEST_INT_EQ(99996, *CLC_CQ_cat_t(q, int, 7));
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        {
+            CLC_CQ_pop_front(q);
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(7, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        {
+            ;
+        }
+
+        CLC_CQ_clear(q);
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(0, CLC_CQ_len(q));
+            TEST_INT_EQ(8, CLC_CQ_spare(q));
+        }
+    }
+
+    {
+        int array[8];
+
+        CLC_CQ_define_on_stack_with_cb(q, array, fn_element_free_stub, &array[0]);
+
+        q.flags |= CLC_CQ_F_OVERWRITE_FRONT_WHEN_FULL;
+
+        TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+        TEST_INT_EQ(0, CLC_CQ_len(q));
+        TEST_INT_EQ(8, CLC_CQ_spare(q));
+
+        TEST_POINTER_EQUAL(&array[0], q.param_element_free);
+        TEST_FUNCTION_POINTER_EQUAL(fn_element_free_stub, q.pfn_element_free);
+
+        for (int i = 0; i != 11111; ++i)
+        {
+            int elements[8] =
+            {
+                i * 8 + 0,
+                i * 8 + 1,
+                i * 8 + 2,
+                i * 8 + 3,
+                i * 8 + 4,
+                i * 8 + 5,
+                i * 8 + 6,
+                i * 8 + 7,
+            };
+            size_t      num_inserted;
+            int const   r = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(elements), elements, &num_inserted);
+
+            TEST_INT_EQ(0, r);
+            TEST_INT_EQ(8, num_inserted);
+
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88880, *CLC_CQ_cat_t(q, int, 0));
+            TEST_INT_EQ(88881, *CLC_CQ_cat_t(q, int, 1));
+            TEST_INT_EQ(88882, *CLC_CQ_cat_t(q, int, 2));
+            TEST_INT_EQ(88883, *CLC_CQ_cat_t(q, int, 3));
+            TEST_INT_EQ(88884, *CLC_CQ_cat_t(q, int, 4));
+            TEST_INT_EQ(88885, *CLC_CQ_cat_t(q, int, 5));
+            TEST_INT_EQ(88886, *CLC_CQ_cat_t(q, int, 6));
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 7));
+        }
+
+        {
+            for (int i = 0; i != 7; ++i)
+            {
+                CLC_CQ_pop_front(q);
+            }
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(1, CLC_CQ_len(q));
+            TEST_INT_EQ(7, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 0));
+        }
+
+        {
+            int elements[7] =
+            {
+                99990,
+                99991,
+                99992,
+                99993,
+                99994,
+                99995,
+                99996,
+            };
+            size_t      num_inserted;
+            int const   r = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(elements), elements, &num_inserted);
+
+            TEST_INT_EQ(0, r);
+            TEST_INT_EQ(7, num_inserted);
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+
+            TEST_INT_EQ(88887, *CLC_CQ_cat_t(q, int, 0));
+            TEST_INT_EQ(99990, *CLC_CQ_cat_t(q, int, 1));
+            TEST_INT_EQ(99991, *CLC_CQ_cat_t(q, int, 2));
+            TEST_INT_EQ(99992, *CLC_CQ_cat_t(q, int, 3));
+            TEST_INT_EQ(99993, *CLC_CQ_cat_t(q, int, 4));
+            TEST_INT_EQ(99994, *CLC_CQ_cat_t(q, int, 5));
+            TEST_INT_EQ(99995, *CLC_CQ_cat_t(q, int, 6));
+            TEST_INT_EQ(99996, *CLC_CQ_cat_t(q, int, 7));
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(8, CLC_CQ_len(q));
+            TEST_INT_EQ(0, CLC_CQ_spare(q));
+        }
+
+        {
+            CLC_CQ_pop_front(q);
+        }
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_FALSE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(7, CLC_CQ_len(q));
+            TEST_INT_EQ(1, CLC_CQ_spare(q));
+        }
+
+        CLC_CQ_clear(q);
+
+        /* verify contents */
+        {
+            TEST_BOOLEAN_TRUE(CLC_CQ_is_empty(q));
+            TEST_INT_EQ(0, CLC_CQ_len(q));
+            TEST_INT_EQ(8, CLC_CQ_spare(q));
+        }
     }
 }
 
@@ -1717,6 +2065,152 @@ static void TEST_HEAP_AND_CALLBACK_INDEXES_2(void)
     /* pop_back(): run straight through allocated spaces, pop front, push back one more, and then deallocate */
     {
         CLC_CQ_define_empty(int, q, 8);
+
+        int const r = clc_cq_allocate_storage(&q);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            int const   values[8] = { 1, 2, 3, 4, 5, 6, 7, 8, };
+            int         checks[1];
+
+
+            /* load values */
+            {
+                {
+                    size_t      num_inserted;
+                    int const   r1 = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(values), values, &num_inserted);
+
+                    TEST_INT_EQ(0, r1);
+                    TEST_INT_EQ(8, CLC_CQ_len(q));
+                }
+
+                {
+                    int const r2 = CLC_CQ_pop_front(q);
+
+                    TEST_INT_EQ(0, r2);
+                }
+
+                {
+                    int const r3 = CLC_CQ_push_back_by_value(q, int, 9);
+
+                    TEST_INT_EQ(0, r3);
+                }
+            }
+
+
+            /* pop_back() */
+            {
+                q.pfn_element_free      =   fn_element_free_store_in_array;
+                q.param_element_free    =   &checks[0];
+
+                CLC_CQ_pop_back(q);
+
+                q.pfn_element_free      =   NULL;
+                q.param_element_free    =   NULL;
+            }
+
+
+            /* check cleared values that were recorded */
+
+            { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(checks) != i; ++i)
+            {
+                TEST_INT_EQ(9, checks[i]);
+            }}
+
+
+            clc_cq_free_storage(&q);
+        }
+    }
+}
+
+static void TEST_HEAP_AND_CALLBACK_INDEXES_2_WITH_CUSTOM_mem_api(void)
+{
+    /* pop_front(): run straight through allocated spaces, pop front, push back one more, and then deallocate */
+    {
+        CLC_CQ_define_empty(int, q, 8);
+
+        q.mem_api.pfn_alloc = custom_alloc;
+        q.mem_api.pfn_realloc = custom_realloc;
+        q.mem_api.pfn_free = custom_free;
+
+        int const r = clc_cq_allocate_storage(&q);
+
+        TEST_INTEGER_EQUAL_ANY_OF2(0, ENOMEM, r);
+
+        if (0 == r)
+        {
+            int const   values[8] = { 1, 2, 3, 4, 5, 6, 7, 8, };
+            int         checks[1];
+
+
+            /* load values */
+            {
+                {
+                    size_t      num_inserted;
+                    int const   r1 = collect_c_cq_push_back_n_by_ref(&q, STLSOFT_NUM_ELEMENTS(values), values, &num_inserted);
+
+                    TEST_INT_EQ(0, r1);
+
+                    TEST_INT_EQ(8, CLC_CQ_len(q));
+                    TEST_INT_EQ(1, *CLC_CQ_cat_t(q, int, 0));
+                    TEST_INT_EQ(8, *CLC_CQ_cat_t(q, int, 7));
+                }
+
+                {
+                    int const r2 = CLC_CQ_pop_front(q);
+
+                    TEST_INT_EQ(0, r2);
+
+                    TEST_INT_EQ(7, CLC_CQ_len(q));
+                    TEST_INT_EQ(2, *CLC_CQ_cat_t(q, int, 0));
+                    TEST_INT_EQ(8, *CLC_CQ_cat_t(q, int, 6));
+                }
+
+                {
+                    int const r3 = CLC_CQ_push_back_by_value(q, int, 9);
+
+                    TEST_INT_EQ(0, r3);
+
+                    TEST_INT_EQ(8, CLC_CQ_len(q));
+                    TEST_INT_EQ(2, *CLC_CQ_cat_t(q, int, 0));
+                    TEST_INT_EQ(9, *CLC_CQ_cat_t(q, int, 7));
+                }
+            }
+
+
+            /* pop_front() */
+            {
+                q.pfn_element_free      =   fn_element_free_store_in_array;
+                q.param_element_free    =   &checks[0];
+
+                CLC_CQ_pop_front(q);
+
+                q.pfn_element_free      =   NULL;
+                q.param_element_free    =   NULL;
+            }
+
+
+            /* check cleared values that were recorded */
+
+            { for (size_t i = 0; STLSOFT_NUM_ELEMENTS(checks) != i; ++i)
+            {
+                TEST_INT_EQ(2, checks[i]);
+            }}
+
+
+            clc_cq_free_storage(&q);
+        }
+    }
+
+    /* pop_back(): run straight through allocated spaces, pop front, push back one more, and then deallocate */
+    {
+        CLC_CQ_define_empty(int, q, 8);
+
+        q.mem_api.pfn_alloc = custom_alloc;
+        q.mem_api.pfn_realloc = custom_realloc;
+        q.mem_api.pfn_free = custom_free;
 
         int const r = clc_cq_allocate_storage(&q);
 

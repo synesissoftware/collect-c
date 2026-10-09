@@ -227,7 +227,7 @@ endif()
 
 if(BUILD_TESTING)
 
-	set(xTests_REQUIRED_VERSION_ 0.26)
+	set(xTests_REQUIRED_VERSION_ 0.26.4)
 
 	find_package(xTests ${xTests_REQUIRED_VERSION_} REQUIRED)
 
@@ -261,20 +261,20 @@ else(UNIX)
 
 	if(WIN32)
 
-			if(USE_UNIXEM)
+		if(USE_UNIXEM)
 
-					set(_BUILD_AS_UNIX 1)
+			set(_BUILD_AS_UNIX 1)
 
-					message("-- Operating system Unix (synthesised on Windows)")
-			else(USE_UNIXEM)
+			message("-- Operating system Unix (synthesised on Windows)")
+		else(USE_UNIXEM)
 
-					set(_BUILD_AS_WIN32 1)
+			set(_BUILD_AS_WIN32 1)
 
-					message("-- Operating system Windows")
-			endif(USE_UNIXEM)
+			message("-- Operating system Windows")
+		endif(USE_UNIXEM)
 	else(WIN32)
 
-			message("-- Operating system unknown")
+		message("-- Operating system unknown")
 	endif(WIN32)
 endif(UNIX)
 

@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 10th February 2025
+ * Updated: 16th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -17,10 +17,15 @@
 
 #include <errno.h>
 #include <assert.h>
-#include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
 #include <string.h>
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * constants
+ */
+
+#define COLLECT_C_DLIST_INTERNAL_MAX_SPARES_                64
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -34,19 +39,50 @@ typedef collect_c_dlist_node_t                              node_t;
  * helper functions and macros
  */
 
-#define COLLECT_C_DLIST_INTERNAL_sizeof_node_(el_size)      (offsetof(collect_c_dlist_node_t, data) + el_size)
+#define COLLECT_C_DLIST_INTERNAL_sizeof_node_(el_size)      (offsetof(node_t, data) + el_size)
 
 static
 node_t*
-clc_c_dl_make_node_(
-    node_t*     prev
-,   node_t*     next
-,   size_t      el_size
-,   void const* ptr_new_el
+clc_c_dl_alloc_node_(
+    collect_c_mem_api_t*    mem_api
+,   size_t                  el_size
 )
 {
     size_t const    cb  =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(el_size);
-    node_t* const   nd  =   malloc(cb);
+    node_t* const   nd  =   (*mem_api->pfn_alloc)(mem_api->param, cb);
+
+    return nd;
+}
+
+static
+node_t*
+clc_c_dl_obtain_node_(
+    collect_c_dlist_t*  l
+,   node_t*             prev
+,   node_t*             next
+,   size_t              el_size
+,   void const*         ptr_new_el
+)
+{
+    node_t* nd;
+
+    if (0 != l->num_spares)
+    {
+        nd = l->spares;
+
+        l->spares = nd->next;
+
+        --l->num_spares;
+    }
+    else
+    {
+        nd = clc_c_dl_alloc_node_(&l->mem_api, el_size);
+
+        if (NULL == nd)
+        {
+            return NULL;
+        }
+    }
 
     nd->prev    =   prev;
     nd->next    =   next;
@@ -75,25 +111,30 @@ clc_dlist_free_storage(
     assert(NULL != l);
 
     {
-        for (collect_c_dlist_node_t* n = l->head; NULL != n; )
+        collect_c_mem_api_t* const  mem_api =   &l->mem_api;
+        size_t const                cb      =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(l->el_size);
+
+        for (node_t* n = l->head; NULL != n; )
         {
-            collect_c_dlist_node_t* const n2 = n;
+            node_t* const n2 = n;
 
             n = n->next;
 
-            free(n2);
+            (mem_api->pfn_free)(mem_api->param, n2, cb);
         }
 
         l->head = l->tail = NULL;
         l->size = 0;
 
-        for (collect_c_dlist_node_t* n = l->spares; NULL != n; )
+        for (node_t* n = l->spares; NULL != n; )
         {
-            collect_c_dlist_node_t* const n2 = n;
+            node_t* const n2 = n;
 
             n = n->next;
 
-            free(n2);
+            (mem_api->pfn_free)(mem_api->param, n2, cb);
+
+            --l->num_spares;
         }
 
         l->spares = NULL;
@@ -118,7 +159,9 @@ collect_c_dlist_clear(
     assert(NULL == reserved1);
 
     {
-        size_t dummy;
+        collect_c_mem_api_t* const  mem_api =   &l->mem_api;
+        size_t const                cb      =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(l->el_size);
+        size_t                      dummy;
 
         if (NULL == num_dropped)
         {
@@ -127,23 +170,25 @@ collect_c_dlist_clear(
 
         *num_dropped = 0;
 
-        for (collect_c_dlist_node_t* n = l->head; NULL != n; )
+        for (node_t* n = l->head; NULL != n; )
         {
-            collect_c_dlist_node_t* const n2 = n;
+            node_t* const n2 = n;
 
             n = n->next;
 
-#if 1
+            if (0 == (COLLECT_C_DLIST_F_NO_SPARES & l->flags) &&
+                l->num_spares < COLLECT_C_DLIST_INTERNAL_MAX_SPARES_)
+            {
+                n2->next = n2->prev = l->spares;
 
-            n2->next = n2->prev = l->spares;
+                l->spares = n2;
 
-            l->spares = n2;
-
-            ++l->num_spares;
-#else
-
-            free(n2);
-#endif
+                ++l->num_spares;
+            }
+            else
+            {
+                (mem_api->pfn_free)(mem_api->param, n2, cb);
+            }
 
             ++*num_dropped;
         }
@@ -165,6 +210,9 @@ collect_c_dlist_erase_node(
     assert(NULL != node);
 
     {
+        collect_c_mem_api_t* const  mem_api =   &l->mem_api;
+        size_t const                cb      =   COLLECT_C_DLIST_INTERNAL_sizeof_node_(l->el_size);
+
         /* simple set of actions:
          *
          * 1. "destruct" element;
@@ -174,7 +222,7 @@ collect_c_dlist_erase_node(
 
         if (NULL != l->pfn_element_free)
         {
-            (*l->pfn_element_free)(l->el_size, 0, &node->data->data[0], l->param_element_free);
+            (*l->pfn_element_free)(l->el_size, -1, &node->data->data[0], l->param_element_free);
         }
 
         {
@@ -210,17 +258,18 @@ collect_c_dlist_erase_node(
 
             --l->size;
 
-            if (0 != (COLLECT_C_DLIST_F_NO_SPARES & l->flags))
-            {
-                free(node);
-            }
-            else
+            if (0 == (COLLECT_C_DLIST_F_NO_SPARES & l->flags) &&
+                l->num_spares < COLLECT_C_DLIST_INTERNAL_MAX_SPARES_)
             {
                 node->next = node->prev = l->spares;
 
                 l->spares = node;
 
                 ++l->num_spares;
+            }
+            else
+            {
+                (mem_api->pfn_free)(mem_api->param, node, cb);
             }
         }
 
@@ -255,7 +304,7 @@ collect_c_dlist_find_node(
 
         *num_searched = 0;
 
-        for (collect_c_dlist_node_t* n = l->head; NULL != n; n = n->next)
+        for (node_t* n = l->head; NULL != n; n = n->next)
         {
             int const r = (*pfn)(l, p_lhs, &n->data->data[0]);
 
@@ -303,7 +352,7 @@ collect_c_dlist_rfind_node(
 
         *num_searched = 0;
 
-        for (collect_c_dlist_node_t* n = l->tail; NULL != n; n = n->prev)
+        for (node_t* n = l->tail; NULL != n; n = n->prev)
         {
             int const r = (*pfn)(l, p_lhs, &n->data->data[0]);
 
@@ -337,14 +386,14 @@ collect_c_dlist_insert_after(
     assert(NULL != ptr_new_el);
 
     {
-        collect_c_dlist_node_t* dummy;
+        node_t* dummy;
 
         if (NULL == new_node)
         {
             new_node = &dummy;
         }
 
-        *new_node = clc_c_dl_make_node_(reference_node, reference_node->next, l->el_size, ptr_new_el);
+        *new_node = clc_c_dl_obtain_node_(l, reference_node, reference_node->next, l->el_size, ptr_new_el);
 
         if (NULL == *new_node)
         {
@@ -384,14 +433,14 @@ collect_c_dlist_insert_before(
     assert(NULL != ptr_new_el);
 
     {
-        collect_c_dlist_node_t* dummy;
+        node_t* dummy;
 
         if (NULL == new_node)
         {
             new_node = &dummy;
         }
 
-        *new_node = clc_c_dl_make_node_(reference_node->prev, reference_node, l->el_size, ptr_new_el);
+        *new_node = clc_c_dl_obtain_node_(l, reference_node->prev, reference_node, l->el_size, ptr_new_el);
 
         if (NULL == *new_node)
         {
@@ -431,7 +480,7 @@ collect_c_dlist_push_back_by_ref(
     {
         if (NULL == l->head)
         {
-            collect_c_dlist_node_t* const nd = clc_c_dl_make_node_(NULL, NULL, l->el_size, ptr_new_el);
+            node_t* const nd = clc_c_dl_obtain_node_(l, NULL, NULL, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
@@ -446,9 +495,9 @@ collect_c_dlist_push_back_by_ref(
         }
         else
         {
-            collect_c_dlist_node_t* const   prev    =   l->tail;
-            collect_c_dlist_node_t* const   next    =   NULL;
-            collect_c_dlist_node_t* const   nd      =   clc_c_dl_make_node_(prev, next, l->el_size, ptr_new_el);
+            node_t* const   prev    =   l->tail;
+            node_t* const   next    =   NULL;
+            node_t* const   nd      =   clc_c_dl_obtain_node_(l, prev, next, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
@@ -479,7 +528,7 @@ collect_c_dlist_push_front_by_ref(
     {
         if (NULL == l->head)
         {
-            collect_c_dlist_node_t* const nd = clc_c_dl_make_node_(NULL, NULL, l->el_size, ptr_new_el);
+            node_t* const nd = clc_c_dl_obtain_node_(l, NULL, NULL, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {
@@ -494,9 +543,9 @@ collect_c_dlist_push_front_by_ref(
         }
         else
         {
-            collect_c_dlist_node_t* const   prev    =   NULL;
-            collect_c_dlist_node_t* const   next    =   l->head;
-            collect_c_dlist_node_t* const   nd      =   clc_c_dl_make_node_(prev, next, l->el_size, ptr_new_el);
+            node_t* const   prev    =   NULL;
+            node_t* const   next    =   l->head;
+            node_t* const   nd      =   clc_c_dl_obtain_node_(l, prev, next, l->el_size, ptr_new_el);
 
             if (NULL == nd)
             {

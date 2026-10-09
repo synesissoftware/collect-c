@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 11th February 2025
+ * Updated: 17th February 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -14,6 +14,10 @@
  */
 
 #ifdef __cplusplus
+/* NOTE: C++ functionality is provided opt-in and at the users' own risk for
+ * the purpose of faciliting functional/performance testing with C++
+ */
+
 # ifndef COLLECT_C_DLIST_SUPPRESS_CXX_WARNING
 #  error This file not currently compatible with C++ compilation
 # endif
@@ -25,9 +29,9 @@
  */
 
 #define COLLECT_C_DLIST_VER_MAJOR       0
-#define COLLECT_C_DLIST_VER_MINOR       1
-#define COLLECT_C_DLIST_VER_PATCH       0
-#define COLLECT_C_DLIST_VER_ALPHABETA   41
+#define COLLECT_C_DLIST_VER_MINOR       2
+#define COLLECT_C_DLIST_VER_PATCH       3
+#define COLLECT_C_DLIST_VER_ALPHABETA   45
 
 #define COLLECT_C_DLIST_VER \
     (0\
@@ -61,33 +65,21 @@
  * API types
  */
 
-typedef union
-{
-    char            data[1];
-    int             _i;
-    long            _l;
-    long long       _ll;
-    double          _d;
-    long double     _ld;
-    void*           _pv;
-} collect_c_dlist_node_data_t;
-
 struct collect_c_dlist_node_t;
 #ifndef __cplusplus
-typedef struct collect_c_dlist_node_t   collect_c_dlist_node_t;
+typedef struct collect_c_dlist_node_t                       collect_c_dlist_node_t;
 #endif
-
 struct collect_c_dlist_node_t
 {
-    collect_c_dlist_node_t*     prev;
-    collect_c_dlist_node_t*     next;
-    collect_c_dlist_node_data_t data[1];
+    collect_c_dlist_node_t*         prev;
+    collect_c_dlist_node_t*         next;
+    collect_c_common_node_data_t    data[1];
 };
 
 
 struct collect_c_dlist_block_t;
 #ifndef __cplusplus
-typedef struct collect_c_dlist_block_t  collect_c_dlist_block_t;
+typedef struct collect_c_dlist_block_t                      collect_c_dlist_block_t;
 #endif
 struct collect_c_dlist_block_t
 {
@@ -102,14 +94,15 @@ struct collect_c_dlist_block_t
  * each element upon its erasure or replacement by any of the API functions.
  */
 typedef void (*collect_c_dlist_pfn_free)(
-    size_t  el_size
-,   size_t  el_index    /* always 0 */
-,   void*   el_ptr
-,   void*   param_element_free
+    size_t      el_size
+,   intptr_t    el_index    /* always -1 */
+,   void*       el_ptr
+,   void*       param_element_free
 );
 
 struct collect_c_dlist_t
 {
+    collect_c_mem_api_t         mem_api;
     size_t                      el_size;            /*! The element size. */
     size_t                      num_spares;         /*! */
     size_t                      size;               /*! */
@@ -123,7 +116,7 @@ struct collect_c_dlist_t
     collect_c_dlist_pfn_free    pfn_element_free;   /*! Custom function to be invoked when element erased/replaced. */
 };
 #ifndef __cplusplus
-typedef struct collect_c_dlist_t        collect_c_dlist_t;
+typedef struct collect_c_dlist_t                            collect_c_dlist_t;
 #endif
 
 /** Callback function that performs comparison between elements for the
@@ -152,12 +145,21 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
  * API functions & macros (internal)
  */
 
-#define COLLECT_C_DLIST_get_l_ptr_(l)                       _Generic((l),   \
+#ifdef __cplusplus
+
+inline collect_c_dlist_t      * COLLECT_C_DLIST_get_l_ptr_(collect_c_dlist_t      & l) { return &l; }
+inline collect_c_dlist_t const* COLLECT_C_DLIST_get_l_ptr_(collect_c_dlist_t const& l) { return &l; }
+inline collect_c_dlist_t      * COLLECT_C_DLIST_get_l_ptr_(collect_c_dlist_t      * p) { return  p; }
+inline collect_c_dlist_t const* COLLECT_C_DLIST_get_l_ptr_(collect_c_dlist_t const* p) { return  p; }
+#else
+
+# define COLLECT_C_DLIST_get_l_ptr_(l)                       _Generic((l),  \
                                                                             \
                              collect_c_dlist_t* :  (l),                     \
                        collect_c_dlist_t const* :  (l),                     \
                                         default : &(l)                      \
 )
+#endif
 
 #define COLLECT_C_DLIST_assert_el_size_(l_name, t_el)       assert(sizeof(t_el) == COLLECT_C_DLIST_get_l_ptr_(l_name)->el_size)
 #define COLLECT_C_DLIST_assert_ix_(l_name, ix)              assert((ix) < COLLECT_C_DLIST_get_l_ptr_(l_name)->size)
@@ -197,6 +199,8 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
     collect_c_dlist_t l_name = COLLECT_C_DLIST_EMPTY_INITIALIZER_(l_el_type, 0, NULL, NULL, 0)
 
 
+#define COLLECT_C_DLIST_free_storage(l_name)                clc_dlist_free_storage(COLLECT_C_DLIST_get_l_ptr_(l_name))
+
 /* modifiers */
 
 #define COLLECT_C_DLIST_clear(...)                          COLLECT_C_UTIL_GET_MACRO_1_or_2_(__VA_ARGS__, COLLECT_C_DLIST_clear_2_, COLLECT_C_DLIST_clear_1_, NULL)(__VA_ARGS__)
@@ -207,10 +211,38 @@ typedef int (*collect_c_dlist_pfn_compare_t)(
 
 #define COLLECT_C_DLIST_insert_before(...)                  COLLECT_C_UTIL_GET_MACRO_3_or_4_(__VA_ARGS__, COLLECT_C_DLIST_insert_before_4_, COLLECT_C_DLIST_insert_before_3_, NULL)(__VA_ARGS__)
 
-#define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)    \
+#define COLLECT_DLIST_push_back_by_ref(l_name, t_el, new_el)    \
+                                                            (COLLECT_C_DLIST_assert_el_size_(l_name, t_el),  collect_c_dlist_push_back_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), (new_el)))
+#define COLLECT_DLIST_push_front_by_ref(l_name, t_el, new_el)   \
+                                                            (COLLECT_C_DLIST_assert_el_size_(l_name, t_el),  collect_c_dlist_push_front_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), (new_el)))
+
+
+#ifdef __cplusplus
+
+template <typename T_element>
+inline
+int
+collect_c_dlist_push_by_ref(
+    collect_c_dlist_t*  l
+,   T_element const&    el
+,   int               (*pfn)(collect_c_dlist_t*, void const*)
+)
+{
+    return (*pfn)(l, &el);
+}
+
+# define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)   \
+                                                            collect_c_dlist_push_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), (new_el), collect_c_dlist_push_back_by_ref)
+# define COLLECT_DLIST_push_front_by_val(l_name, t_el, new_el)  \
+                                                            collect_c_dlist_push_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), (new_el), collect_c_dlist_push_front_by_ref)
+#else
+
+# define COLLECT_DLIST_push_back_by_val(l_name, t_el, new_el)   \
                                                             (COLLECT_C_DLIST_assert_el_size_(l_name, t_el),  collect_c_dlist_push_back_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), &((t_el){(new_el)})))
-#define COLLECT_DLIST_push_front_by_val(l_name, t_el, new_el)   \
+# define COLLECT_DLIST_push_front_by_val(l_name, t_el, new_el)  \
                                                             (COLLECT_C_DLIST_assert_el_size_(l_name, t_el), collect_c_dlist_push_front_by_ref(COLLECT_C_DLIST_get_l_ptr_(l_name), &((t_el){(new_el)})))
+#endif
+
 
 /* attributes */
 
@@ -443,6 +475,13 @@ collect_c_dlist_push_front_by_ref(
 #define COLLECT_C_DLIST_EMPTY_INITIALIZER_(l_el_type, l_flags, l_storage, elf_fn, elf_param) \
                                                                             \
     {                                                                       \
+        .mem_api =                                                          \
+        {                                                                   \
+            .pfn_alloc = collect_c_mem_std_alloc,                           \
+            .pfn_realloc = collect_c_mem_std_realloc,                       \
+            .pfn_free = collect_c_mem_std_free,                             \
+            .param = NULL,                                                  \
+        },                                                                  \
         .el_size = sizeof(l_el_type),                                       \
         .num_spares = 0,                                                    \
         .size = 0,                                                          \
@@ -451,6 +490,7 @@ collect_c_dlist_push_front_by_ref(
         .head = NULL,                                                       \
         .tail = NULL,                                                       \
         .spares = NULL,                                                     \
+        .blocks = NULL,                                                     \
         .param_element_free = (elf_param),                                  \
         .pfn_element_free = (elf_fn),                                       \
     }
