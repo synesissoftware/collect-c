@@ -30,8 +30,8 @@
  * version
  */
 
-#define COLLECT_C_VER_MAJOR         1
-#define COLLECT_C_VER_MINOR         0
+#define COLLECT_C_VER_MAJOR         0
+#define COLLECT_C_VER_MINOR         1
 #define COLLECT_C_VER_PATCH         1
 #define COLLECT_C_VER_ALPHABETA     0x81
 
