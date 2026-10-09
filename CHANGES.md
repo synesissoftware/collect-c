@@ -3,6 +3,10 @@
 
 ## Unreleased
 
+* Brought CMake helper scripts to Phase 4b gold: replaced the **make**-driven **prepare_cmake.sh** / **build_cmake.sh** / **clean_cmake.sh** / **run_all_*.sh** with the **SisClr** **cmake --build** set (MinGW only via `--mingw`; colour via `SIS_CMAKE_ALWAYS_USE_COLOURS`), preserving `--no-shwild` and `--stlsoft-root-dir` / `-s`;
+* Added **ctest_cmake.sh**, **run_all_automated_tests.sh**, **run_all_component_tests.sh**, **run_all_performance_tests.sh**, and the native `cmd.exe` **run_all_{automated,component,examples,performance,scratch,unit}_tests.cmd** runners (no Bash wrappers);
+* **run_all_unit_tests.sh** is now unit-only (aggregate behaviour is **run_all_automated_tests.sh**), and **run_all_scratch_tests.sh** no longer runs performance programs (see **run_all_performance_tests.sh**);
+* Renamed the scratch reporter target / argv0 to `test.scratch.versions` (Phase 4c);
 * Applied **misc-dev-scripts** **0.6.0** editor/Git/`.sis` drop-in templates on **boilerplate**;
 * Restored historical **.gitignore** patterns as a sorted union with **misc-dev-scripts** gold section layout;
 

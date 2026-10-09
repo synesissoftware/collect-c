@@ -4,7 +4,7 @@
  * Purpose: Prints collect-c composite version.
  *
  * Created: 17th September 2026
- * Updated: 17th September 2026
+ * Updated: 9th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 
-#define PROGRAM_NAME                                        "versions"
+#define PROGRAM_NAME                                        "test.scratch.versions"
 
 
 static void
