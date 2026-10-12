@@ -83,6 +83,8 @@ push/pop and storage management APIs.
 
 * **collect-c/common/mem_api.h** — pluggable alloc/realloc/free used by all
   heap-backed containers (defaults to the C standard library);
+* **collect-c/hash.h** — stock 64-bit hashing functions (**djb2**,
+  **FNV-1a**, **SDBM**) over byte sequences / C-strings;
 * **collect-c/util/limits.h** — type-detecting min/max macros used internally
   (e.g. circular-queue index wrap safety);
 
