@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 17th February 2025
+ * Updated: 12th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 /* NOTE: C++ functionality is provided opt-in and at the users' own risk for
- * the purpose of faciliting functional/performance testing with C++
+ * the purpose of facilitating functional/performance testing with C++
  */
 
 # ifndef COLLECT_C_DLIST_SUPPRESS_CXX_WARNING
