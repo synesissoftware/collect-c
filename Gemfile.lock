@@ -6,15 +6,16 @@ GEM
       clasp-ruby (~> 0.23, >= 0.23.0.2)
       xqsr3 (~> 0.39)
     recls-ruby (2.13.1)
-    xqsr3 (0.39.3)
+    xqsr3 (0.39.11)
 
 PLATFORMS
+  arm64-darwin-24
   x86_64-darwin-20
 
 DEPENDENCIES
   libclimate-ruby
   recls-ruby
-  xqsr3
+  xqsr3 (>= 0.39.9, < 1.0)
 
 BUNDLED WITH
    2.3.17
