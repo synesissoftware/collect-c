@@ -4,7 +4,7 @@
  * Purpose: Common elements for collect-c library.
  *
  * Created: 4th February 2025
- * Updated: 10th September 2026
+ * Updated: 12th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -32,8 +32,8 @@
 
 #define COLLECT_C_VER_MAJOR         0
 #define COLLECT_C_VER_MINOR         1
-#define COLLECT_C_VER_PATCH         0
-#define COLLECT_C_VER_ALPHABETA     44
+#define COLLECT_C_VER_PATCH         1
+#define COLLECT_C_VER_ALPHABETA     0x82
 
 #define COLLECT_C_VER \
     (0\
