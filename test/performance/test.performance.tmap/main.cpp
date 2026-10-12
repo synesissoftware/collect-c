@@ -4,7 +4,7 @@
  * Purpose: Performance-test for tree-map.
  *
  * Created: 19th March 2025
- * Updated: 10th September 2026
+ * Updated: 12th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -276,7 +276,7 @@ int main(int argc, char* /*argv*/[])
 {
     std::uint64_t anchor_value = 0;
 
-    ((void)element_walk_function_stub);
+    ((void)&element_walk_function_stub);
 
     display_results_title();
 
