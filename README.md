@@ -17,6 +17,7 @@ Special and custom Collections and Containers, for C
 - [Components](#components)
   - [Circular Queue](#circular-queue)
   - [Doubly-linked List](#doubly-linked-list)
+  - [Hash-table](#hash-table)
   - [Tree-map](#tree-map)
   - [Vector](#vector)
   - [Common facilities](#common-facilities)
@@ -60,6 +61,16 @@ Header: **collect-c/dlist.h** (terse macros in **collect-c/terse/dlist.h**).
 
 Intrusive-style doubly-linked list (`collect_c_dlist_t`) with front/back
 operations, insert/erase/find, spare-node reuse, and walk/clear helpers.
+
+
+### Hash-table
+
+Header: **collect-c/htab.h** (terse macros in **collect-c/terse/htab.h**).
+
+Hash-table (`collect_c_htab_t`) of key/value pairs with separate chaining,
+pluggable hash/compare/`pfn_free`, custom **mem_api**, and automatic bucket
+growth. Pair with stock digests in **collect-c/hash.h** and key compares in
+**collect-c/compare.h**.
 
 
 ### Tree-map

@@ -14,6 +14,10 @@
  */
 
 #ifdef __cplusplus
+/* NOTE: C++ functionality is provided opt-in and at the users' own risk for
+ * the purpose of faciliting functional/performance testing with C++
+ */
+
 # ifndef COLLECT_C_TMAP_SUPPRESS_CXX_WARNING
 #  error This file not currently compatible with C++ compilation
 # endif

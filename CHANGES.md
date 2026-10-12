@@ -1,6 +1,14 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## 0.2.0-alpha1 - 14th October 2026
+
+* Added hash-table container (**htab** / **collect-c/htab.h**, terse API in **collect-c/terse/htab.h**) with separate chaining, pluggable hash/compare/`pfn_free`, custom **mem_api**, load-factor growth, insert/replace reporting, and aligned key/value node storage;
+* Added stock digests (**collect-c/hash.h**: **djb2**, **FNV-1a**, **SDBM** `*_mbuf` forms) and stock key compares (**collect-c/compare.h**: bytes / `mbuf` / `mbuf_case`, ASCII-only case fold);
+* Unit tests: **test.unit.htab**, **test.unit.hash_fns**, **test.unit.compare_fns**; **test.unit.version** covers **htab**;
+* **test.scratch.versions** prints library and component version strings via **Diagnosticism** `diagnosticism_calc_version_string()`;
+
+
 ## 0.1.1-beta1 - 10th October 2026
 
 * Brought CMake helper scripts to Phase 4b gold: replaced the **make**-driven **prepare_cmake.sh** / **build_cmake.sh** / **clean_cmake.sh** / **run_all_*.sh** with the **SisClr** **cmake --build** set (MinGW only via `--mingw`; colour via `SIS_CMAKE_ALWAYS_USE_COLOURS`), preserving `--no-shwild` and `--stlsoft-root-dir` / `-s`;
