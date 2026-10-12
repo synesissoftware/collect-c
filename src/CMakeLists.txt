@@ -41,6 +41,7 @@ endif()
 
 set(CORE_SRCS
 	circq.c
+	compare_fns.c
 	dlist.c
 	hash_fns.c
 	mem_api.c

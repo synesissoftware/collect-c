@@ -37,7 +37,7 @@
  */
 
 collect_c_hash_t
-collect_c_hash_djb2(
+collect_c_hash_djb2_mbuf(
     void const* key
 ,   size_t      key_len
 ,   void*       param
@@ -63,7 +63,7 @@ collect_c_hash_djb2(
 }
 
 collect_c_hash_t
-collect_c_hash_fnv1a(
+collect_c_hash_fnv1a_mbuf(
     void const* key
 ,   size_t      key_len
 ,   void*       param
@@ -90,7 +90,7 @@ collect_c_hash_fnv1a(
 }
 
 collect_c_hash_t
-collect_c_hash_sdbm(
+collect_c_hash_sdbm_mbuf(
     void const* key
 ,   size_t      key_len
 ,   void*       param
