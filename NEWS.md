@@ -3,6 +3,7 @@
 
 | Date                 | News Item                                                                                                   | Details                                      |
 | -------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| 14th October 2026    | Release of [collect-c 0.2.0-alpha1](https://github.com/synesissoftware/collect-c/releases/tag/0.2.0-alpha1) | **htab**; stock **hash** / **compare**; Diagnosticism version strings |
 | 10th October 2026    | Release of [collect-c 0.1.1-beta1](https://github.com/synesissoftware/collect-c/releases/tag/0.1.1-beta1)   | CMake helpers and `test.scratch.versions`    |
 | 10th September 2026  | Release of [collect-c 0.1.0-alpha3](https://github.com/synesissoftware/collect-c/releases/tag/0.1.0-alpha3) | Tree-map, custom mem_api, circq wrap fix     |
 | 10th September 2026  | Release of [collect-c 0.1.0-alpha2](https://github.com/synesissoftware/collect-c/releases/tag/0.1.0-alpha2) | Modular CI and markdown set                  |

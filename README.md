@@ -17,6 +17,7 @@ Special and custom Collections and Containers, for C
 - [Components](#components)
   - [Circular Queue](#circular-queue)
   - [Doubly-linked List](#doubly-linked-list)
+  - [Hash-table](#hash-table)
   - [Tree-map](#tree-map)
   - [Vector](#vector)
   - [Common facilities](#common-facilities)
@@ -62,6 +63,16 @@ Intrusive-style doubly-linked list (`collect_c_dlist_t`) with front/back
 operations, insert/erase/find, spare-node reuse, and walk/clear helpers.
 
 
+### Hash-table
+
+Header: **collect-c/htab.h** (terse macros in **collect-c/terse/htab.h**).
+
+Hash-table (`collect_c_htab_t`) of key/value pairs with separate chaining,
+pluggable hash/compare/`pfn_free`, custom **mem_api**, and automatic bucket
+growth. Pair with stock digests in **collect-c/hash.h** and key compares in
+**collect-c/compare.h**.
+
+
 ### Tree-map
 
 Header: **collect-c/tmap.h** (terse macros in **collect-c/terse/tmap.h**).
@@ -83,6 +94,10 @@ push/pop and storage management APIs.
 
 * **collect-c/common/mem_api.h** — pluggable alloc/realloc/free used by all
   heap-backed containers (defaults to the C standard library);
+* **collect-c/compare.h** — stock key-equality helpers for hashtables
+  (**bytes**, counted multibyte **_mbuf**, **_mbuf_case** ASCII fold);
+* **collect-c/hash.h** — stock 64-bit hashing of counted multibyte buffers
+  (**djb2_mbuf**, **fnv1a_mbuf**, **sdbm_mbuf**);
 * **collect-c/util/limits.h** — type-detecting min/max macros used internally
   (e.g. circular-queue index wrap safety);
 
