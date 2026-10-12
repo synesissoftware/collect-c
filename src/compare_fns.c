@@ -16,8 +16,30 @@
 #include <collect-c/compare.h>
 
 #include <assert.h>
-#include <ctype.h>
+#include <stdint.h>
 #include <string.h>
+
+
+/* /////////////////////////////////////////////////////////////////////////
+ * helpers
+ */
+
+/* ASCII A-Z becomes a-z by adding 0x20. Every other octet is unchanged,
+ * including values above 0x7F (locale-independent; not Unicode case-fold).
+ */
+static
+uint8_t
+collect_c_compare_ascii_fold_octet_(
+    uint8_t octet
+)
+{
+    if (octet >= (uint8_t)'A' && octet <= (uint8_t)'Z')
+    {
+        octet = (uint8_t)(octet + 0x20u);
+    }
+
+    return octet;
+}
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -128,8 +150,8 @@ collect_c_compare_mbuf_case(
 
     for (i = 0; i != n; ++i)
     {
-        int const   c1  =   tolower(p1[i]);
-        int const   c2  =   tolower(p2[i]);
+        uint8_t const   c1  =   collect_c_compare_ascii_fold_octet_(p1[i]);
+        uint8_t const   c2  =   collect_c_compare_ascii_fold_octet_(p2[i]);
 
         if (c1 != c2)
         {

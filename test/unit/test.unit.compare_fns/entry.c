@@ -290,6 +290,14 @@ static void TEST_collect_c_compare_mbuf_case_UNEQUAL(void)
 
         TEST_INT_NE(0, collect_c_compare_mbuf_case(a, 3, b, 3, NULL));
     }
+
+    {
+        /* High octets are not folded (ASCII A-Z only; not locale/Unicode). */
+        uint8_t const a[] = { 0xc0 };
+        uint8_t const b[] = { 0xe0 };
+
+        TEST_INT_NE(0, collect_c_compare_mbuf_case(a, 1, b, 1, NULL));
+    }
 }
 
 static void TEST_collect_c_compare_mbuf_case_LENGTH_MISMATCH(void)
