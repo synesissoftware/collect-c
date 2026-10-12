@@ -94,8 +94,9 @@ collect_c_compare_mbuf(
  *
  * @return Negative, zero, or positive (magnitude not significant).
  *
- * @note Compares the common prefix after ASCII @c tolower (@c _case); if
- *  that is equal, the shorter buffer is less (prefix rule).
+ * @note Compares the common prefix after an ASCII-only fold of @c A-Z to
+ *  @c a-z (@c _case; locale-independent). If that is equal, the shorter
+ *  buffer is less (prefix rule).
  *
  * @pre @c 0 == k1_len || NULL != k1
  * @pre @c 0 == k2_len || NULL != k2
