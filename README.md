@@ -15,6 +15,7 @@ Special and custom Collections and Containers, for C
 - [Introduction](#introduction)
 - [Developer Experience](#developer-experience)
 - [Installation](#installation)
+  - [API documentation (Doxygen)](#api-documentation-doxygen)
 - [Components](#components)
   - [Circular Queue](#circular-queue)
   - [Doubly-linked List](#doubly-linked-list)
@@ -72,6 +73,19 @@ Try **test/scratch/versions** (`test.scratch.versions`) or a unit suite under
 
 Detailed instructions — via **CMake**, or by bundling sources — are provided
 in the accompanying [INSTALL.md](./INSTALL.md) file.
+
+
+### API documentation (Doxygen)
+
+HTML API reference for the public headers may be generated locally:
+
+```bash
+./generate_doxygen.sh
+```
+
+Open `_build/doxygen/html/index.html` in a browser (or
+`<build-dir>/doxygen/html/index.html` when `SIS_CMAKE_BUILD_DIR` is set).
+Requires [Doxygen](https://www.doxygen.nl/) on `PATH`.
 
 
 ## Components

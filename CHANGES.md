@@ -7,7 +7,8 @@
 * Tip-synced **run_all_examples** / **run_all_scratch_tests** / **run_all_unit_tests** helpers from **misc-dev-scripts** cmake-helpers (CMakeFiles / `*.d` / `*.o` / `*.obj` exclusions; scratch `--skip-interactive`);
 * Added empty **.sis** ATF / skip-interactive list stubs;
 * Restructured **ci-cell.yml** to build → artifact → run jobs with non-Windows execute-bit restore and Windows native **.cmd** dogfood;
-* Added **README.md** **Developer Experience** section;
+* Added Doxygen support (**Doxyfile**, **generate_doxygen.sh**, **doc/mainpage.md**) modelled on **xTests** / compact **CLASP**/**cstring** form;
+* Added **README.md** **Developer Experience** and Doxygen sections;
 
 
 ## 0.1.1-beta1 - 10th October 2026
