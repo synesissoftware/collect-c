@@ -1,6 +1,16 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## 0.1.1 - 16th October 2026
+
+* Migrated `COLLECT_C_VER_*` and component composite VERs (**circq**, **dlist**, **tmap**, **vec**) from `*_VER_ALPHABETA` to `*_VER_RELSTATUS` (`0xFF`), with documentation-skip aliases for the prior names;
+* Tip-synced **run_all_examples** / **run_all_scratch_tests** / **run_all_unit_tests** helpers from **misc-dev-scripts** cmake-helpers (CMakeFiles / `*.d` / `*.o` / `*.obj` exclusions; scratch `--skip-interactive`);
+* Added empty **.sis** ATF / skip-interactive list stubs;
+* Restructured **ci-cell.yml** to build → artifact → run jobs with non-Windows execute-bit restore and Windows native **.cmd** dogfood;
+* Added Doxygen support (**Doxyfile**, **generate_doxygen.sh**, **doc/mainpage.md**) modelled on **xTests** / compact **CLASP**/**cstring** form;
+* Added **README.md** **Developer Experience** and Doxygen sections;
+
+
 ## 0.1.1-beta1 - 10th October 2026
 
 * Brought CMake helper scripts to Phase 4b gold: replaced the **make**-driven **prepare_cmake.sh** / **build_cmake.sh** / **clean_cmake.sh** / **run_all_*.sh** with the **SisClr** **cmake --build** set (MinGW only via `--mingw`; colour via `SIS_CMAKE_ALWAYS_USE_COLOURS`), preserving `--no-shwild` and `--stlsoft-root-dir` / `-s`;
