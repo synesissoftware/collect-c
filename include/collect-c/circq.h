@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 23rd March 2025
+ * Updated: 16th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -27,15 +27,19 @@
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
 #define COLLECT_C_CIRCQ_VER_MINOR       3
 #define COLLECT_C_CIRCQ_VER_PATCH       0
-#define COLLECT_C_CIRCQ_VER_ALPHABETA   42
+#define COLLECT_C_CIRCQ_VER_RELSTATUS   42
 
 #define COLLECT_C_CIRCQ_VER \
     (0\
         |   (   COLLECT_C_CIRCQ_VER_MAJOR       << 24   ) \
         |   (   COLLECT_C_CIRCQ_VER_MINOR       << 16   ) \
         |   (   COLLECT_C_CIRCQ_VER_PATCH       <<  8   ) \
-        |   (   COLLECT_C_CIRCQ_VER_ALPHABETA   <<  0   ) \
+        |   (   COLLECT_C_CIRCQ_VER_RELSTATUS   <<  0   ) \
     )
+
+#ifndef COLLECT_C_DOCUMENTATION_SKIP_SECTION
+# define COLLECT_C_CIRCQ_VER_ALPHABETA              COLLECT_C_CIRCQ_VER_RELSTATUS
+#endif /* !COLLECT_C_DOCUMENTATION_SKIP_SECTION */
 
 
 /* /////////////////////////////////////////////////////////////////////////

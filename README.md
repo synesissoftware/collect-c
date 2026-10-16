@@ -13,6 +13,7 @@ Special and custom Collections and Containers, for C
 ## Table of Contents <!-- omit in toc -->
 
 - [Introduction](#introduction)
+- [Developer Experience](#developer-experience)
 - [Installation](#installation)
 - [Components](#components)
   - [Circular Queue](#circular-queue)
@@ -25,6 +26,7 @@ Special and custom Collections and Containers, for C
   - [Where to get help](#where-to-get-help)
   - [Contribution guidelines](#contribution-guidelines)
   - [Dependencies](#dependencies)
+    - [Tests-only Dependencies](#tests-only-dependencies)
   - [Related projects](#related-projects)
   - [License](#license)
 
@@ -35,6 +37,35 @@ Special and custom Collections and Containers, for C
 standard C (C99 and later). The library ships as a small, standalone C API
 with no non-standard dependencies for application use. Unit tests are built
 with **xTests** and related Synesis packages.
+
+
+## Developer Experience
+
+The **C** core needs _no non-standard dependencies_ for application use,
+so just:
+
+```bash
+./prepare_cmake.sh -m -v -E -T
+./run_all_unit_tests.sh
+```
+
+For a full tree (examples and tests), install via CMake:
+* [**STLSoft**](https://github.com/synesissoftware/STLSoft);
+* [**cstring**](https://github.com/synesissoftware/cstring);
+* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism);
+* [**shwild**](https://github.com/synesissoftware/shwild);
+* [**xTests**](https://github.com/synesissoftware/xTests);
+
+then:
+
+```bash
+./prepare_cmake.sh -m -v
+./run_all_automated_tests.sh
+```
+
+Try **test/scratch/versions** (`test.scratch.versions`) or a unit suite under
+**test/unit/**. Full options: [INSTALL.md](./INSTALL.md);
+`./prepare_cmake.sh --help`.
 
 
 ## Installation
