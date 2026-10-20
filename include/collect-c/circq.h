@@ -31,15 +31,19 @@
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
 #define COLLECT_C_CIRCQ_VER_MINOR       3
 #define COLLECT_C_CIRCQ_VER_PATCH       0
-#define COLLECT_C_CIRCQ_VER_ALPHABETA   43
+#define COLLECT_C_CIRCQ_VER_RELSTATUS  43
 
 #define COLLECT_C_CIRCQ_VER \
     (0\
         |   (   COLLECT_C_CIRCQ_VER_MAJOR       << 24   ) \
         |   (   COLLECT_C_CIRCQ_VER_MINOR       << 16   ) \
         |   (   COLLECT_C_CIRCQ_VER_PATCH       <<  8   ) \
-        |   (   COLLECT_C_CIRCQ_VER_ALPHABETA   <<  0   ) \
+        |   (   COLLECT_C_CIRCQ_VER_RELSTATUS   <<  0   ) \
     )
+
+#ifndef COLLECT_C_DOCUMENTATION_SKIP_SECTION
+# define COLLECT_C_CIRCQ_VER_ALPHABETA              COLLECT_C_CIRCQ_VER_RELSTATUS
+#endif /* !COLLECT_C_DOCUMENTATION_SKIP_SECTION */
 
 
 /* /////////////////////////////////////////////////////////////////////////
