@@ -1,6 +1,9 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## 0.2.0-alpha1 - 20th October 2026
+
+
 ## 0.1.1-beta1 - 10th October 2026
 
 * Brought CMake helper scripts to Phase 4b gold: replaced the **make**-driven **prepare_cmake.sh** / **build_cmake.sh** / **clean_cmake.sh** / **run_all_*.sh** with the **SisClr** **cmake --build** set (MinGW only via `--mingw`; colour via `SIS_CMAKE_ALWAYS_USE_COLOURS`), preserving `--no-shwild` and `--stlsoft-root-dir` / `-s`;
