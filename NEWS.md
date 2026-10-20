@@ -1,10 +1,11 @@
 # collect-c - News <!-- omit in toc -->
 
 
-| Date                 | News Item                                                                                                   | Details |
-| -------------------- | ----------------------------------------------------------------------------------------------------------- | ------- |
+| Date                 | News Item                                                                                     | Details |
+| -------------------- | --------------------------------------------------------------------------------------------- | ------- |
 | 20th October 2026    | Release of [collect-c 0.2.0-alpha1](https://github.com/synesissoftware/collect-c/releases/tag/0.2.0-alpha1) | |
-| 10th October 2026    | Release of [collect-c 0.1.1-beta1](https://github.com/synesissoftware/collect-c/releases/tag/0.1.1-beta1)   | CMake helpers and `test.scratch.versions` |
+| 16th October 2026    | Release of [collect-c 0.1.1](https://github.com/synesissoftware/collect-c/releases/tag/0.1.1) | RelSt; tip helpers; CI xbit / `.cmd`; Doxygen |
+| 10th October 2026    | Release of [collect-c 0.1.1-beta1](https://github.com/synesissoftware/collect-c/releases/tag/0.1.1-beta1) | CMake helpers and `test.scratch.versions` |
 | 10th September 2026  | Release of [collect-c 0.1.0-alpha3](https://github.com/synesissoftware/collect-c/releases/tag/0.1.0-alpha3) | Tree-map, custom mem_api, circq wrap fix |
 | 10th September 2026  | Release of [collect-c 0.1.0-alpha2](https://github.com/synesissoftware/collect-c/releases/tag/0.1.0-alpha2) | Modular CI and markdown set |
 | 11th February 2025   | Release of [collect-c 0.1.0-alpha1](https://github.com/synesissoftware/collect-c/releases/tag/0.1.0-alpha1) | Initial alpha: circq, dlist, and vec |
