@@ -4,7 +4,7 @@
  * Purpose: Prints collect-c version strings via Diagnosticism.
  *
  * Created: 17th September 2026
- * Updated: 14th October 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -150,6 +150,5 @@ int main(int argc, char* argv[])
 
     return EXIT_SUCCESS;
 }
-
 
 /* ///////////////////////////// end of file //////////////////////////// */

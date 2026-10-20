@@ -4,7 +4,7 @@
  * Purpose: Unit-test for stock comparison functions.
  *
  * Created: 19th February 2025
- * Updated: 19th February 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -1312,6 +1312,5 @@ static void TEST_collect_c_fn_cmp_ccs_ignore_case(void)
     }
 }
 
-
- /* ///////////////////////////// end of file //////////////////////////// */
+/* ///////////////////////////// end of file //////////////////////////// */
 

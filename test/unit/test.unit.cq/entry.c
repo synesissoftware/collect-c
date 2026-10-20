@@ -4,7 +4,7 @@
  * Purpose: Unit-test for circular queue.
  *
  * Created: 5th February 2025
- * Updated: 7th June 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -2270,7 +2270,6 @@ static void TEST_HEAP_AND_CALLBACK_INDEXES_2_WITH_CUSTOM_mem_api(void)
         }
     }
 }
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

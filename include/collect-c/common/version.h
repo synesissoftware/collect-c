@@ -4,7 +4,7 @@
  * Purpose: Common elements for collect-c library.
  *
  * Created: 4th February 2025
- * Updated: 14th October 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -30,18 +30,43 @@
  * version
  */
 
+/** \def COLLECT_C_VER_MAJOR
+ * The major version number of collect-c
+ */
+
+/** \def COLLECT_C_VER_MINOR
+ * The minor version number of collect-c
+ */
+
+/** \def COLLECT_C_VER_PATCH
+ * The patch version number of collect-c
+ */
+
+/** \def COLLECT_C_VER_RELSTATUS
+ * The release status of collect-c, in the range 1-0xFE for
+ * prerelease versions, and 0xFF for a released version
+ */
+
+/** \def COLLECT_C_VER
+ * The current composite version number of collect-c
+ */
+
 #define COLLECT_C_VER_MAJOR         0
 #define COLLECT_C_VER_MINOR         2
 #define COLLECT_C_VER_PATCH         0
-#define COLLECT_C_VER_ALPHABETA     0x41
+#define COLLECT_C_VER_RELSTATUS     0x41
 
 #define COLLECT_C_VER \
     (0\
         |   (   COLLECT_C_VER_MAJOR       << 24   ) \
         |   (   COLLECT_C_VER_MINOR       << 16   ) \
         |   (   COLLECT_C_VER_PATCH       <<  8   ) \
-        |   (   COLLECT_C_VER_ALPHABETA   <<  0   ) \
+        |   (   COLLECT_C_VER_RELSTATUS   <<  0   ) \
     )
+
+#ifndef COLLECT_C_DOCUMENTATION_SKIP_SECTION
+# define COLLECT_C_VER_ALPHABETA                    COLLECT_C_VER_RELSTATUS
+#endif /* !COLLECT_C_DOCUMENTATION_SKIP_SECTION */
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -68,6 +93,4 @@ collect_c_api_version(void);
 
 #pragma once
 
-
 /* ///////////////////////////// end of file //////////////////////////// */
-

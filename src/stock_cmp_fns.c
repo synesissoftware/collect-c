@@ -4,7 +4,7 @@
  * Purpose: Stock comparison functions.
  *
  * Created: 19th February 2025
- * Updated: 10th September 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -592,7 +592,6 @@ collect_c_fn_cmp_ccs_ignore_case(
         }
     }
 }
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

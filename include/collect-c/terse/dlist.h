@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container terse api.
  *
  * Created: 7th February 2025
- * Updated: 16th February 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -53,7 +53,6 @@
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

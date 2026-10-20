@@ -4,7 +4,7 @@
  * Purpose: Unit-test for Type-detecting limits functions/macros.
  *
  * Created: 7th June 2025
- * Updated: 10th September 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -334,6 +334,5 @@ static void TEST_FOR_BUILT_IN_INTEGRAL_TYPES(void)
     }
 }
 
-
- /* ///////////////////////////// end of file //////////////////////////// */
+/* ///////////////////////////// end of file //////////////////////////// */
 
