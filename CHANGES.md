@@ -1,6 +1,11 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## 0.2.0-alpha1 - 20th October 2026
+
+* tidying
+
+
 ## 0.1.1 - 16th October 2026
 
 * Migrated `COLLECT_C_VER_*` and component composite VERs (**circq**, **dlist**, **tmap**, **vec**) from `*_VER_ALPHABETA` to `*_VER_RELSTATUS` (`0xFF`), with documentation-skip aliases for the prior names;

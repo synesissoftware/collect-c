@@ -4,7 +4,7 @@
  * Purpose: Common macros.
  *
  * Created: 11th February 2025
- * Updated: 11th February 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -32,7 +32,6 @@
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

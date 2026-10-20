@@ -4,7 +4,7 @@
  * Purpose: Common string helpers.
  *
  * Created: 19th February 2025
- * Updated: 10th September 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -133,7 +133,6 @@ collect_c_stricmp(
     return STLSOFT_API_EXTERNAL_string_stricmp(lhs, rhs);
 }
 #endif
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

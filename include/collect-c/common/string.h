@@ -4,7 +4,7 @@
  * Purpose: Common macros.
  *
  * Created: 19th February 2025
- * Updated: 19th February 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -47,7 +47,6 @@ collect_c_stricmp(
 */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

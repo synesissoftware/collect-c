@@ -4,7 +4,7 @@
  * Purpose: Memory API.
  *
  * Created: 14th February 2025
- * Updated: 15th February 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -81,7 +81,6 @@ collect_c_mem_std_free(
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

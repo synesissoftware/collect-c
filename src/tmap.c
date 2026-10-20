@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 10th September 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -667,8 +667,6 @@ collect_c_tmap_node_walk(
         return 0;
     }
 }
-
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 
