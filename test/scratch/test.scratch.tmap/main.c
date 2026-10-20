@@ -4,7 +4,7 @@
  * Purpose: Scratch-test for tree-map.
  *
  * Created: 19th March 2025
- * Updated: 10th September 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -211,7 +211,6 @@ free_storage:
 
     return 0;
 }
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

@@ -4,7 +4,7 @@
  * Purpose: Unit-test for doubly-linked list.
  *
  * Created: 7th February 2025
- * Updated: 22nd March 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -1200,7 +1200,6 @@ static void TEST_push_back_10000_ELEMENTS_THEN_clear_THEN_CHECK_spare_THEN_ALLOC
         }
     }
 }
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

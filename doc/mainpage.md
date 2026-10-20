@@ -15,6 +15,8 @@ API with no non-standard dependencies for application use.
 | Vector | `<collect-c/vec.h>` | Contiguous growable vector (`collect_c_vec_t`) |
 | Common / version | `<collect-c/common.h>`, `<collect-c/common/version.h>` | Shared types and `COLLECT_C_VER_*` / `collect_c_api_version()` |
 | Memory API | `<collect-c/common/mem_api.h>` | Pluggable alloc/realloc/free |
+| Key comparison | `<collect-c/compare.h>` | Stock key comparison for hashtable keys |
+| Hashing | `<collect-c/hash.h>` | Stock 64-bit hashes of counted multibyte buffers |
 | Limits | `<collect-c/util/limits.h>` | Type-detecting min/max macros |
 
 

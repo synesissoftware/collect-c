@@ -4,7 +4,7 @@
  * Purpose: Unit-test for vector.
  *
  * Created: 5th February 2025
- * Updated: 22nd March 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -1022,7 +1022,6 @@ static void TEST_V_define_empty_THEN_allocate_storage_THEN_push_front_UNTIL_FULL
         }
     }
 }
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

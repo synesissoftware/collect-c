@@ -4,7 +4,7 @@
  * Purpose: Unit-test for version(s).
  *
  * Created: 7th February 2025
- * Updated: 14th February 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -102,7 +102,6 @@ static void TEST_VEC_version(void)
         TEST_INT_EQ(COLLECT_C_VEC_VER, collect_c_vec_version());
     }
 }
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

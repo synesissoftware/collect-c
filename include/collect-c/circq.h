@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 16th October 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -14,6 +14,10 @@
  */
 
 #ifdef __cplusplus
+/* NOTE: C++ functionality is provided opt-in and at the users' own risk for
+ * the purpose of facilitating functional/performance testing with C++
+ */
+
 # ifndef COLLECT_C_CIRCQ_SUPPRESS_CXX_WARNING
 #  error This file not currently compatible with C++ compilation
 # endif
@@ -27,7 +31,7 @@
 #define COLLECT_C_CIRCQ_VER_MAJOR       0
 #define COLLECT_C_CIRCQ_VER_MINOR       3
 #define COLLECT_C_CIRCQ_VER_PATCH       0
-#define COLLECT_C_CIRCQ_VER_RELSTATUS   42
+#define COLLECT_C_CIRCQ_VER_RELSTATUS  43
 
 #define COLLECT_C_CIRCQ_VER \
     (0\
@@ -407,7 +411,6 @@ collect_c_cq_pop_from_front_n(
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

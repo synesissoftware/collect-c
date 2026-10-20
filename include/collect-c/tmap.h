@@ -4,7 +4,7 @@
  * Purpose: Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 16th October 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -14,6 +14,10 @@
  */
 
 #ifdef __cplusplus
+/* NOTE: C++ functionality is provided opt-in and at the users' own risk for
+ * the purpose of facilitating functional/performance testing with C++
+ */
+
 # ifndef COLLECT_C_TMAP_SUPPRESS_CXX_WARNING
 #  error This file not currently compatible with C++ compilation
 # endif
@@ -27,7 +31,7 @@
 #define COLLECT_C_TMAP_VER_MAJOR        0
 #define COLLECT_C_TMAP_VER_MINOR        0
 #define COLLECT_C_TMAP_VER_PATCH        3
-#define COLLECT_C_TMAP_VER_RELSTATUS    1
+#define COLLECT_C_TMAP_VER_RELSTATUS    2
 
 #define COLLECT_C_TMAP_VER \
     (0\
@@ -369,7 +373,6 @@ collect_c_tmap_node_walk(
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

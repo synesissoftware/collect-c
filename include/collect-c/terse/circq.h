@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container terse api.
  *
  * Created: 5th February 2025
- * Updated: 10th February 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -72,7 +72,6 @@
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 
