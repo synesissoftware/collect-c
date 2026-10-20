@@ -44,6 +44,7 @@ set(CORE_SRCS
 	compare_fns.c
 	dlist.c
 	hash_fns.c
+	htab.c
 	mem_api.c
 	stock_cmp_fns.c
 	string_fns.c

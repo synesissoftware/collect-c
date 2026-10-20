@@ -16,6 +16,7 @@
 #include <collect-c/common/version.h>
 #include <collect-c/circq.h>
 #include <collect-c/dlist.h>
+#include <collect-c/htab.h>
 #include <collect-c/tmap.h>
 #include <collect-c/vec.h>
 
@@ -31,6 +32,7 @@
 static void TEST_LIBRARY_version(void);
 static void TEST_CIRCQ_version(void);
 static void TEST_DLIST_version(void);
+static void TEST_HTAB_version(void);
 static void TEST_TMAP_version(void);
 static void TEST_VEC_version(void);
 
@@ -51,6 +53,7 @@ int main(int argc, char* argv[])
         XTESTS_RUN_CASE(TEST_LIBRARY_version);
         XTESTS_RUN_CASE(TEST_CIRCQ_version);
         XTESTS_RUN_CASE(TEST_DLIST_version);
+        XTESTS_RUN_CASE(TEST_HTAB_version);
         XTESTS_RUN_CASE(TEST_TMAP_version);
         XTESTS_RUN_CASE(TEST_VEC_version);
 
@@ -86,6 +89,13 @@ static void TEST_DLIST_version(void)
 {
     {
         TEST_INT_EQ(COLLECT_C_DLIST_VER, collect_c_dlist_version());
+    }
+}
+
+static void TEST_HTAB_version(void)
+{
+    {
+        TEST_INT_EQ(COLLECT_C_HTAB_VER, collect_c_htab_version());
     }
 }
 

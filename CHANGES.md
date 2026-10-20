@@ -1,6 +1,14 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## 0.2.0-alpha2 - 21st October 2026
+
+* Added hash-table container (**htab** / **collect-c/htab.h**, terse API in **collect-c/terse/htab.h**) with separate chaining, pluggable hash/compare/`pfn_free`, custom **mem_api**, load-factor growth, insert/replace reporting, and aligned key/value node storage;
+* **htab** uses the stock digests (**collect-c/hash.h**) and key compares (**collect-c/compare.h**) added in 0.2.0-alpha1;
+* Unit tests: **test.unit.htab**; **test.unit.version** covers **htab**;
+* **test.scratch.versions** prints library and component version strings via **Diagnosticism** `diagnosticism_calc_version_string()`;
+
+
 ## 0.2.0-alpha1 - 20th October 2026
 
 * Added stock key-comparison functions in **collect-c/compare.h** (`collect_c_compare_bytes`, `collect_c_compare_mbuf`, and ASCII-fold `collect_c_compare_mbuf_case`) for hashtable keys, with unit tests in **test.unit.compare_fns**;
