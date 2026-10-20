@@ -3,7 +3,9 @@
 
 ## 0.2.0-alpha1 - 20th October 2026
 
-* tidying
+* Added stock key-comparison functions in **collect-c/compare.h** (`collect_c_compare_bytes`, `collect_c_compare_mbuf`, and ASCII-fold `collect_c_compare_mbuf_case`) for hashtable keys, with unit tests in **test.unit.compare_fns**;
+* Added stock 64-bit hashing of counted multibyte buffers in **collect-c/hash.h** (`collect_c_hash_djb2_mbuf`, `collect_c_hash_fnv1a_mbuf`, `collect_c_hash_sdbm_mbuf`; type `collect_c_hash_t`), with unit tests in **test.unit.hash_fns**;
+* Recorded that C++ use of **circq**, **tmap**, and **vec** is opt-in (as for **dlist**) and corrected the **dlist** note spelling;
 
 
 ## 0.1.1 - 16th October 2026
