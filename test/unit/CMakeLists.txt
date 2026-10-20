@@ -1,6 +1,8 @@
 # SIS:AUTO_GENERATED: Remove this line if you edit the file, otherwise it will be overwritten
 add_subdirectory(test.unit.cq)
+add_subdirectory(test.unit.compare_fns)
 add_subdirectory(test.unit.dlist)
+add_subdirectory(test.unit.hash_fns)
 add_subdirectory(test.unit.stock_cmp_fns)
 add_subdirectory(test.unit.tmap)
 add_subdirectory(test.unit.util.limits)
