@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 /* NOTE: C++ functionality is provided opt-in and at the users' own risk for
- * the purpose of faciliting functional/performance testing with C++
+ * the purpose of facilitating functional/performance testing with C++
  */
 
 # ifndef COLLECT_C_DLIST_SUPPRESS_CXX_WARNING
@@ -31,7 +31,7 @@
 #define COLLECT_C_DLIST_VER_MAJOR       0
 #define COLLECT_C_DLIST_VER_MINOR       2
 #define COLLECT_C_DLIST_VER_PATCH       3
-#define COLLECT_C_DLIST_VER_ALPHABETA   45
+#define COLLECT_C_DLIST_VER_ALPHABETA   46
 
 #define COLLECT_C_DLIST_VER \
     (0\
