@@ -4,7 +4,7 @@
  * Purpose: Tree-map container terse api.
  *
  * Created: 14th February 2025
- * Updated: 19th February 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -38,7 +38,6 @@
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

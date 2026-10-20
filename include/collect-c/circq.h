@@ -4,7 +4,7 @@
  * Purpose: Circular-queue container.
  *
  * Created: 4th February 2025
- * Updated: 23rd March 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -403,7 +403,6 @@ collect_c_cq_pop_from_front_n(
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

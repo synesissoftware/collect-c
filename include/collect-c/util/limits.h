@@ -4,7 +4,7 @@
  * Purpose: Type-detecting limits functions/macros.
  *
  * Created: 7th June 2025
- * Updated: 10th September 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -121,6 +121,5 @@
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */

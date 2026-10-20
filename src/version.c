@@ -4,7 +4,7 @@
  * Purpose: Implements collect-c Version API.
  *
  * Created: 4th February 2025
- * Updated: 4th February 2025
+ * Updated: 20th October 2026
  *
  * Home:    https://github.com/synesissoftware/collect-cxx/
  *
@@ -80,7 +80,6 @@ collect_c_api_version(void)
 {
     return COLLECT_C_VER;
 }
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

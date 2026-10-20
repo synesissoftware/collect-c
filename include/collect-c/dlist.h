@@ -4,7 +4,7 @@
  * Purpose: Doubly-linked list container.
  *
  * Created: 7th February 2025
- * Updated: 17th February 2025
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -501,7 +501,6 @@ collect_c_dlist_push_front_by_ref(
  */
 
 #pragma once
-
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

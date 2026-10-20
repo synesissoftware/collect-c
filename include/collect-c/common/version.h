@@ -69,6 +69,5 @@ collect_c_api_version(void);
 
 #pragma once
 
-
 /* ///////////////////////////// end of file //////////////////////////// */
 

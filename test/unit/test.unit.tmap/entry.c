@@ -4,7 +4,7 @@
  * Purpose: Unit-test for Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 10th September 2026
+ * Updated: 20th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -1426,6 +1426,5 @@ static void TEST_insert_1000_ELEMENTS_WITH_int_TO_int_WITH_CUSTOM_mem_api(void)
     }
 }
 
-
- /* ///////////////////////////// end of file //////////////////////////// */
+/* ///////////////////////////// end of file //////////////////////////// */
 
