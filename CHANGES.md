@@ -1,12 +1,19 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
-## 0.2.0-alpha1 - 14th October 2026
+## 0.2.0-alpha2 - 21st October 2026
 
 * Added hash-table container (**htab** / **collect-c/htab.h**, terse API in **collect-c/terse/htab.h**) with separate chaining, pluggable hash/compare/`pfn_free`, custom **mem_api**, load-factor growth, insert/replace reporting, and aligned key/value node storage;
-* Added stock digests (**collect-c/hash.h**: **djb2**, **FNV-1a**, **SDBM** `*_mbuf` forms) and stock key compares (**collect-c/compare.h**: bytes / `mbuf` / `mbuf_case`, ASCII-only case fold);
-* Unit tests: **test.unit.htab**, **test.unit.hash_fns**, **test.unit.compare_fns**; **test.unit.version** covers **htab**;
+* **htab** uses the stock digests (**collect-c/hash.h**) and key compares (**collect-c/compare.h**) added in 0.2.0-alpha1;
+* Unit tests: **test.unit.htab**; **test.unit.version** covers **htab**;
 * **test.scratch.versions** prints library and component version strings via **Diagnosticism** `diagnosticism_calc_version_string()`;
+
+
+## 0.2.0-alpha1 - 20th October 2026
+
+* Added stock key-comparison functions in **collect-c/compare.h** (`collect_c_compare_bytes`, `collect_c_compare_mbuf`, and ASCII-fold `collect_c_compare_mbuf_case`) for hashtable keys, with unit tests in **test.unit.compare_fns**;
+* Added stock 64-bit hashing of counted multibyte buffers in **collect-c/hash.h** (`collect_c_hash_djb2_mbuf`, `collect_c_hash_fnv1a_mbuf`, `collect_c_hash_sdbm_mbuf`; type `collect_c_hash_t`), with unit tests in **test.unit.hash_fns**;
+* Recorded that C++ use of **circq**, **tmap**, and **vec** is opt-in (as for **dlist**) and corrected the **dlist** note spelling;
 
 
 ## 0.1.1 - 16th October 2026
