@@ -1,6 +1,11 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## 0.2.0-alpha2 - 27th October 2026
+
+* Defined `HAS_<Pkg>` and `HAS_<PKG>` when a Synesis package other than **STLSoft** is detected;
+
+
 ## 0.2.0-alpha1 - 20th October 2026
 
 * Added stock key-comparison functions in **collect-c/compare.h** (`collect_c_compare_bytes`, `collect_c_compare_mbuf`, and ASCII-fold `collect_c_compare_mbuf_case`) for hashtable keys, with unit tests in **test.unit.compare_fns**;
