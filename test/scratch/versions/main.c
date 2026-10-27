@@ -17,6 +17,7 @@
 
 #ifdef HAS_Diagnosticism
 # include <diagnosticism/diagnosticism.h>
+# include <diagnosticism/version_string.h>
 #endif
 
 #ifdef HAS_shwild
@@ -47,6 +48,38 @@ version(
 ,   unsigned    libver
 )
 {
+#ifdef HAS_Diagnosticism
+
+    char        buffer[101];
+    size_t      n;
+    int const   r = diagnosticism_calc_version_string(
+        buffer
+    ,   sizeof(buffer) / sizeof(buffer[0])
+    ,   (int)((libver >> 24) & 0xff)
+    ,   (int)((libver >> 16) & 0xff)
+    ,   (int)((libver >> 8) & 0xff)
+    ,   (int)((libver >> 0) & 0xff)
+    ,   &n
+    );
+
+    if (0 == r)
+    {
+        buffer[n] = '\0';
+
+        fprintf(
+            stm
+        ,   "%s%s: %s (%s = 0x%08x)\n"
+        ,   prefix
+        ,   libname
+        ,   buffer
+        ,   macroname
+        ,   libver
+        );
+
+        return;
+    }
+#endif /* HAS_Diagnosticism */
+
     fprintf(
         stm
     ,   "%s%s: v%u.%u.%u.%u (%s = 0x%08x)\n"
