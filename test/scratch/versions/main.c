@@ -1,15 +1,35 @@
 /* /////////////////////////////////////////////////////////////////////////
  * File:    test/scratch/versions/main.c
  *
- * Purpose: Prints collect-c composite version.
+ * Purpose: Prints collect-c composite version and efferent dependencies.
  *
  * Created: 17th September 2026
- * Updated: 20th October 2026
+ * Updated: 27th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
 
 #include <collect-c/common/version.h>
+
+#ifdef HAS_cstring
+# include <cstring/cstring.h>
+#endif
+
+#ifdef HAS_Diagnosticism
+# include <diagnosticism/diagnosticism.h>
+#endif
+
+#ifdef HAS_shwild
+# include <shwild/shwild.h>
+#endif
+
+#ifdef HAS_STLSoft
+# include <stlsoft/stlsoft.h>
+#endif
+
+#ifdef HAS_xTests
+# include <xtests/xtests.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,6 +64,8 @@ version(
 
 int main(int argc, char* argv[])
 {
+    size_t efferent_counts = 0;
+
     ((void)&argc);
     ((void)&argv);
 
@@ -52,6 +74,61 @@ int main(int argc, char* argv[])
 
         version(stdout, "", "collect-c", "COLLECT_C_VER", libver);
     }
+
+#ifdef HAS_cstring
+
+    (0 == efferent_counts++) && fputs("\nefferent dependencies:\n", stdout);
+
+    {
+        unsigned const libver = (unsigned)CSTRING_VER;
+
+        version(stdout, "\t", "cstring", "CSTRING_VER", libver);
+    }
+#endif
+
+#ifdef HAS_Diagnosticism
+
+    (0 == efferent_counts++) && fputs("\nefferent dependencies:\n", stdout);
+
+    {
+        unsigned const libver = (unsigned)DIAGNOSTICISM_VER;
+
+        version(stdout, "\t", "Diagnosticism", "DIAGNOSTICISM_VER", libver);
+    }
+#endif
+
+#ifdef HAS_shwild
+
+    (0 == efferent_counts++) && fputs("\nefferent dependencies:\n", stdout);
+
+    {
+        unsigned const libver = (unsigned)SHWILD_VER;
+
+        version(stdout, "\t", "shwild", "SHWILD_VER", libver);
+    }
+#endif
+
+#ifdef HAS_STLSoft
+
+    (0 == efferent_counts++) && fputs("\nefferent dependencies:\n", stdout);
+
+    {
+        unsigned const libver = (unsigned)_STLSOFT_VER;
+
+        version(stdout, "\t", "STLSoft", "_STLSOFT_VER", libver);
+    }
+#endif
+
+#ifdef HAS_xTests
+
+    (0 == efferent_counts++) && fputs("\nefferent dependencies:\n", stdout);
+
+    {
+        unsigned const libver = (unsigned)_XTESTS_VER;
+
+        version(stdout, "\t", "xTests", "_XTESTS_VER", libver);
+    }
+#endif
 
     return EXIT_SUCCESS;
 }
