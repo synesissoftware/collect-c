@@ -170,7 +170,7 @@ depends on:
 * [**STLSoft**](https://github.com/synesissoftware/STLSoft/) 1.11+;
 * [**cstring**](https://github.com/synesissoftware/cstring/);
 * [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism/);
-* [**xTests**](https://github.com/synesissoftware/xTests/) 0.26.4+;
+* [**xTests**](https://github.com/synesissoftware/xTests/) 0.28.2+;
 
 and may optionally recognise:
 

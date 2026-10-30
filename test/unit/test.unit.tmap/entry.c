@@ -4,7 +4,7 @@
  * Purpose: Unit-test for Tree-map container.
  *
  * Created: 14th February 2025
- * Updated: 20th October 2026
+ * Updated: 30th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 
     XTESTS_COMMANDLINE_PARSE_HELP_OR_VERBOSITY(argc, argv, &verbosity);
 
-    if (XTESTS_START_RUNNER("test.unit.tmap", verbosity))
+    if (XTESTS_START_RUNNER(__FILE__, verbosity))
     {
         XTESTS_RUN_CASE(TEST_define_empty);
         XTESTS_RUN_CASE(TEST_insert_1_ELEMENT_WITH_int_TO_int);

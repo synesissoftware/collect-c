@@ -1,6 +1,18 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## 0.2.0-alpha3 - 31st October 2026
+
+* testing:
+  * automated-test runners pass `__FILE__` to `XTESTS_START_RUNNER`;
+* build:
+  * **xTests** minimum is **0.28.2**;
+* documentation and boilerplate:
+  * **Doxyfile** `PROJECT_NUMBER` is **0.2.0-alpha3**;
+  * **NEWS.md** records **0.2.0-alpha3**;
+  * documented **xTests** minimum is **0.28.2**;
+
+
 ## 0.2.0-alpha2 - 27th October 2026
 
 * Defined `HAS_<Pkg>` and `HAS_<PKG>` when a Synesis package other than **STLSoft** is detected;
