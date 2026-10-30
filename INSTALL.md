@@ -8,7 +8,7 @@ appropriate headers (for example **collect-c/circq.h**, **collect-c/dlist.h**,
 
 The **C** API has no non-standard dependencies. Building the project's tests
 (and example programs, when present) additionally requires **STLSoft**,
-**cstring**, **Diagnosticism**, and **xTests** **0.26.4**+ (and may
+**cstring**, **Diagnosticism**, and **xTests** **0.28.2**+ (and may
 optionally recognise **shwild**).
 
 

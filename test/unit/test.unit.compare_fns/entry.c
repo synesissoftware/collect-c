@@ -4,7 +4,7 @@
  * Purpose: Unit-test for stock key-comparison functions.
  *
  * Created: 12th October 2026
- * Updated: 12th October 2026
+ * Updated: 30th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
     XTESTS_COMMANDLINE_PARSE_HELP_OR_VERBOSITY(argc, argv, &verbosity);
 
-    if (XTESTS_START_RUNNER("test.unit.compare_fns", verbosity))
+    if (XTESTS_START_RUNNER(__FILE__, verbosity))
     {
         XTESTS_RUN_CASE(TEST_collect_c_compare_bytes_EMPTY);
         XTESTS_RUN_CASE(TEST_collect_c_compare_bytes_EQUAL);
