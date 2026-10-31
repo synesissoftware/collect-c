@@ -3,6 +3,7 @@
 
 | Date                 | News Item                                                                                     | Details |
 | -------------------- | --------------------------------------------------------------------------------------------- | ------- |
+| 1st November 2026    | Release of [collect-c 0.2.0-alpha3](https://github.com/synesissoftware/collect-c/releases/tag/0.2.0-alpha3) | `__FILE__` runners (**xTests** 0.28.2); **Check test names** |
 | 27th October 2026    | Release of [collect-c 0.2.0-alpha2](https://github.com/synesissoftware/collect-c/releases/tag/0.2.0-alpha2) | `HAS_<Pkg>` / `HAS_<PKG>` for detected Synesis packages |
 | 20th October 2026    | Release of [collect-c 0.2.0-alpha1](https://github.com/synesissoftware/collect-c/releases/tag/0.2.0-alpha1) | Key compare and 64-bit `_mbuf` hash |
 | 16th October 2026    | Release of [collect-c 0.1.1](https://github.com/synesissoftware/collect-c/releases/tag/0.1.1) | RelSt; tip helpers; CI xbit / `.cmd`; Doxygen |

@@ -58,7 +58,7 @@ direct C++ compilation. Optional custom allocators are configured via
 Yes. Unit-test programs live under **test/unit/** and are built when
 `BUILD_TESTING` is enabled. Run them with **run_all_unit_tests.sh** (see
 `--unit-only` / `--component-only`). Building tests requires **STLSoft**,
-**cstring**, **Diagnosticism**, and **xTests** **0.26.4**+.
+**cstring**, **Diagnosticism**, and **xTests** **0.28.2**+.
 
 
 ## Q5: "Where are the examples?"

@@ -4,7 +4,7 @@
  * Purpose: Unit-test for vector.
  *
  * Created: 5th February 2025
- * Updated: 20th October 2026
+ * Updated: 30th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
     XTESTS_COMMANDLINE_PARSE_HELP_OR_VERBOSITY(argc, argv, &verbosity);
 
-    if (XTESTS_START_RUNNER("test.unit.vec", verbosity))
+    if (XTESTS_START_RUNNER(__FILE__, verbosity))
     {
         XTESTS_RUN_CASE(TEST_V_define_empty);
         XTESTS_RUN_CASE(TEST_V_define_empty_with_cb);

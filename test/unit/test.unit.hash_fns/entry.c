@@ -4,7 +4,7 @@
  * Purpose: Unit-test for stock hashing functions.
  *
  * Created: 12th October 2026
- * Updated: 12th October 2026
+ * Updated: 30th October 2026
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
     XTESTS_COMMANDLINE_PARSE_HELP_OR_VERBOSITY(argc, argv, &verbosity);
 
-    if (XTESTS_START_RUNNER("test.unit.hash_fns", verbosity))
+    if (XTESTS_START_RUNNER(__FILE__, verbosity))
     {
         XTESTS_RUN_CASE(TEST_collect_c_hash_djb2_mbuf_EMPTY);
         XTESTS_RUN_CASE(TEST_collect_c_hash_djb2_mbuf_KNOWN_VECTORS);
