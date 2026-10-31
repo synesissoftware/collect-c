@@ -1,7 +1,7 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
-## 0.2.0-alpha3 - 31st October 2026
+## 0.2.0-alpha3 - 1st November 2026
 
 * testing:
   * automated-test runners pass `__FILE__` to `XTESTS_START_RUNNER`;
