@@ -1,6 +1,13 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## 0.2.0-alpha4 - 2nd November 2026
+
+* build:
+  * **cstring** minimum is **4.0.19**;
+  * **Diagnosticism** minimum is **0.4.3**;
+  * **STLSoft** minimum is **1.11.5**;
+
 ## 0.2.0-alpha3 - 1st November 2026
 
 * testing:
