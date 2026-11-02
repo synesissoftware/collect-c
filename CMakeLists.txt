@@ -5,7 +5,7 @@
 # Purpose:  Top-level CMake lists file for collect-c
 #
 # Created:  4th February 2025
-# Updated:  30th October 2026
+# Updated:  2nd November 2026
 #
 # ######################################################################## #
 
@@ -150,7 +150,7 @@ if(BUILD_EXAMPLES OR BUILD_TESTING)
 
 	if(NOT DEFINED STLSOFT AND NOT DEFINED ENV{STLSOFT})
 
-		set(STLSoft_REQUIRED_VERSION_ 1.11)
+		set(STLSoft_REQUIRED_VERSION_ 1.11.5)
 
 		find_package(STLSoft ${STLSoft_REQUIRED_VERSION_} REQUIRED)
 
@@ -187,7 +187,7 @@ endif()
 
 if(BUILD_EXAMPLES OR BUILD_TESTING)
 
-	set(cstring_REQUIRED_VERSION_ 0.0)
+	set(cstring_REQUIRED_VERSION_ 4.0.19)
 
 	find_package(cstring ${cstring_REQUIRED_VERSION_} REQUIRED)
 
@@ -205,7 +205,7 @@ endif()
 
 if(BUILD_EXAMPLES OR BUILD_TESTING)
 
-	set(Diagnosticism_REQUIRED_VERSION_ 0.0)
+	set(Diagnosticism_REQUIRED_VERSION_ 0.4.3)
 
 	find_package(Diagnosticism ${Diagnosticism_REQUIRED_VERSION_} REQUIRED)
 

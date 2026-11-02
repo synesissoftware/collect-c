@@ -7,9 +7,9 @@ appropriate headers (for example **collect-c/circq.h**, **collect-c/dlist.h**,
 **CMake** target is `collect-c::core`).
 
 The **C** API has no non-standard dependencies. Building the project's tests
-(and example programs, when present) additionally requires **STLSoft**,
-**cstring**, **Diagnosticism**, and **xTests** **0.28.2**+ (and may
-optionally recognise **shwild**).
+(and example programs, when present) additionally requires **STLSoft**
+**1.11.5**+, **cstring** **4.0.19**+, **Diagnosticism** **0.4.3**+, and
+**xTests** **0.28.2**+ (and may optionally recognise **shwild**).
 
 
 ## Table of Contents <!-- omit in toc -->
@@ -40,8 +40,8 @@ The primary choice for installation is by use of **CMake**.
    $ ./prepare_cmake.sh --disable-examples --disable-testing -v
    ```
 
-   For a full build including tests, install **STLSoft** 1.11+, **cstring**,
-   **Diagnosticism**, and **xTests** via their own **CMake** scripts first,
+   For a full build including tests, install **STLSoft** 1.11.5+, **cstring**
+   **4.0.19**+, **Diagnosticism** **0.4.3**+, and **xTests** via their own **CMake** scripts first,
    then:
 
    ```bash

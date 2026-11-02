@@ -51,11 +51,11 @@ so just:
 ```
 
 For a full tree (examples and tests), install via CMake:
-* [**STLSoft**](https://github.com/synesissoftware/STLSoft);
-* [**cstring**](https://github.com/synesissoftware/cstring);
-* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism);
+* [**STLSoft**](https://github.com/synesissoftware/STLSoft) **1.11.5**+;
+* [**cstring**](https://github.com/synesissoftware/cstring) **4.0.19**+;
+* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism) **0.4.3**+;
 * [**shwild**](https://github.com/synesissoftware/shwild);
-* [**xTests**](https://github.com/synesissoftware/xTests);
+* [**xTests**](https://github.com/synesissoftware/xTests) **0.28.2**+;
 
 then:
 
@@ -167,9 +167,9 @@ The **C** library itself has no non-standard dependencies.
 For unit-testing (and for example programs when present), **collect-c**
 depends on:
 
-* [**STLSoft**](https://github.com/synesissoftware/STLSoft/) 1.11+;
-* [**cstring**](https://github.com/synesissoftware/cstring/);
-* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism/);
+* [**STLSoft**](https://github.com/synesissoftware/STLSoft/) 1.11.5+;
+* [**cstring**](https://github.com/synesissoftware/cstring/) **4.0.19**+;
+* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism/) **0.4.3**+;
 * [**xTests**](https://github.com/synesissoftware/xTests/) 0.28.2+;
 
 and may optionally recognise:
