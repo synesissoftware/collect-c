@@ -65,7 +65,7 @@ jobs:
           # Dependency order (not lexicographic): each package is configured
           # against those already installed under the shared prefix.
           dependencies: >-
-            STLSoft shwild xTests cstring Diagnosticism
+            STLSoft shwild woad xTests cstring Diagnosticism
           toolchain: ${{ inputs.toolchain }}
 
       - name: Configure
