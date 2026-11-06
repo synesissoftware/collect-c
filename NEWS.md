@@ -3,6 +3,7 @@
 
 | Date                 | News Item                                                                                     | Details |
 | -------------------- | --------------------------------------------------------------------------------------------- | ------- |
+| 6th November 2026    | Release of [collect-c 0.2.0-alpha5](https://github.com/synesissoftware/collect-c/releases/tag/0.2.0-alpha5) | CI installs **woad** before **xTests** |
 | 2nd November 2026    | Release of [collect-c 0.2.0-alpha4](https://github.com/synesissoftware/collect-c/releases/tag/0.2.0-alpha4) | **cstring** **4.0.19**; **Diagnosticism** **0.4.3**; **STLSoft** **1.11.5** |
 | 1st November 2026    | Release of [collect-c 0.2.0-alpha3](https://github.com/synesissoftware/collect-c/releases/tag/0.2.0-alpha3) | `__FILE__` runners (**xTests** 0.28.2); **Check test names** |
 | 27th October 2026    | Release of [collect-c 0.2.0-alpha2](https://github.com/synesissoftware/collect-c/releases/tag/0.2.0-alpha2) | `HAS_<Pkg>` / `HAS_<PKG>` for detected Synesis packages |

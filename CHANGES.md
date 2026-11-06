@@ -1,6 +1,14 @@
 # collect-c - Changes <!-- omit in toc -->
 
 
+## 0.2.0-alpha5 - 6th November 2026
+
+* build:
+  * CI installs **woad** before **xTests**, which **xTests** 0.29 requires;
+* documentation and boilerplate:
+  * **Doxyfile** `PROJECT_NUMBER` is **0.2.0-alpha5**;
+
+
 ## 0.2.0-alpha4 - 2nd November 2026
 
 * build:
